@@ -1,0 +1,9 @@
+#EXTM3U tvg-shift=0
+
+# France
+# fr_live
+
+##  France 2
+##  france-2
+#EXTINF:-1 tvg-id="C4.api.telerama.fr" tvg-logo="resource://resource.images.catchuptvandmore/channels/fr/france2.png" group-title="France TNT",France 2
+plugin://script.orange.fr/resources/feed/get_feed_url/?id=4
