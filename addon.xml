@@ -10,21 +10,18 @@
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>
-		<summary lang="en">Popup Hello World</summary>
-		<description lang="en">Example Script to show Hello World</description>
-		<license>GNU General Public License, v2</license>
+		<summary lang="en">Orange TV France</summary>
+		<description lang="en">Orange TV Kodi addon</description>
+		<license>MIT</license>
 		<language></language>
-		<forum>http://forum.kodi.tv/showthread.php?tid=209948</forum>
-		<source>https://github.com/zag2me/script.hello.world</source>
-		<website>Kodi.tv</website>
-		<email>zag@kodi.org</email>
+		<source>https://github.com/BreizhReloaded/script.orange.fr</source>
+		<email>breizhreloaded@outlook.com</email>
 		<assets>
-			<icon>icon.png</icon>
-			<fanart>fanart.jpg</fanart>
+			<icon>resources/icon.png</icon>
+			<fanart>resources/fanart.jpg</fanart>
 			<screenshot>resources/screenshot-01.jpg</screenshot>
 			<screenshot>resources/screenshot-02.jpg</screenshot>
 			<screenshot>resources/screenshot-03.jpg</screenshot>
 		</assets>
-		<news>Updated the addon to use new addon.xml metadata</news>
 	</extension>
 </addon>
