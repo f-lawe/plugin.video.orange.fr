@@ -1,7 +1,7 @@
 from codequick import run
 
 def main():
-    exception = run()
+    run()
 
 if __name__ == "__main__":
     main()
