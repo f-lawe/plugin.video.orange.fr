@@ -1,13 +1,7 @@
-This is a hello world popup tutorial for Kodi.
+# Orange TV France
 
-It is meant to be used as a guide to making your first Kodi Add-on.
+## Description
+Test addon to provide Orange TV to Kodi via PVR. Currently supporting Kodi 18 Leia.
 
-============
-Installation
-============
-
-Launch Kodi >> Add-ons >> Get More >> .. >> Install from zip file
-
-Feel free to ask any questions on the Kodi Forums.
-
-Enjoy!
+## Install
+For the moment, you'll have to clone this repo into your addon folder.
