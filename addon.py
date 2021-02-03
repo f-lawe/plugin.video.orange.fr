@@ -10,12 +10,12 @@ def log(msg, level):
     xbmc.log('{}: {}'.format(ADDON_NAME, msg), level)
 
 def get_channel_info(channel_id):
-    request = urllib2.Request(CHANNEL_INFO_URL.format(channel_id), headers={
+    req = urllib2.Request(CHANNEL_INFO_URL.format(channel_id), headers={
         'User-Agent': USER_AGENT,
         'Host': HOST
     })
 
-    channel_info = urllib2.urlopen(request).read()
+    channel_info = urllib2.urlopen(req).read()
     channel_info = json.loads(channel_info)
 
     stream_info = {
