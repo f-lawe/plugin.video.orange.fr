@@ -68,7 +68,6 @@ def write_m3u():
 def generate_m3u():
     get_channels_info()
     write_m3u()
-    # print(CHANNELS)
 
 def main():
     generate_m3u()
