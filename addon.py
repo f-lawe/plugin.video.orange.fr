@@ -34,9 +34,9 @@ def get_channel_stream_item(channel_id):
     channel_info = get_channel_info(channel_id)
 
     license_server_url = channel_info['laUrl']
-    headers = 'User-Agent={}&Host={}'.format(USER_AGENT, HOST)
+    headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, HOST)
     post_data = 'R{SSM}'
-    response = 'B'
+    response = ''
 
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
     log(license_key, xbmc.LOGNOTICE)
