@@ -1,62 +1,62 @@
 #EXTM3U tvg-shift=0
 
 ##	TF1
-##	TF1
+##	tf1
 #EXTINF:-1 tvg-id="C192.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_tf1/20180417_164011/webTVSquare/logo_150x150.png",TF1
 plugin://script.orange.fr/?channel_id=192
 
 ##	FRANCE 2
-##	FRANCE 2
+##	france 2
 #EXTINF:-1 tvg-id="C4.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_france2/20180417_153001/webTVSquare/logo_150x150.png",FRANCE 2
 plugin://script.orange.fr/?channel_id=4
 
-##	F3
-##	F3
-#EXTINF:-1 tvg-id="C80.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_france3/20180131_171239/webTVSquare/logo_150x150.png",F3
+##	FRANCE 3
+##	france 3
+#EXTINF:-1 tvg-id="C80.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_france3/20180131_171239/webTVSquare/logo_150x150.png",FRANCE 3
 plugin://script.orange.fr/?channel_id=80
 
 ##	CANAL+
-##	CANAL+
+##	canal+
 #EXTINF:-1 tvg-id="C34.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_canalplus/20151026_092415/webTVSquare/logo_150x150.png",CANAL+
 plugin://script.orange.fr/?channel_id=34
 
 ##	FRANCE 5
-##	FRANCE 5
+##	france 5
 #EXTINF:-1 tvg-id="C47.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_france5/20180131_171239/webTVSquare/logo_150x150.png",FRANCE 5
 plugin://script.orange.fr/?channel_id=47
 
 ##	M6
-##	M6
+##	m6
 #EXTINF:-1 tvg-id="C118.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_m6_umts/20151026_092415/webTVSquare/logo_150x150.png",M6
 plugin://script.orange.fr/?channel_id=118
 
 ##	ARTE
-##	ARTE
+##	arte
 #EXTINF:-1 tvg-id="C111.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_arte/20151026_092415/webTVSquare/logo_150x150.png",ARTE
 plugin://script.orange.fr/?channel_id=111
 
 ##	C8
-##	C8
+##	c8
 #EXTINF:-1 tvg-id="C445.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_direct8/20180417_143126/webTVSquare/logo_150x150.png",C8
 plugin://script.orange.fr/?channel_id=445
 
 ##	W9
-##	W9
+##	w9
 #EXTINF:-1 tvg-id="C119.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_w9/20151026_092415/webTVSquare/logo_150x150.png",W9
 plugin://script.orange.fr/?channel_id=119
 
 ##	TMC
-##	TMC
+##	tmc
 #EXTINF:-1 tvg-id="C195.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_tmc/20180417_113022/webTVSquare/logo_150x150.png",TMC
 plugin://script.orange.fr/?channel_id=195
 
 ##	TFX
-##	TFX
+##	tfx
 #EXTINF:-1 tvg-id="C446.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_nt1_umts/20180129_113538/webTVSquare/logo_150x150.png",TFX
 plugin://script.orange.fr/?channel_id=446
 
 ##	NRJ12
-##	NRJ12
+##	nrj12
 #EXTINF:-1 tvg-id="C444.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_nrj12/20151026_092415/webTVSquare/logo_150x150.png",NRJ12
 plugin://script.orange.fr/?channel_id=444
 

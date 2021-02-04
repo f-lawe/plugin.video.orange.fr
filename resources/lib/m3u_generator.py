@@ -1,16 +1,14 @@
 from urllib import request
 from html.parser import HTMLParser
 
-ORANGE_HOME_URL = 'https://chaines-tv.orange.fr/'
-USER_AGENT      = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'  
-HOST            = 'chaines-tv.orange.fr'
+from __init__ import HOST, ORANGE_HOME_URL, USER_AGENT
 
 CHANNEL_DIV_CLASSNAME = 'list-item-wrapper wptv-xsmall-1 wptv-medium-3 wptv-large-4'
 CHANNEL_IMG_CLASSNAME = 'poster-logo bottom-left'
 
-M3U_FILEPATH = './orange-fr.m3u'
-M3U_INFO_LINE = '#EXTINF:-1 tvg-id="C%s.api.telerama.fr" tvg-logo="%s",%s'
-M3U_URL_LINE = 'plugin://script.orange.fr/?channel_id=%s'
+M3U_FILEPATH = '../orange-fr.m3u'
+M3U_INFO_LINE = '#EXTINF:-1 tvg-id="C{}.api.telerama.fr" tvg-logo="{}",{}'
+M3U_URL_LINE = 'plugin://script.orange.fr/?channel_id={}'
 
 CHANNELS = {}
 
@@ -60,9 +58,9 @@ def write_m3u():
 
     for id, channel in CHANNELS.items():
         file.write('##\t' + channel['name'] + '\n')
-        file.write('##\t' + channel['name'] + '\n')
-        file.write(M3U_INFO_LINE % (id, channel['img_url'], channel['name']) + '\n')
-        file.write(M3U_URL_LINE % (id) + '\n')
+        file.write('##\t' + channel['name'].lower() + '\n')
+        file.write(M3U_INFO_LINE.format(id, channel['img_url'], channel['name']) + '\n')
+        file.write(M3U_URL_LINE.format(id) + '\n')
         file.write('\n')
 
 def generate_m3u():
