@@ -4,16 +4,18 @@
         <!-- <import addon="xbmc.python" version="3.0.0"/> -->
         <import addon="xbmc.python" version="2.20.0"/>
 	</requires>
-	<extension point="xbmc.python.script" library="addon.py">
-		<provides>executable</provides>
+	<extension point="xbmc.python.pluginsource" library="addon.py">
+		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>
 		<summary lang="en">Orange TV France</summary>
-		<description lang="en">Orange TV Kodi addon</description>
+		<description lang="en">
+            This addon brings Orange TV to Kodi. It currently provides a m3u file you can load into your PVR.
+        </description>
 		<license>MIT</license>
 		<language></language>
-		<source>https://github.com/BreizhReloaded/script.orange.fr</source>
+		<source>https://github.com/BreizhReloaded/plugin.video.orange.fr</source>
 		<email>breizhreloaded@outlook.com</email>
 		<assets>
 			<icon>resources/icon.png</icon>
