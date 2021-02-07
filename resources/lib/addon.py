@@ -1,53 +1,40 @@
 # -*- coding: utf-8 -*-
-import json, urllib2 as request, urlparse as parse, sys
+import json, urllib2 as request, urlparse as parse
 import xbmc, xbmcgui, xbmcplugin
 import routing
 
-from __init__ import STREAM_INFO_ENDPOINT, USER_AGENT
+from orange import get_channel_stream, USER_AGENT
 from utils import dialog, log
 
-def get_channel_info(channel_id):
-    req = request.Request(STREAM_INFO_ENDPOINT.format(channel_id), headers={
-        'User-Agent': USER_AGENT,
-        'Host': parse.urlparse(STREAM_INFO_ENDPOINT).netloc
-    })
+plugin = routing.Plugin()
 
-    try:
-        res = request.urlopen(req)
-    except request.HTTPError as error:
-        if error.code == 403:
-            dialog('This channel is not part of your current registration.')
-            return False
+def extract_widevine_info(channel_stream):
+    path = channel_stream.get('url')
+    laUrl = None
 
-    channel_info = json.loads(res.read())
-
-    stream_info = {
-        'path': channel_info.get('url'),
-    }
-
-    for system in channel_info.get('protectionData'):
+    for system in channel_stream.get('protectionData'):
         if system.get('keySystem') == 'com.widevine.alpha':
-            stream_info['keySystem'] = system.get('keySystem')
-            stream_info['drmToken'] = system.get('drmToken')
-            stream_info['laUrl'] = system.get('laUrl')
+            laUrl = system.get('laUrl')
 
-    return stream_info
+    return path, laUrl
 
-def get_channel_stream_item(channel_id):
-    channel_info = get_channel_info(channel_id)
+@plugin.route('/channel/<channel_id>')
+def channel(channel_id):
+    stream = get_channel_stream(channel_id)
 
-    if channel_info == False:
+    if stream == False:
+        dialog('This channel is not part of your current registration.')
         return
 
-    license_server_url = channel_info['laUrl']
-    headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, parse.urlparse(channel_info['laUrl']).netloc)
+    path, license_server_url = extract_widevine_info(stream)
+    headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, parse.urlparse(license_server_url).netloc)
     post_data = 'R{SSM}'
     response = ''
 
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
     log(license_key, xbmc.LOGNOTICE)
 
-    listitem = xbmcgui.ListItem(path=channel_info['path'])
+    listitem = xbmcgui.ListItem(path=path)
     listitem.setMimeType('application/xml+dash')
     listitem.setContentLookup(False)
     listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
@@ -55,13 +42,15 @@ def get_channel_stream_item(channel_id):
     listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
     listitem.setProperty('inputstream.adaptive.license_key', license_key)
 
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem=listitem)
+    xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=listitem)
 
-def main():
-    if(len(sys.argv) > 3):
-        args = parse.parse_qs(sys.argv[2][1:])
-        log('Loading channel {}'.format(args['channel_id'][0]), xbmc.LOGNOTICE)
-        get_channel_stream_item(args['channel_id'][0])
+@plugin.route('/iptv/channels')
+def iptv_channels():
+    pass
+
+@plugin.route('/iptv/epg')
+def iptv_epg():
+    pass
 
 if __name__ == '__main__':
-    main()
+    plugin.run()
