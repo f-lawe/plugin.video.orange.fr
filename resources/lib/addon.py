@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json, urllib2 as request, urlparse, sys
-import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+import xbmc, xbmcgui, xbmcplugin
 
 from __init__ import STREAM_INFO_ENDPOINT, HOST, USER_AGENT
-from utils import log
+from utils import dialog, log
 
 def get_channel_info(channel_id):
     req = request.Request(STREAM_INFO_ENDPOINT.format(channel_id), headers={
@@ -11,8 +11,14 @@ def get_channel_info(channel_id):
         'Host': HOST
     })
 
-    channel_info = request.urlopen(req).read()
-    channel_info = json.loads(channel_info)
+    try:
+        res = request.urlopen(req)
+    except request.HTTPError as error:
+        if error.code == 403:
+            dialog('This channel is not part of your current registration.')
+            return False
+
+    channel_info = json.loads(res.read())
 
     stream_info = {
         'path': channel_info.get('url'),
@@ -28,6 +34,9 @@ def get_channel_info(channel_id):
 
 def get_channel_stream_item(channel_id):
     channel_info = get_channel_info(channel_id)
+
+    if channel_info == False:
+        return
 
     license_server_url = channel_info['laUrl']
     headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, HOST)
