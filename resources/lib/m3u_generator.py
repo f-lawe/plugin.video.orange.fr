@@ -13,8 +13,8 @@ def get_channels():
         'Host': parse.urlparse(CHANNELS_ENDPOINT).netloc
     })
 
-    res = request.urlopen(req).read()
-    channels = json.loads(res)
+    res = request.urlopen(req)
+    channels = json.loads(res.read())
     channels.sort(key=lambda x: x.get('zappingNumber'))
 
     return channels

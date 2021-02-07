@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 CHANNELS_ENDPOINT       = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/channels'
 STREAM_INFO_ENDPOINT    = 'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
 
