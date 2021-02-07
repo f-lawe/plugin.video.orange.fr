@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json, urllib2 as request, urlparse, sys
+import json, urllib2 as request, urlparse as parse, sys
 import xbmc, xbmcgui, xbmcplugin
 
 from __init__ import STREAM_INFO_ENDPOINT, HOST, USER_AGENT
@@ -8,7 +8,7 @@ from utils import dialog, log
 def get_channel_info(channel_id):
     req = request.Request(STREAM_INFO_ENDPOINT.format(channel_id), headers={
         'User-Agent': USER_AGENT,
-        'Host': HOST
+        'Host': parse.urlparse(STREAM_INFO_ENDPOINT).netloc
     })
 
     try:
@@ -58,7 +58,7 @@ def get_channel_stream_item(channel_id):
 
 def main():
     if(len(sys.argv) > 3):
-        args = urlparse.parse_qs(sys.argv[2][1:])
+        args = parse.parse_qs(sys.argv[2][1:])
         log('Loading channel {}'.format(args['channel_id'][0]), xbmc.LOGNOTICE)
         get_channel_stream_item(args['channel_id'][0])
 
