@@ -13,7 +13,7 @@ def get_channels():
         'Host': parse.urlparse(CHANNELS_ENDPOINT).netloc
     })
 
-    res = request.urlopen(req).read().decode('utf-8')
+    res = request.urlopen(req).read()
     channels = json.loads(res)
     channels.sort(key=lambda x: x.get('zappingNumber'))
 
@@ -38,7 +38,7 @@ def channel_entry(channel):
     return """
 ##\t{name}
 #EXTINF:-1 tvg-name="{zapping_number}" tvg-id="C{id}.api.telerama.fr" tvg-logo="{logo}" group-title="channels",{name}
-plugin://script.orange.fr/?channel_id={id}
+plugin://plugin.video.orange.fr/?channel_id={id}
 """.format(
         id=channel['id'],
         name=channel['name'],
