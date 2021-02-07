@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import json, urllib2 as request, urlparse as parse, sys
 import xbmc, xbmcgui, xbmcplugin
+import routing
 
-from __init__ import STREAM_INFO_ENDPOINT, HOST, USER_AGENT
+from __init__ import STREAM_INFO_ENDPOINT, USER_AGENT
 from utils import dialog, log
 
 def get_channel_info(channel_id):
@@ -39,7 +40,7 @@ def get_channel_stream_item(channel_id):
         return
 
     license_server_url = channel_info['laUrl']
-    headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, HOST)
+    headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, parse.urlparse(channel_info['laUrl']).netloc)
     post_data = 'R{SSM}'
     response = ''
 
