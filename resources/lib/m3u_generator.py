@@ -1,25 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
 from urllib import request, parse
-from html.parser import HTMLParser
 
-from __init__ import CHANNELS_ENDPOINT, USER_AGENT
+from orange import get_channels
 
 M3U_FILEPATH = '../orange-fr.m3u'
 
-def get_channels():
-    req = request.Request(CHANNELS_ENDPOINT, headers={
-        'User-Agent': USER_AGENT,
-        'Host': parse.urlparse(CHANNELS_ENDPOINT).netloc
-    })
-
-    res = request.urlopen(req)
-    channels = json.loads(res.read())
+def load_channels(channels):
     channels.sort(key=lambda x: x.get('zappingNumber'))
 
-    return channels
-
-def load_channels(channels):
     current_zapping_number = 1
     loaded_channels = []
 
@@ -38,7 +27,7 @@ def channel_entry(channel):
     return """
 ##\t{name}
 #EXTINF:-1 tvg-name="{zapping_number}" tvg-id="C{id}.api.telerama.fr" tvg-logo="{logo}" group-title="channels",{name}
-plugin://plugin.video.orange.fr/?channel_id={id}
+plugin://plugin.video.orange.fr/channel/{id}
 """.format(
         id=channel['id'],
         name=channel['name'],
@@ -65,13 +54,10 @@ def write_m3u(channels):
 
     file.close()
 
-def generate_m3u():
+def main():
     channels = get_channels()
     channels = load_channels(channels)
     write_m3u(channels)
-
-def main():
-    generate_m3u()
 
 if __name__ == '__main__':
     main()
