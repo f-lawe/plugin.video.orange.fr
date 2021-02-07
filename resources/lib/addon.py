@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-import json, urllib2, urlparse, sys
+import json, urllib2 as request, urlparse, sys
 import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 
-from resources.lib import STREAM_INFO_ENDPOINT, HOST, USER_AGENT
-from resources.lib.utils import log
+from __init__ import STREAM_INFO_ENDPOINT, HOST, USER_AGENT
+from utils import log
 
 def get_channel_info(channel_id):
-    req = urllib2.Request(STREAM_INFO_ENDPOINT.format(channel_id), headers={
+    req = request.Request(STREAM_INFO_ENDPOINT.format(channel_id), headers={
         'User-Agent': USER_AGENT,
         'Host': HOST
     })
 
-    channel_info = urllib2.urlopen(req).read()
+    channel_info = request.urlopen(req).read()
     channel_info = json.loads(channel_info)
 
     stream_info = {
