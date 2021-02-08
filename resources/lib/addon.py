@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import urlparse as parse
 import xbmc, xbmcgui, xbmcplugin
 import routing
 
