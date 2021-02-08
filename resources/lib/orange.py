@@ -36,8 +36,7 @@ def get_channel_stream(channel_id):
     return json.loads(res.read())
 
 def get_programs(period):
-    # endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?groupBy=channel&period=1612767600000,1612782000000&mco=OFR'
-    # endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?groupBy=channel&period={},{}&mco=OFR'
+    # endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?period={},{}&mco=OFR'
     endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?period={}&mco=OFR'
 
     req = request.Request(endpoint.format(period), headers={
