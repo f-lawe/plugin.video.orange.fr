@@ -6,24 +6,25 @@ if sys.version_info[0] < 3:
 else:
     from urllib import request, parse
 
-CHANNELS_ENDPOINT       = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/channels'
-STREAM_INFO_ENDPOINT    = 'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
-
-USER_AGENT              = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'
 
 def get_channels():
-    req = request.Request(CHANNELS_ENDPOINT, headers={
+    endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/channels'
+
+    req = request.Request(endpoint, headers={
         'User-Agent': USER_AGENT,
-        'Host': parse.urlparse(CHANNELS_ENDPOINT).netloc
+        'Host': parse.urlparse(endpoint).netloc
     })
 
     res = request.urlopen(req)
     return json.loads(res.read())
 
 def get_channel_stream(channel_id):
-    req = request.Request(STREAM_INFO_ENDPOINT.format(channel_id), headers={
+    endpoint = 'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
+
+    req = request.Request(endpoint.format(channel_id), headers={
         'User-Agent': USER_AGENT,
-        'Host': parse.urlparse(STREAM_INFO_ENDPOINT).netloc
+        'Host': parse.urlparse(endpoint).netloc
     })
 
     try:
@@ -32,4 +33,17 @@ def get_channel_stream(channel_id):
         if error.code == 403:
             return False
 
+    return json.loads(res.read())
+
+def get_programs(period):
+    # endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?groupBy=channel&period=1612767600000,1612782000000&mco=OFR'
+    # endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?groupBy=channel&period={},{}&mco=OFR'
+    endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?period={}&mco=OFR'
+
+    req = request.Request(endpoint.format(period), headers={
+        'User-Agent': USER_AGENT,
+        'Host': parse.urlparse(endpoint).netloc
+    })
+
+    res = request.urlopen(req)
     return json.loads(res.read())
