@@ -5,15 +5,22 @@
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.routing" version="0.2.0"/>
 	</requires>
+    <extension point="xbmc.service" library="resources/service.py" />
 	<extension point="xbmc.python.pluginsource" library="resources/addon.py">
 		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en">Orange TV France</summary>
-		<description lang="en">
-            This addon brings Orange TV to Kodi. It currently provides a m3u file you can load into your PVR.
-        </description>
 		<language></language>
+        
+		<summary lang="en">Watch TV channels provided by your Orange subscription from Kodi!</summary>
+		<description lang="en">
+            This addon brings all the TV channels included in your Orange subscription to Kodi. Easy install via a m3u file you can load by your PVR.
+        </description>
+
+		<summary lang="fr">Regardez les chanînes de télé incluses dans votre abonnement Orange depuis Kodi !</summary>
+		<description lang="fr">
+            Cet addon intègre toutes les chaînes de télé incluses dans votre abonnement Orange dans Kodi. L'installation se fait facilement via un fichier m3u que vous pouvez charger par votre PVR.
+        </description>
 
 		<platform>all</platform>
 		<license>MIT</license>
