@@ -2,7 +2,7 @@
 from orange import get_channels
 
 class M3UGenerator:
-    filepath = '../orange-fr.m3u'
+    filepath = '../data/orange-fr.m3u'
 
     def __init__(self):
         self.entries = ['#EXTM3U tvg-shift=0']

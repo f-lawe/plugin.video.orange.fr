@@ -5,8 +5,8 @@ from urllib import urlencode
 import xbmc, xbmcgui, xbmcplugin
 import routing
 
-from orange import get_channel_stream, USER_AGENT
-from utils import dialog, log
+from lib.orange import get_channel_stream, USER_AGENT
+from lib.utils import dialog, log
 
 plugin = routing.Plugin()
 
@@ -24,6 +24,7 @@ def extract_widevine_info(channel_stream):
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id):
     """Load stream for the required channel id"""
+    log('Loading channel {}'.format(channel_id), xbmc.LOGNOTICE)
     stream = get_channel_stream(channel_id)
 
     if stream == False:
@@ -36,7 +37,6 @@ def channel(channel_id):
     response = ''
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
 
-    log(path, xbmc.LOGNOTICE)
     log(license_key, xbmc.LOGNOTICE)
 
     listitem = xbmcgui.ListItem(path=path)
@@ -60,4 +60,5 @@ def iptv_epg():
     pass
 
 if __name__ == '__main__':
+    log('startup', xbmc.LOGNOTICE)
     plugin.run()
