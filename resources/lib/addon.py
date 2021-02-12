@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from urlparse import urlparse, parse_qs, urlunparse
+from urlparse import urlparse
 from urllib import urlencode
 
 import xbmc, xbmcgui, xbmcplugin
