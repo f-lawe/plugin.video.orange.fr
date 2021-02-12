@@ -13,12 +13,12 @@
         
 		<summary lang="en">Watch TV channels provided by your Orange subscription from Kodi!</summary>
 		<description lang="en">
-            This addon brings all the TV channels included in your Orange subscription to Kodi. Easy install via a m3u file you can load by your PVR.
+            This addon brings all the TV channels included in your Orange subscription to Kodi. Easy install via a m3u file you can load with your PVR.
         </description>
 
 		<summary lang="fr">Regardez les chanînes de télé incluses dans votre abonnement Orange depuis Kodi !</summary>
 		<description lang="fr">
-            Cet addon intègre toutes les chaînes de télé incluses dans votre abonnement Orange dans Kodi. L'installation se fait facilement via un fichier m3u que vous pouvez charger par votre PVR.
+            Cet addon intègre toutes les chaînes de télé incluses dans votre abonnement Orange dans Kodi. L'installation se fait facilement via un fichier m3u que vous pouvez charger avec votre PVR.
         </description>
 
 		<platform>all</platform>
