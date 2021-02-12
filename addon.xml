@@ -5,7 +5,6 @@
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.routing" version="0.2.0"/>
 	</requires>
-    <extension point="xbmc.service" library="resources/service.py" />
 	<extension point="xbmc.python.pluginsource" library="resources/addon.py">
 		<provides>video</provides>
 	</extension>
