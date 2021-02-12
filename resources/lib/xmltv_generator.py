@@ -5,7 +5,7 @@ from datetime import datetime
 from orange import get_channels, get_programs
 
 class XMLTVGenerator:
-    filepath = '../orange-fr.xml'
+    filepath = '../data/orange-fr.xml'
 
     def __init__(self):
         self.document = minidom.Document()
