@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """m3u_generator"""
-from .orange import get_channels
+from orange import get_channels # pylint: disable=import-error
 
 class M3UGenerator:
     """M3UGenerator"""
