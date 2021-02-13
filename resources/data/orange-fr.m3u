@@ -312,9 +312,9 @@ plugin://plugin.video.orange.fr/channel/87
 #EXTINF:-1 tvg-name="78" tvg-id="C1167.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_game_one_plus1/20171120_154149/webTVSquare/logo_150x150.png" group-title="channels",GAME ONE +1
 plugin://plugin.video.orange.fr/channel/1167
 
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="78" tvg-id="" tvg-logo="" group-title="-",
-http://null
+##	COMEDIE+
+#EXTINF:-1 tvg-name="79" tvg-id="C54.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_comedieplus/20170405_200000/webTVSquare/logo_150x150.png" group-title="channels",COMEDIE+
+plugin://plugin.video.orange.fr/channel/54
 
 ##	POLAR+
 #EXTINF:-1 tvg-name="80" tvg-id="C2326.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_polarPlus/20171002_155125/webTVSquare/logo_150x150.png" group-title="channels",POLAR+
