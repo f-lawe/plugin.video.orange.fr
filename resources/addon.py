@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
-from urlparse import urlparse
-from urllib import urlencode
+"""addon"""
+import sys
 
-import xbmc, xbmcgui, xbmcplugin
-import routing
+import xbmc
+import xbmcgui
+import xbmcplugin
+import routing # pylint: disable=import-error
 
 from lib.orange import get_channel_stream, USER_AGENT
 from lib.utils import dialog, log
+
+if sys.version_info[0] < 3:
+    from urlparse import urlparse # pylint: disable=import-error
+else:
+    from urllib.parse import urlparse
 
 plugin = routing.Plugin()
 
@@ -14,20 +21,20 @@ def extract_widevine_info(channel_stream):
     """Extract Widevine licence information from stream details"""
     path = channel_stream.get('url')
 
-    laUrl = None
+    la_url = None
     for system in channel_stream.get('protectionData'):
         if system.get('keySystem') == 'com.widevine.alpha':
-            laUrl = system.get('laUrl')
+            la_url = system.get('laUrl')
 
-    return path, laUrl
+    return path, la_url
 
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id):
     """Load stream for the required channel id"""
-    log('Loading channel {}'.format(channel_id), xbmc.LOGNOTICE)
+    log('Loading channel {}'.format(channel_id), xbmc.LOGINFO)
     stream = get_channel_stream(channel_id)
 
-    if stream == False:
+    if not stream:
         dialog('This channel is not part of your current registration.')
         return
 
@@ -37,7 +44,7 @@ def channel(channel_id):
     response = ''
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
 
-    log(license_key, xbmc.LOGNOTICE)
+    log(license_key, xbmc.LOGINFO)
 
     listitem = xbmcgui.ListItem(path=path)
     listitem.setMimeType('application/xml+dash')
@@ -52,13 +59,11 @@ def channel(channel_id):
 @plugin.route('/iptv/channels')
 def iptv_channels():
     """Return JSON-STREAMS formatted data for all live channels"""
-    pass
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
     """Return JSON-EPG formatted data for all live channel EPG data"""
-    pass
 
 if __name__ == '__main__':
-    log('startup', xbmc.LOGNOTICE)
+    log('startup', xbmc.LOGINFO)
     plugin.run()

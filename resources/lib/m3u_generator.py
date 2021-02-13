@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from orange import get_channels
+"""m3u_generator"""
+from .orange import get_channels
 
 class M3UGenerator:
+    """M3UGenerator"""
     filepath = '../data/orange-fr.m3u'
 
     def __init__(self):
@@ -16,7 +18,7 @@ class M3UGenerator:
         for channel in channels:
             next_zapping_number = channel['zappingNumber']
 
-            for zapping_number in range(current_zapping_number, next_zapping_number)[:-1]:
+            for _ in range(current_zapping_number, next_zapping_number)[:-1]:
                 loaded_channels.append(None)
 
             loaded_channels.append(channel)
@@ -43,17 +45,20 @@ http://null""" \
         .format(zapping_number=zapping_number)
 
     def append_channels(self, channels):
+        """append_channels"""
         channels = self._load_channels(channels)
 
         for zapping_number, channel in enumerate(channels):
-            self.entries.append(self._empty_entry(zapping_number) if channel == None else self._channel_entry(channel))
+            self.entries.append(self._empty_entry(zapping_number) if channel is None else self._channel_entry(channel))
 
     def write(self):
+        """write"""
         file = open(self.filepath, 'wb')
         file.writelines('{}\n'.format(entry).encode('utf-8') for entry in self.entries)
         file.close()
 
 def main():
+    """main"""
     generator = M3UGenerator()
     generator.append_channels(get_channels())
     generator.write()
