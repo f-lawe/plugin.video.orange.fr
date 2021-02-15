@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""utils"""
+'''Make the use of some Kodi functions easier'''
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -7,9 +7,9 @@ import xbmcgui
 ADDON_NAME = xbmcaddon.Addon().getAddonInfo('name')
 
 def log(msg, level):
-    """log"""
+    '''Wrapper around the Kodi log function'''
     xbmc.log('{}: {}'.format(ADDON_NAME, msg), level)
 
 def dialog(msg):
-    """dialog"""
+    '''Wrapper around the Kodi dialop function, display a popup window with a button'''
     xbmcgui.Dialog().ok(ADDON_NAME, msg)

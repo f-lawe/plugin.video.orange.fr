@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+'''Orange API client'''
 import json
 import sys
 
@@ -13,7 +14,7 @@ else:
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'
 
 def get_channels():
-    """get_channels"""
+    '''Retrieve all the available channels and the the associated information (name, logo, zapping number, etc.)'''
     endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/channels'
 
     req = Request(endpoint, headers={
@@ -25,8 +26,9 @@ def get_channels():
     return json.loads(res.read())
 
 def get_channel_stream(channel_id):
-    """get_channel_stream"""
-    endpoint = 'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
+    '''Get stream information (MPD address, Widewine key) for the specified channel'''
+    endpoint = \
+        'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
 
     req = Request(endpoint.format(channel_id), headers={
         'User-Agent': USER_AGENT,
@@ -41,8 +43,8 @@ def get_channel_stream(channel_id):
 
     return json.loads(res.read())
 
-def get_programs(period):
-    """get_programs"""
+def get_programs(period='today'):
+    '''Returns all the programs for the specified period'''
     # endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?period={},{}&mco=OFR'
     endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?period={}&mco=OFR'
 
