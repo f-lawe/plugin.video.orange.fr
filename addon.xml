@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.orange.fr" name="Orange TV France" version="0.0.1" provider-name="BreizhReloaded">
-	<requires>
+    <requires>
         <!-- <import addon="xbmc.python" version="3.0.0"/> -->
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.routing" version="0.2.0"/>
-	</requires>
-	<extension point="xbmc.python.pluginsource" library="resources/addon.py">
-		<provides>video</provides>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<language></language>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="resources/addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <language></language>
         
-		<summary lang="en">Watch TV channels provided by your Orange subscription from Kodi!</summary>
-		<description lang="en">
+        <summary lang="en">Watch TV channels provided by your Orange subscription from Kodi!</summary>
+        <description lang="en">
             This addon brings to Kodi all the TV channels included in your Orange subscription. Easy install via a m3u file you can load with your PVR.
         </description>
 
-		<summary lang="fr">Regardez les chanînes de télé incluses dans votre abonnement Orange depuis Kodi !</summary>
-		<description lang="fr">
+        <summary lang="fr">Regardez les chanînes de télé incluses dans votre abonnement Orange depuis Kodi !</summary>
+        <description lang="fr">
             Cet addon intègre à Kodi toutes les chaînes de télé incluses dans votre abonnement Orange. L'installation se fait facilement via un fichier m3u que vous pouvez charger avec votre PVR.
         </description>
 
-		<platform>all</platform>
-		<license>MIT</license>
+        <platform>all</platform>
+        <license>MIT</license>
         <forum>https://forum.kodi.tv/showthread.php?tid=360391</forum>
-		<source>https://github.com/BreizhReloaded/plugin.video.orange.fr</source>
-		<email>breizhreloaded@outlook.com</email>
-		<assets>
-			<icon>resources/img/icon.png</icon>
-			<fanart>resources/img/fanart.jpg</fanart>
-			<screenshot>resources/img/screenshot-01.jpg</screenshot>
-			<screenshot>resources/img/screenshot-02.jpg</screenshot>
-			<screenshot>resources/img/screenshot-03.jpg</screenshot>
-		</assets>
-	</extension>
+        <source>https://github.com/BreizhReloaded/plugin.video.orange.fr</source>
+        <email>breizhreloaded@outlook.com</email>
+        <assets>
+            <icon>resources/img/icon.png</icon>
+            <fanart>resources/img/fanart.jpg</fanart>
+            <screenshot>resources/img/screenshot-01.jpg</screenshot>
+            <screenshot>resources/img/screenshot-02.jpg</screenshot>
+            <screenshot>resources/img/screenshot-03.jpg</screenshot>
+        </assets>
+    </extension>
 </addon>
