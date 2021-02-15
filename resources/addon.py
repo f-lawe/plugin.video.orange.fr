@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Add entry point'''
+'''Addon entry point'''
 import sys
 
 import xbmc
