@@ -109,10 +109,6 @@ plugin://plugin.video.orange.fr/channel/112
 plugin://plugin.video.orange.fr/channel/2111
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="27" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="28" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
@@ -130,6 +126,10 @@ http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="32" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="33" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TV5MONDE
@@ -153,10 +153,6 @@ plugin://plugin.video.orange.fr/channel/115
 plugin://plugin.video.orange.fr/channel/225
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="38" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="39" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
@@ -176,6 +172,10 @@ http://null
 #EXTINF:-1 tvg-name="43" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="44" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	BEIN SPORTS 1
 #EXTINF:-1 tvg-name="45" tvg-id="C1290.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_beinsport1/20180417_151324/webTVSquare/logo_150x150.png" group-title="channels",BEIN SPORTS 1
 plugin://plugin.video.orange.fr/channel/1290
@@ -193,7 +193,7 @@ plugin://plugin.video.orange.fr/channel/1335
 plugin://plugin.video.orange.fr/channel/3037
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="48" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="49" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	OCS MAX
@@ -213,7 +213,7 @@ plugin://plugin.video.orange.fr/channel/732
 plugin://plugin.video.orange.fr/channel/734
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="53" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="54" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TCM CINEMA
@@ -261,10 +261,6 @@ plugin://plugin.video.orange.fr/channel/287
 plugin://plugin.video.orange.fr/channel/1190
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="65" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="66" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
@@ -278,6 +274,10 @@ http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="69" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="70" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	MTV
@@ -329,7 +329,7 @@ plugin://plugin.video.orange.fr/channel/2334
 plugin://plugin.video.orange.fr/channel/49
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="82" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="83" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	NON STOP PEOPLE
@@ -341,11 +341,11 @@ plugin://plugin.video.orange.fr/channel/1408
 plugin://plugin.video.orange.fr/channel/1832
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="85" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="86" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="86" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="87" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TV PITCHOUN
@@ -353,11 +353,11 @@ http://null
 plugin://plugin.video.orange.fr/channel/2803
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="88" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="89" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="89" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="90" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	BOOMERANG
@@ -425,10 +425,6 @@ plugin://plugin.video.orange.fr/channel/197
 plugin://plugin.video.orange.fr/channel/293
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="106" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="107" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
@@ -444,6 +440,10 @@ http://null
 #EXTINF:-1 tvg-name="110" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="111" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	AEROSTAR TV
 #EXTINF:-1 tvg-name="112" tvg-id="C90112.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_aerostar/20151025_103301/webTVSquare/logo_150x150.png" group-title="channels",AEROSTAR TV
 plugin://plugin.video.orange.fr/channel/90112
@@ -453,11 +453,11 @@ plugin://plugin.video.orange.fr/channel/90112
 plugin://plugin.video.orange.fr/channel/1072
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="113" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="114" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="114" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="115" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	ANIMAUX
@@ -473,11 +473,11 @@ plugin://plugin.video.orange.fr/channel/2037
 plugin://plugin.video.orange.fr/channel/38
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="118" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="119" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="119" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="120" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TOUTE L'HISTOIRE
@@ -501,15 +501,15 @@ plugin://plugin.video.orange.fr/channel/829
 plugin://plugin.video.orange.fr/channel/63
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="125" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="126" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="127" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="128" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	NATIONAL GEOGRAPHIC
@@ -521,7 +521,7 @@ plugin://plugin.video.orange.fr/channel/508
 plugin://plugin.video.orange.fr/channel/719
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="130" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="131" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLANETE+
@@ -535,10 +535,6 @@ plugin://plugin.video.orange.fr/channel/662
 ##	PLANETE+ Aventure - Expérience
 #EXTINF:-1 tvg-name="134" tvg-id="C402.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_planeteplus_aventure_experience/20170405_200000/webTVSquare/logo_150x150.png" group-title="channels",PLANETE+ Aventure - Expérience
 plugin://plugin.video.orange.fr/channel/402
-
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="134" tvg-id="" tvg-logo="" group-title="-",
-http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="135" tvg-id="" tvg-logo="" group-title="-",
@@ -556,6 +552,10 @@ http://null
 #EXTINF:-1 tvg-name="138" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="139" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	GINX
 #EXTINF:-1 tvg-name="140" tvg-id="C563.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_ginx/20170110_142515/webTVSquare/logo_150x150.png" group-title="channels",GINX
 plugin://plugin.video.orange.fr/channel/563
@@ -569,7 +569,7 @@ plugin://plugin.video.orange.fr/channel/2942
 plugin://plugin.video.orange.fr/channel/2353
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="142" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="143" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TMC +1
@@ -609,11 +609,11 @@ plugin://plugin.video.orange.fr/channel/605
 plugin://plugin.video.orange.fr/channel/2006
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="152" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="153" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="153" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="154" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	CLUBBING TV
@@ -621,7 +621,7 @@ http://null
 plugin://plugin.video.orange.fr/channel/1989
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="155" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="156" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	M6MUSIC
@@ -629,7 +629,7 @@ http://null
 plugin://plugin.video.orange.fr/channel/453
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="157" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="158" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	RFM TV
@@ -649,11 +649,11 @@ plugin://plugin.video.orange.fr/channel/90161
 plugin://plugin.video.orange.fr/channel/90162
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="162" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="163" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="163" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="164" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	CSTAR HITS FRANCE
@@ -677,15 +677,15 @@ plugin://plugin.video.orange.fr/channel/907
 plugin://plugin.video.orange.fr/channel/1353
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="169" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="170" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="171" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="172" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	EQUIDIA
@@ -697,10 +697,6 @@ plugin://plugin.video.orange.fr/channel/64
 plugin://plugin.video.orange.fr/channel/2837
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="174" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="175" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
@@ -710,6 +706,10 @@ http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="177" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="178" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	BEIN SPORTS MAX 4
@@ -741,7 +741,7 @@ plugin://plugin.video.orange.fr/channel/1341
 plugin://plugin.video.orange.fr/channel/1342
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="185" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="186" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TELEFOOT STADIUM 1
@@ -777,7 +777,7 @@ plugin://plugin.video.orange.fr/channel/3044
 plugin://plugin.video.orange.fr/channel/3045
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="194" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="195" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	AUTOMOTO, la chaine
@@ -787,10 +787,6 @@ plugin://plugin.video.orange.fr/channel/15
 ##	GOLF CHANNEL
 #EXTINF:-1 tvg-name="197" tvg-id="C1166.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_golfchannel/20151026_092415/webTVSquare/logo_150x150.png" group-title="channels",GOLF CHANNEL
 plugin://plugin.video.orange.fr/channel/1166
-
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="197" tvg-id="" tvg-logo="" group-title="-",
-http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="198" tvg-id="" tvg-logo="" group-title="-",
@@ -840,16 +836,20 @@ http://null
 #EXTINF:-1 tvg-name="209" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="210" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	LUCKY JACK
 #EXTINF:-1 tvg-name="211" tvg-id="C1061.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_luckyjack/20151026_092415/webTVSquare/logo_150x150.png" group-title="channels",LUCKY JACK
 plugin://plugin.video.orange.fr/channel/1061
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="211" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="212" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="212" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="213" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	FASHION TV
@@ -865,11 +865,11 @@ plugin://plugin.video.orange.fr/channel/531
 plugin://plugin.video.orange.fr/channel/90216
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="216" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="217" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="217" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="218" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	DEMAIN
@@ -885,15 +885,15 @@ plugin://plugin.video.orange.fr/channel/110
 plugin://plugin.video.orange.fr/channel/90221
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="221" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="222" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="223" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="224" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	LCP 100%
@@ -977,16 +977,12 @@ plugin://plugin.video.orange.fr/channel/781
 plugin://plugin.video.orange.fr/channel/830
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="244" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="245" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TRT WORLD
 #EXTINF:-1 tvg-name="246" tvg-id="C90246.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_trtworld/20190701_094947/webTVSquare/logo_150x150.png" group-title="channels",TRT WORLD
 plugin://plugin.video.orange.fr/channel/90246
-
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="246" tvg-id="" tvg-logo="" group-title="-",
-http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="247" tvg-id="" tvg-logo="" group-title="-",
@@ -1200,6 +1196,10 @@ http://null
 #EXTINF:-1 tvg-name="299" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="300" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	FRANCE 3 ALPES
 #EXTINF:-1 tvg-name="301" tvg-id="C655.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_france3alpes/20181002_122427/webTVSquare/logo_150x150.png" group-title="channels",FRANCE 3 ALPES
 plugin://plugin.video.orange.fr/channel/655
@@ -1295,10 +1295,6 @@ plugin://plugin.video.orange.fr/channel/643
 ##	FRANCE 3 RHONE ALPES
 #EXTINF:-1 tvg-name="324" tvg-id="C648.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_france3rhalpes/20181002_123926/webTVSquare/logo_150x150.png" group-title="channels",FRANCE 3 RHONE ALPES
 plugin://plugin.video.orange.fr/channel/648
-
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="324" tvg-id="" tvg-logo="" group-title="-",
-http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="325" tvg-id="" tvg-logo="" group-title="-",
@@ -1584,6 +1580,10 @@ http://null
 #EXTINF:-1 tvg-name="395" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="396" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	TAHITI NUI TELEVISION
 #EXTINF:-1 tvg-name="397" tvg-id="C90397.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_tn_tv/20180108_141727/webTVSquare/logo_150x150.png" group-title="channels",TAHITI NUI TELEVISION
 plugin://plugin.video.orange.fr/channel/90397
@@ -1595,10 +1595,6 @@ plugin://plugin.video.orange.fr/channel/90398
 ##	MADRAS FM TV
 #EXTINF:-1 tvg-name="399" tvg-id="C90399.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_mfm/20200324_111923/webTVSquare/logo_150x150.png" group-title="channels",MADRAS FM TV
 plugin://plugin.video.orange.fr/channel/90399
-
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="399" tvg-id="" tvg-logo="" group-title="-",
-http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="400" tvg-id="" tvg-logo="" group-title="-",
@@ -1776,12 +1772,16 @@ http://null
 #EXTINF:-1 tvg-name="443" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="444" tvg-id="" tvg-logo="" group-title="-",
-http://null
+##	RTP 3
+#EXTINF:-1 tvg-name="444" tvg-id="C90444.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_rtp3/20170629_134322/webTVSquare/logo_150x150.png" group-title="channels",RTP 3
+plugin://plugin.video.orange.fr/channel/90444
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="445" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="446" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	TVI INTERNACIONAL
@@ -1816,17 +1816,13 @@ plugin://plugin.video.orange.fr/channel/90453
 #EXTINF:-1 tvg-name="454" tvg-id="C90454.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_abolatv/20170629_134322/webTVSquare/logo_150x150.png" group-title="channels",A BOLA TV
 plugin://plugin.video.orange.fr/channel/90454
 
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="454" tvg-id="" tvg-logo="" group-title="-",
-http://null
+##	RTPI
+#EXTINF:-1 tvg-name="455" tvg-id="C169.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_rtpi/20151026_092415/webTVSquare/logo_150x150.png" group-title="channels",RTPI
+plugin://plugin.video.orange.fr/channel/169
 
 ##	CORREIO DA MANHA TV
 #EXTINF:-1 tvg-name="456" tvg-id="C90456.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_correio/20170807_145546/webTVSquare/logo_150x150.png" group-title="channels",CORREIO DA MANHA TV
 plugin://plugin.video.orange.fr/channel/90456
-
-##	PLACEHOLDER
-#EXTINF:-1 tvg-name="456" tvg-id="" tvg-logo="" group-title="-",
-http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="457" tvg-id="" tvg-logo="" group-title="-",
@@ -2008,6 +2004,10 @@ http://null
 #EXTINF:-1 tvg-name="501" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="502" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
 ##	ALARABY TELEVISION
 #EXTINF:-1 tvg-name="503" tvg-id="C90503.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_alaraby2/20200102_141654/webTVSquare/logo_150x150.png" group-title="channels",ALARABY TELEVISION
 plugin://plugin.video.orange.fr/channel/90503
@@ -2021,7 +2021,7 @@ plugin://plugin.video.orange.fr/channel/90504
 plugin://plugin.video.orange.fr/channel/90505
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="505" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="506" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	MBC
@@ -2069,7 +2069,7 @@ plugin://plugin.video.orange.fr/channel/90516
 plugin://plugin.video.orange.fr/channel/90517
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="517" tvg-id="" tvg-logo="" group-title="-",
+#EXTINF:-1 tvg-name="518" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	ROTANA MUSICA
@@ -2129,10 +2129,6 @@ plugin://plugin.video.orange.fr/channel/90531
 plugin://plugin.video.orange.fr/channel/90532
 
 ##	PLACEHOLDER
-#EXTINF:-1 tvg-name="532" tvg-id="" tvg-logo="" group-title="-",
-http://null
-
-##	PLACEHOLDER
 #EXTINF:-1 tvg-name="533" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
@@ -2186,6 +2182,10 @@ http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="546" tvg-id="" tvg-logo="" group-title="-",
+http://null
+
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="547" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
 ##	NTD TV

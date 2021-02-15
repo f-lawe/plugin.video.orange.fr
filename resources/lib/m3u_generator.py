@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-"""m3u_generator"""
+'''Generate M3U list based on available channels'''
 from orange import get_channels # pylint: disable=import-error
 
 class M3UGenerator:
-    """M3UGenerator"""
-    filepath = '../data/orange-fr.m3u'
+    '''This class provides tools to generate a M3U list based on the given channel information'''
 
-    def __init__(self):
+    def __init__(self, filepath):
         self.entries = ['#EXTM3U tvg-shift=0']
+        self.filepath = filepath
 
-    def _load_channels(self, channels):
+    def _load_dummy_channels(self, channels):
+        '''Add empty slots in order to keep channel zapping number in Kodi'''
         channels.sort(key=lambda x: x.get('zappingNumber'))
 
         current_zapping_number = 1
@@ -27,10 +28,11 @@ class M3UGenerator:
         return loaded_channels
 
     def _channel_entry(self, channel):
-        return """
+        '''Regular channel template'''
+        return '''
 ##\t{name}
 #EXTINF:-1 tvg-name="{zapping_number}" tvg-id="C{id}.api.telerama.fr" tvg-logo="{logo}" group-title="channels",{name}
-plugin://plugin.video.orange.fr/channel/{id}""" \
+plugin://plugin.video.orange.fr/channel/{id}''' \
         .format(
             id=channel['id'],
             name=channel['name'],
@@ -38,28 +40,30 @@ plugin://plugin.video.orange.fr/channel/{id}""" \
             zapping_number=channel['zappingNumber'])
 
     def _empty_entry(self, zapping_number):
-        return """
+        '''Dummy placeholder template'''
+        return '''
 ##\tPLACEHOLDER
 #EXTINF:-1 tvg-name="{zapping_number}" tvg-id="" tvg-logo="" group-title="-",
-http://null""" \
+http://null''' \
         .format(zapping_number=zapping_number)
 
     def append_channels(self, channels):
-        """append_channels"""
-        channels = self._load_channels(channels)
+        '''Append the provided channels to the current list'''
+        channels = self._load_dummy_channels(channels)
 
-        for zapping_number, channel in enumerate(channels):
-            self.entries.append(self._empty_entry(zapping_number) if channel is None else self._channel_entry(channel))
+        self.entries = ['#EXTM3U tvg-shift=0']
+        for key, channel in enumerate(channels):
+            self.entries.append(self._empty_entry(key + 1) if channel is None else self._channel_entry(channel))
 
     def write(self):
-        """write"""
+        '''Write the loaded channels into M3U file'''
         file = open(self.filepath, 'wb')
         file.writelines('{}\n'.format(entry).encode('utf-8') for entry in self.entries)
         file.close()
 
 def main():
-    """main"""
-    generator = M3UGenerator()
+    '''Script entry point'''
+    generator = M3UGenerator(filepath='../data/orange-fr.m3u')
     generator.append_channels(get_channels())
     generator.write()
 

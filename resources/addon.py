@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""addon"""
+'''Add entry point'''
 import sys
 
 import xbmc
@@ -18,7 +18,7 @@ else:
 plugin = routing.Plugin()
 
 def extract_widevine_info(channel_stream):
-    """Extract Widevine licence information from stream details"""
+    '''Extract Widevine licence information from stream details'''
     path = channel_stream.get('url')
 
     la_url = None
@@ -30,7 +30,7 @@ def extract_widevine_info(channel_stream):
 
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id):
-    """Load stream for the required channel id"""
+    '''Load stream for the required channel id'''
     log('Loading channel {}'.format(channel_id), xbmc.LOGINFO)
     stream = get_channel_stream(channel_id)
 
@@ -58,11 +58,11 @@ def channel(channel_id):
 
 @plugin.route('/iptv/channels')
 def iptv_channels():
-    """Return JSON-STREAMS formatted data for all live channels"""
+    '''Return JSON-STREAMS formatted data for all live channels'''
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
-    """Return JSON-EPG formatted data for all live channel EPG data"""
+    '''Return JSON-EPG formatted data for all live channel EPG data'''
 
 if __name__ == '__main__':
     log('startup', xbmc.LOGINFO)
