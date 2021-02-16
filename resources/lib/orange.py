@@ -28,7 +28,8 @@ def get_channels():
 def get_channel_stream(channel_id):
     '''Get stream information (MPD address, Widewine key) for the specified channel'''
     endpoint = \
-        'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
+        'https://mediation-tv.orange.fr/all/live/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
+        # 'https://chaines-tv.orange.fr/live-webapp/v3/applications/PC/users/me/channels/{}/stream?terminalModel=WEB_PC'
 
     req = Request(endpoint.format(channel_id), headers={
         'User-Agent': USER_AGENT,
