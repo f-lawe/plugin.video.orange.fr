@@ -40,26 +40,42 @@ class XMLTVGenerator:
 
             program_element = self.document.createElement('programme')
             program_element.setAttribute('start', start.strftime('%Y%m%d%H%M%S %z'))
-            program_element.setAttribute('end', end.strftime('%Y%m%d%H%M%S %z'))
+            program_element.setAttribute('stop', end.strftime('%Y%m%d%H%M%S %z'))
             program_element.setAttribute('channel', 'C{}.api.telerama.fr'.format(program['channelId']))
 
-            title_element = self.document.createElement('title')
-            title_element.appendChild(self.document.createTextNode(program['title']))
-            program_element.appendChild(title_element)
+            if program['programType'] == 'EPISODE':
+                title_element = self.document.createElement('title')
+                title_element.appendChild(self.document.createTextNode(program['season']['serie']['title']))
+                program_element.appendChild(title_element)
+
+                sub_title_element = self.document.createElement('sub-title')
+                sub_title_element.appendChild(self.document.createTextNode(program['title']))
+                program_element.appendChild(sub_title_element)
+
+                episode_num = '{}.{}.'.format(program['season']['number'] - 1, program['episodeNumber'] - 1)
+                episode_num_element = self.document.createElement('episode-num')
+                episode_num_element.setAttribute('system', 'xmltv_ns')
+                episode_num_element.appendChild(self.document.createTextNode(episode_num))
+                program_element.appendChild(episode_num_element)
+            else:
+                title_element = self.document.createElement('title')
+                title_element.appendChild(self.document.createTextNode(program['title']))
+                program_element.appendChild(title_element)
 
             desc_element = self.document.createElement('desc')
             desc_element.setAttribute('lang', 'fr')
             desc_element.appendChild(self.document.createTextNode(program['synopsis']))
             program_element.appendChild(desc_element)
 
+            category = program['genre'] if program['genreDetailed'] is None else program['genreDetailed']
             category_element = self.document.createElement('category')
             category_element.setAttribute('lang', 'fr')
-            category_element.appendChild(self.document.createTextNode(str(program['genre'])))
+            category_element.appendChild(self.document.createTextNode(category))
             program_element.appendChild(category_element)
 
             length_element = self.document.createElement('length')
-            length_element.setAttribute('unit', 'seconds')
-            length_element.appendChild(self.document.createTextNode(str(program['duration'])))
+            length_element.setAttribute('unit', 'minutes')
+            length_element.appendChild(self.document.createTextNode(str(int(program['duration'] / 60))))
             program_element.appendChild(length_element)
 
             if isinstance(program['covers'], list):
