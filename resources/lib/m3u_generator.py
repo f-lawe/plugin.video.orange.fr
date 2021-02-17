@@ -53,7 +53,7 @@ http://null''' \
 
         self.entries = ['#EXTM3U tvg-shift=0']
         for key, channel in enumerate(channels):
-            self.entries.append(self._empty_entry(key + 1) if channel is None else self._channel_entry(channel))
+            self.entries.append(self._empty_entry(key + 1) if not channel else self._channel_entry(channel))
 
     def write(self):
         '''Write the loaded channels into M3U file'''
@@ -62,7 +62,7 @@ http://null''' \
         file.close()
 
 def main():
-    '''Script entry point'''
+    '''Script entry point: load channels into m3u list'''
     generator = M3UGenerator(filepath='../data/orange-fr.m3u')
     generator.append_channels(get_channels())
     generator.write()

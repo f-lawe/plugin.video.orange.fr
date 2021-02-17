@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''Generate XMLTV file based on the information provided by Orange'''
 from xml.dom import minidom
-from datetime import datetime
+from datetime import date, datetime
 
 from orange import get_channels, get_programs
 
@@ -94,10 +94,18 @@ class XMLTVGenerator:
         file.close()
 
 def main():
-    '''Script entry point'''
+    '''Script entry point: load channels and program data for the 6 next days into XMLTV file'''
     generator = XMLTVGenerator(filepath='../data/orange-fr.xml')
     generator.append_channels(get_channels())
-    generator.append_programs(get_programs('today'))
+
+    today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
+    day_duration = 24 * 60 * 60
+
+    for day in range(0, 6):
+        period_start = (today + day_duration * day) * 1000
+        period_end = period_start + (day_duration * 1000)
+        generator.append_programs(get_programs(period_start=period_start, period_end=period_end))
+
     generator.write()
 
 if __name__ == '__main__':
