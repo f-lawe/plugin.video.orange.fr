@@ -31,7 +31,7 @@ def extract_widevine_info(channel_stream):
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id):
     '''Load stream for the required channel id'''
-    log('Loading channel {}'.format(channel_id), xbmc.LOGINFO)
+    log('Loading channel {}'.format(channel_id), xbmc.LOGNOTICE) # pylint: disable=no-member
     stream = get_channel_stream(channel_id)
 
     if not stream:
@@ -44,7 +44,7 @@ def channel(channel_id):
     response = ''
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
 
-    log(license_key, xbmc.LOGINFO)
+    log(license_key, xbmc.LOGDEBUG)
 
     listitem = xbmcgui.ListItem(path=path)
     listitem.setMimeType('application/xml+dash')
@@ -65,5 +65,4 @@ def iptv_epg():
     '''Return JSON-EPG formatted data for all live channel EPG data'''
 
 if __name__ == '__main__':
-    log('startup', xbmc.LOGINFO)
     plugin.run()

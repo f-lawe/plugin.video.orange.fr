@@ -49,8 +49,6 @@ def get_programs(period_start='today', period_end=None):
     endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/programs?period={}&mco=OFR'
     period = period_start if not period_end else '{},{}'.format(int(period_start), int(period_end))
 
-    print(endpoint.format(period))
-
     req = Request(endpoint.format(period), headers={
         'User-Agent': USER_AGENT,
         'Host': urlparse(endpoint).netloc
