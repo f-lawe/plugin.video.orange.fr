@@ -188,9 +188,9 @@ plugin://plugin.video.orange.fr/channel/1304
 #EXTINF:-1 tvg-name="47" tvg-id="C1335.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_beinsportsmax3/20180417_151549/webTVSquare/logo_150x150.png" group-title="channels",BEIN SPORTS 3
 plugin://plugin.video.orange.fr/channel/1335
 
-##	TELEFOOT
-#EXTINF:-1 tvg-name="48" tvg-id="C3037.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefoot/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT
-plugin://plugin.video.orange.fr/channel/3037
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="48" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="49" tvg-id="" tvg-logo="" group-title="-",
@@ -744,37 +744,37 @@ plugin://plugin.video.orange.fr/channel/1342
 #EXTINF:-1 tvg-name="186" tvg-id="" tvg-logo="" group-title="-",
 http://null
 
-##	TELEFOOT STADIUM 1
-#EXTINF:-1 tvg-name="187" tvg-id="C3038.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium1/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 1
-plugin://plugin.video.orange.fr/channel/3038
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="187" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 2
-#EXTINF:-1 tvg-name="188" tvg-id="C3039.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium2/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 2
-plugin://plugin.video.orange.fr/channel/3039
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="188" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 3
-#EXTINF:-1 tvg-name="189" tvg-id="C3040.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium3/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 3
-plugin://plugin.video.orange.fr/channel/3040
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="189" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 4
-#EXTINF:-1 tvg-name="190" tvg-id="C3041.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium4/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 4
-plugin://plugin.video.orange.fr/channel/3041
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="190" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 5
-#EXTINF:-1 tvg-name="191" tvg-id="C3042.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium5/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 5
-plugin://plugin.video.orange.fr/channel/3042
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="191" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 6
-#EXTINF:-1 tvg-name="192" tvg-id="C3043.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium6/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 6
-plugin://plugin.video.orange.fr/channel/3043
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="192" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 7
-#EXTINF:-1 tvg-name="193" tvg-id="C3044.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium7/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 7
-plugin://plugin.video.orange.fr/channel/3044
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="193" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
-##	TELEFOOT STADIUM 8
-#EXTINF:-1 tvg-name="194" tvg-id="C3045.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_telefootstadium8/20200911_155137/webTVSquare/logo_150x150.png" group-title="channels",TELEFOOT STADIUM 8
-plugin://plugin.video.orange.fr/channel/3045
+##	PLACEHOLDER
+#EXTINF:-1 tvg-name="194" tvg-id="" tvg-logo="" group-title="-",
+http://null
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="195" tvg-id="" tvg-logo="" group-title="-",
@@ -1773,8 +1773,8 @@ http://null
 http://null
 
 ##	RTP 3
-#EXTINF:-1 tvg-name="444" tvg-id="C90444.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_rtp3/20170629_134322/webTVSquare/logo_150x150.png" group-title="channels",RTP 3
-plugin://plugin.video.orange.fr/channel/90444
+#EXTINF:-1 tvg-name="444" tvg-id="C90455.api.telerama.fr" tvg-logo="https://proxymedia.woopic.com/553/p/logos/v2/logos/livetv_rtp3/20170629_134322/webTVSquare/logo_150x150.png" group-title="channels",RTP 3
+plugin://plugin.video.orange.fr/channel/90455
 
 ##	PLACEHOLDER
 #EXTINF:-1 tvg-name="445" tvg-id="" tvg-logo="" group-title="-",
