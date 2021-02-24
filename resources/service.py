@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Update channels and programs data on startup and every hour'''
+"""Update channels and programs data on startup and every hour"""
 from datetime import date, datetime
 import os
 
@@ -11,7 +11,7 @@ from lib.orange import get_channels, get_programs
 from lib.utils import log
 
 def generate_m3u():
-    '''Load channels into m3u list'''
+    """Load channels into m3u list"""
     filepath = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'data', 'orange-fr.m3u')
     log(filepath, xbmc.LOGDEBUG)
 
@@ -20,7 +20,7 @@ def generate_m3u():
     generator.write(filepath=filepath)
 
 def generate_xmltv():
-    '''Load channels and programs data for the 6 next days into XMLTV file'''
+    """Load channels and programs data for the 6 next days into XMLTV file"""
     filepath = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'data', 'orange-fr.xml')
     log(filepath, xbmc.LOGDEBUG)
 
@@ -38,14 +38,14 @@ def generate_xmltv():
     generator.write(filepath=filepath)
 
 def run():
-    '''Run data generators'''
+    """Run data generators"""
     log('Updating data...', xbmc.LOGINFO)
     generate_m3u()
     generate_xmltv()
     log('Channels and programs data updated', xbmc.LOGINFO)
 
 def main():
-    '''Service initialisation'''
+    """Service initialisation"""
     log('Initialise service', xbmc.LOGINFO)
     interval = 10
     monitor = xbmc.Monitor()

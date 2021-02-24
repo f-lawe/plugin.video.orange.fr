@@ -6,7 +6,7 @@
 This plugin is not officially commissioned/supported by Orange. It has not been tested with paid channel packs or from any other internet provider.
 
 ## Description
-This addon brings Orange TV to Kodi. It provides a m3u channel list and an XMLTV files you can load into your PVR client. 
+This addon brings Orange TV to Kodi. It provides a m3u channel list and an XMLTV file you can load into your PVR client. 
 
 ## Install
 Download and install the ZIP archive directly into Kodi, then pass the data files to your PVR client.
