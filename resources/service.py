@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-'''SERVICE'''
+'''Update channels and programs data on startup and every hour'''
 from datetime import date, datetime
 import os
+
 import xbmc
 import xbmcaddon
 
@@ -19,7 +20,7 @@ def generate_m3u():
     generator.write(filepath=filepath)
 
 def generate_xmltv():
-    '''Load channels and program data for the 6 next days into XMLTV file'''
+    '''Load channels and programs data for the 6 next days into XMLTV file'''
     filepath = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'data', 'orange-fr.xml')
     log(filepath, xbmc.LOGDEBUG)
 
@@ -36,13 +37,17 @@ def generate_xmltv():
 
     generator.write(filepath=filepath)
 
+def run():
+    '''Run data generators'''
+    log('Updating data...', xbmc.LOGINFO)
+    generate_m3u()
+    generate_xmltv()
+    log('Channels and programs data updated', xbmc.LOGINFO)
+
 if __name__ == '__main__':
+    run()
     monitor = xbmc.Monitor()
     while not monitor.abortRequested():
         if monitor.waitForAbort(3600):
             break
-
-        log('Updating data...', xbmc.LOGINFO)
-        generate_m3u()
-        generate_xmltv()
-        log('Channels and program data updated', xbmc.LOGINFO)
+        run()

@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 '''Addon entry point'''
-import sys
+from urllib.parse import urlparse
 
+import routing # pylint: disable=import-error
 import xbmc
 import xbmcgui
 import xbmcplugin
-import routing # pylint: disable=import-error
 
 from lib.orange import get_channel_stream, USER_AGENT
 from lib.utils import dialog, log
 
-if sys.version_info[0] < 3:
-    from urlparse import urlparse # pylint: disable=import-error
-else:
-    from urllib.parse import urlparse
 
 plugin = routing.Plugin()
 
@@ -31,7 +27,7 @@ def extract_widevine_info(channel_stream):
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id):
     '''Load stream for the required channel id'''
-    log('Loading channel {}'.format(channel_id), xbmc.LOGNOTICE) # pylint: disable=no-member
+    log('Loading channel {}'.format(channel_id), xbmc.LOGINFO)
     stream = get_channel_stream(channel_id)
 
     if not stream:
@@ -49,7 +45,7 @@ def channel(channel_id):
     listitem = xbmcgui.ListItem(path=path)
     listitem.setMimeType('application/xml+dash')
     listitem.setContentLookup(False)
-    listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+    listitem.setProperty('inputstream', 'inputstream.adaptive')
     listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
     listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
     listitem.setProperty('inputstream.adaptive.license_key', license_key)
