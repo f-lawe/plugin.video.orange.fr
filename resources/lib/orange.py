@@ -15,7 +15,7 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 
 
 def get_channels():
     '''Retrieve all the available channels and the the associated information (name, logo, zapping number, etc.)'''
-    endpoint = 'https://rp-live.orange.fr/live-webapp/v3/applications/PC/channels'
+    endpoint = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/channels'
 
     req = Request(endpoint, headers={
         'User-Agent': USER_AGENT,
@@ -23,6 +23,7 @@ def get_channels():
     })
 
     res = urlopen(req)
+    
     return json.loads(res.read())
 
 def get_channel_stream(channel_id):
