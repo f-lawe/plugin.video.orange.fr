@@ -10,19 +10,18 @@ import xbmcplugin
 from lib.orange import get_channel_stream, USER_AGENT
 from lib.utils import dialog, log
 
-
 plugin = routing.Plugin()
 
-def extract_widevine_info(channel_stream):
+def extract_stream_info(license_type, channel_stream):
     '''Extract Widevine licence information from stream details'''
     path = channel_stream.get('url')
 
-    la_url = None
+    license_server_url = None
     for system in channel_stream.get('protectionData'):
-        if system.get('keySystem') == 'com.widevine.alpha':
-            la_url = system.get('laUrl')
+        if system.get('keySystem') == license_type:
+            license_server_url = system.get('laUrl')
 
-    return path, la_url
+    return path, license_server_url
 
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id):
@@ -34,7 +33,8 @@ def channel(channel_id):
         dialog('This channel is not part of your current registration.')
         return
 
-    path, license_server_url = extract_widevine_info(stream)
+    license_type = 'com.widevine.alpha'
+    path, license_server_url = extract_stream_info(license_type, stream)
     headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, urlparse(license_server_url).netloc)
     post_data = 'R{SSM}'
     response = ''
@@ -47,7 +47,7 @@ def channel(channel_id):
     listitem.setContentLookup(False)
     listitem.setProperty('inputstream', 'inputstream.adaptive')
     listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-    listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+    listitem.setProperty('inputstream.adaptive.license_type', license_type)
     listitem.setProperty('inputstream.adaptive.license_key', license_key)
 
     xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=listitem)

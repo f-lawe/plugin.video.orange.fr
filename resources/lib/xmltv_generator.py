@@ -10,8 +10,8 @@ class XMLTVGenerator:
         implementation = minidom.getDOMImplementation('')
         doctype = implementation.createDocumentType('tv', None, 'xmltv.dtd')
         self.document = implementation.createDocument(None, 'tv', doctype)
-        self.document.documentElement.setAttribute('source-info-url', 'https://rp-live.orange.fr')
-        self.document.documentElement.setAttribute('source-data-url', 'https://rp-live.orange.fr')
+        self.document.documentElement.setAttribute('source-info-url', 'https://mediation-tv.orange.fr')
+        self.document.documentElement.setAttribute('source-data-url', 'https://mediation-tv.orange.fr')
 
     def append_channels(self, channels):
         '''Add channels to the XML document'''
