@@ -35,9 +35,9 @@ class M3UGenerator:
 plugin://plugin.video.orange.fr/channel/{id}''' \
         .format(
             id=channel['id'],
-            name=channel['name'],
-            logo=channel['logos']['square'],
-            zapping_number=channel['zappingNumber'])
+            name='name',
+            logo='logo',
+            zapping_number='zappingNumber')
 
     def _empty_entry(self, zapping_number):
         '''Dummy placeholder template'''
