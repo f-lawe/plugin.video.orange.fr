@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 '''Generate XMLTV file based on the information provided by Orange'''
+from datetime import datetime
 from xml.dom import minidom
-from datetime import date, datetime
-
-from orange import get_channels, get_programs
 
 class XMLTVGenerator:
     '''This class provides tools to generate an XMLTV file based on the given channel and program information'''
 
-    def __init__(self, filepath):
-        self.filepath = filepath
+    def __init__(self):
         implementation = minidom.getDOMImplementation('')
         doctype = implementation.createDocumentType('tv', None, 'xmltv.dtd')
         self.document = implementation.createDocument(None, 'tv', doctype)
@@ -87,26 +84,8 @@ class XMLTVGenerator:
 
             self.document.documentElement.appendChild(program_element)
 
-    def write(self):
+    def write(self, filepath):
         '''Write the loaded channels and programs into XMLTV file'''
-        file = open(self.filepath, "wb")
+        file = open(filepath, "wb")
         file.write(self.document.toprettyxml(indent="  ", encoding='utf-8'))
         file.close()
-
-def main():
-    '''Script entry point: load channels and program data for the 6 next days into XMLTV file'''
-    generator = XMLTVGenerator(filepath='../data/orange-fr.xml')
-    generator.append_channels(get_channels())
-
-    today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
-    day_duration = 24 * 60 * 60
-
-    for day in range(0, 6):
-        period_start = (today + day_duration * day) * 1000
-        period_end = period_start + (day_duration * 1000)
-        generator.append_programs(get_programs(period_start=period_start, period_end=period_end))
-
-    generator.write()
-
-if __name__ == '__main__':
-    main()

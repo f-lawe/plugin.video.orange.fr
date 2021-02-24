@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 '''Generate M3U list based on available channels'''
-from orange import get_channels # pylint: disable=import-error
 
 class M3UGenerator:
     '''This class provides tools to generate a M3U list based on the given channel information'''
 
-    def __init__(self, filepath):
+    def __init__(self):
         self.entries = ['#EXTM3U tvg-shift=0']
-        self.filepath = filepath
 
     def _load_dummy_channels(self, channels):
         '''Add empty slots in order to keep channel zapping number in Kodi'''
@@ -35,9 +33,9 @@ class M3UGenerator:
 plugin://plugin.video.orange.fr/channel/{id}''' \
         .format(
             id=channel['id'],
-            name='name',
-            logo='logo',
-            zapping_number='zappingNumber')
+            name=channel['name'],
+            logo=channel['logos']['square'],
+            zapping_number=channel['zappingNumber'])
 
     def _empty_entry(self, zapping_number):
         '''Dummy placeholder template'''
@@ -55,17 +53,8 @@ http://null''' \
         for key, channel in enumerate(channels):
             self.entries.append(self._empty_entry(key + 1) if not channel else self._channel_entry(channel))
 
-    def write(self):
+    def write(self, filepath):
         '''Write the loaded channels into M3U file'''
-        file = open(self.filepath, 'wb')
+        file = open(filepath, 'wb')
         file.writelines('{}\n'.format(entry).encode('utf-8') for entry in self.entries)
         file.close()
-
-def main():
-    '''Script entry point: load channels into m3u list'''
-    generator = M3UGenerator(filepath='../data/orange-fr.m3u')
-    generator.append_channels(get_channels())
-    generator.write()
-
-if __name__ == '__main__':
-    main()
