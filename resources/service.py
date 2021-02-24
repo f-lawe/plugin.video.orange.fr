@@ -44,10 +44,16 @@ def run():
     generate_xmltv()
     log('Channels and programs data updated', xbmc.LOGINFO)
 
-if __name__ == '__main__':
-    run()
+def main():
+    '''Service initialisation'''
+    log('Initialise service', xbmc.LOGINFO)
+    interval = 10
     monitor = xbmc.Monitor()
     while not monitor.abortRequested():
-        if monitor.waitForAbort(3600):
+        if monitor.waitForAbort(interval):
             break
         run()
+        interval = 3600
+
+if __name__ == '__main__':
+    main()
