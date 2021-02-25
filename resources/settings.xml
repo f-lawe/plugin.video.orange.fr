@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <category label="Integration">
-        <setting label="Install IPTV Manager add-on" type="action" action="InstallAddon(service.iptv.manager)" option="close" visible="!System.HasAddon(service.iptv.manager)"/>
-        <setting label="Enable IPTV Manager integration" type="bool" id="iptv.enabled" default="true" visible="System.HasAddon(service.iptv.manager)" />
-        <setting label="IPTV Manager settings…" type="action" action="Addon.OpenSettings(service.iptv.manager)" enable="eq(-1,true)" option="close" visible="System.HasAddon(service.iptv.manager)" subsetting="true"/>
-        <setting id="iptv.channels_uri" default="plugin://plugin.video.orange.fr/iptv/channels" visible="false"/>
-        <setting id="iptv.epg_uri" default="plugin://plugin.video.orange.fr/iptv/epg" visible="false"/>
+        <setting id="iptv.channels_uri" visible="false" default="plugin://plugin.video.orange.fr/iptv/channels" />
+        <setting id="iptv.epg_uri" visible="false" default="plugin://plugin.video.orange.fr/iptv/epg" />
+        <setting id="iptv.enabled" label="Enable IPTV Manager integration" type="bool" default="false" />
+        <setting visible="!System.HasAddon(service.iptv.manager)" enable="eq(-1,true)" label="Install IPTV Manager" type="action" action="InstallAddon(service.iptv.manager)" option="close" />
+        <setting visible="System.HasAddon(service.iptv.manager)" enable="eq(-2,true)" label="Go to IPTV Manager settings" type="action" action="Addon.OpenSettings(service.iptv.manager)" option="close" subsetting="true" />
+        
+        <setting type="sep"/>
+
+        <setting id="basic.enabled" label="Enable basic integration" type="bool" default="false" />
+        <setting id="basic.interval" enable="eq(-1,true)" label="Refresh time interval in minutes" type="number" default="120" subsetting="true"/>
     </category>
 </settings>

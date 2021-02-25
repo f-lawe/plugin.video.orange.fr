@@ -10,9 +10,11 @@ from lib import M3UGenerator, XMLTVGenerator
 from lib.orange import get_channels, get_programs
 from lib.utils import log
 
+ADDON = xbmcaddon.Addon()
+
 def generate_m3u():
     """Load channels into m3u list"""
-    filepath = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'data', 'orange-fr.m3u')
+    filepath = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'data', 'orange-fr.m3u')
     log(filepath, xbmc.LOGDEBUG)
 
     generator = M3UGenerator()
@@ -21,7 +23,7 @@ def generate_m3u():
 
 def generate_xmltv():
     """Load channels and programs data for the 6 next days into XMLTV file"""
-    filepath = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'data', 'orange-fr.xml')
+    filepath = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'data', 'orange-fr.xml')
     log(filepath, xbmc.LOGDEBUG)
 
     generator = XMLTVGenerator()
@@ -52,8 +54,13 @@ def main():
     while not monitor.abortRequested():
         if monitor.waitForAbort(interval):
             break
-        run()
-        interval = 3600
+
+        interval = int(ADDON.getSetting('basic.interval')) * 60
+
+        if ADDON.getSetting('basic.enabled') == 'true':
+            run()
+        else:
+            log('NOT', xbmc.LOGINFO)
 
 if __name__ == '__main__':
     main()
