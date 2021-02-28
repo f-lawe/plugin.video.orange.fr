@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """IPTV Manager Integration module"""
-from datetime import datetime
+from datetime import date, datetime
 import json
 import socket
 
@@ -47,7 +47,15 @@ class IPTVManager:
     @via_socket
     def send_epg(self):
         """Return JSON-EPG formatted python data structure to IPTV Manager"""
-        programs = get_programs()
+        today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
+        day_duration = 24 * 60 * 60
+        programs = []
+
+        for day in range(0, 6):
+            period_start = (today + day_duration * day) * 1000
+            period_end = period_start + (day_duration * 1000)
+            programs.extend(get_programs(period_start=period_start, period_end=period_end))
+
         epg = {}
 
         for program in programs:

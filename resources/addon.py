@@ -20,12 +20,14 @@ def channel(channel_id):
 @plugin.route('/iptv/channels')
 def iptv_channels():
     """Return JSON-STREAMS formatted data for all live channels"""
+    log('Loading channel data for IPTV Manager', xbmc.LOGINFO)
     port = int(plugin.args.get('port')[0])
     IPTVManager(port).send_channels()
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
     """Return JSON-EPG formatted data for all live channel EPG data"""
+    log('Loading progam data for IPTV Manager', xbmc.LOGINFO)
     port = int(plugin.args.get('port')[0])
     IPTVManager(port).send_epg()
 
