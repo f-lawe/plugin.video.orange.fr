@@ -36,7 +36,7 @@ def iptv_channels():
     """Return JSON-STREAMS formatted data for all live channels"""
     log('Loading channel data for IPTV Manager', xbmc.LOGINFO)
     port = int(plugin.args.get('port')[0])
-    IPTVManager(port).send_channels(get_channels())
+    IPTVManager(port, channels=get_channels()).send_channels()
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
@@ -53,7 +53,7 @@ def iptv_epg():
         programs.extend(get_programs(period_start=period_start, period_end=period_end))
 
     port = int(plugin.args.get('port')[0])
-    IPTVManager(port).send_epg(programs)
+    IPTVManager(port, programs=programs).send_epg()
 
 if __name__ == '__main__':
     plugin.run()
