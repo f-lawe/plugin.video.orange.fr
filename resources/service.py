@@ -51,6 +51,7 @@ def main():
     log('Initialise service', xbmc.LOGINFO)
     interval = 10
     monitor = xbmc.Monitor()
+
     while not monitor.abortRequested():
         if monitor.waitForAbort(interval):
             break
@@ -59,8 +60,6 @@ def main():
 
         if ADDON.getSetting('basic.enabled') == 'true':
             run()
-        else:
-            log('NOT', xbmc.LOGINFO)
 
 if __name__ == '__main__':
     main()
