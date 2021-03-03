@@ -28,15 +28,7 @@ def generate_xmltv():
 
     generator = XMLTVGenerator()
     generator.append_channels(get_channels())
-
-    today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
-    day_duration = 24 * 60 * 60
-
-    for day in range(0, 6):
-        period_start = (today + day_duration * day) * 1000
-        period_end = period_start + (day_duration * 1000)
-        generator.append_programs(get_programs(period_start=period_start, period_end=period_end))
-
+    generator.append_programs(get_programs(days=6))
     generator.write(filepath=filepath)
 
 def run():
