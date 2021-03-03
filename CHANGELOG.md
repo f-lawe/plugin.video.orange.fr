@@ -7,6 +7,7 @@
 ### Changed
 
 - IPTV Manager integration refactoring
+- Multi-days program load logic now embedded directly into Orange API client
 
 # 1.x
 
