@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 import inputstreamhelper # pylint: disable=import-error
 import xbmcgui
 
-from .utils import random_ua
+from .utils import log, random_ua
 
 LICENSE_TYPES = {
     'widevine': 'com.widevine.alpha'
@@ -31,6 +31,7 @@ def format_inputstream_properties(stream, drm):
     response = ''
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
 
+    log(license_key, 'debug')
     return path, 'mpd', license_key
 
 def build_channel_listitem(path, manifest_type, drm, license_key):

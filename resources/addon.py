@@ -15,16 +15,13 @@ def channel(channel_id):
     """Load stream for the required channel id"""
     log('Loading channel {}'.format(channel_id), 'info')
 
-    drm = 'widevine'
     stream = get_channel_stream(channel_id)
-
     if not stream:
         dialog('This channel is not part of your current registration.')
         return
 
+    drm = 'widevine'
     path, manifest_type, license_key = format_inputstream_properties(stream, drm)
-    log(license_key, 'debug')
-
     listitem = build_channel_listitem(path, manifest_type, drm, license_key)
     xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=listitem)
 
