@@ -30,9 +30,18 @@ USER_AGENTS = [
     'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0'
 ]
 
+LOG_LEVELS = {
+    'debug': xbmc.LOGDEBUG,
+    'error': xbmc.LOGERROR,
+    'fatal': xbmc.LOGFATAL,
+    'info': xbmc.LOGINFO,
+    'none': xbmc.LOGNONE,
+    'warning': xbmc.LOGWARNING
+}
+
 def log(msg, level):
     """Wrapper around the Kodi log function"""
-    xbmc.log('{}: {}'.format(ADDON_NAME, msg), level)
+    xbmc.log('{}: {}'.format(ADDON_NAME, msg), LOG_LEVELS.get(level))
 
 def dialog(msg):
     """Wrapper around the Kodi dialop function, display a popup window with a button"""

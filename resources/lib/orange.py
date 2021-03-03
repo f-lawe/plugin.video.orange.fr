@@ -6,9 +6,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-import xbmc
-
-from .utils import log, random_ua
+from .utils import random_ua
 
 def get_channels():
     """Retrieve all the available channels and the the associated information (name, logo, zapping number, etc.)"""
@@ -46,12 +44,12 @@ def get_programs(**kwargs):
 
     if 'days' in kwargs and kwargs['days'] > 0:
         today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
-        day_duration = 24 * 60 * 60
+        half_day_duration = 12 * 60 * 60
         programs = []
 
-        for day in range(0, kwargs['days']):
-            period_start = (today + day_duration * day) * 1000
-            period_end = period_start + (day_duration * 1000)
+        for day in range(0, kwargs['days'] * 2):
+            period_start = (today + half_day_duration * day) * 1000
+            period_end = period_start + (half_day_duration * 1000)
             programs.extend(get_programs(period_start=period_start, period_end=period_end))
 
         return programs
@@ -61,10 +59,7 @@ def get_programs(**kwargs):
     else:
         period = 'today'
 
-    url = endpoint.format(period)
-    log(url, xbmc.LOGINFO)
-
-    req = Request(url, headers={
+    req = Request(endpoint.format(period), headers={
         'User-Agent': random_ua(),
         'Host': urlparse(endpoint).netloc
     })
