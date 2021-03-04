@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """IPTV Manager Integration module"""
-from datetime import date, datetime
+from datetime import datetime
 import json
 import socket
-
-from .orange import get_channels, get_programs
 
 class IPTVManager:
     """IPTV Manager interface"""
 
-    def __init__(self, port):
+    def __init__(self, port, **kwargs):
         """Initialize IPTV Manager object"""
         self.port = port
+        self.fetch_channels = kwargs.get('channels_loader')
+        self.fetch_programs = kwargs.get('programs_loader')
 
     def via_socket(func): # pylint: disable=no-self-argument
         """Send the output of the wrapped function to socket"""
@@ -30,7 +30,7 @@ class IPTVManager:
     @via_socket
     def send_channels(self):
         """Return JSON-STREAMS formatted python datastructure to IPTV Manager"""
-        channels = get_channels()
+        channels = self.fetch_channels()
         streams = []
 
         for channel in channels:
@@ -47,15 +47,7 @@ class IPTVManager:
     @via_socket
     def send_epg(self):
         """Return JSON-EPG formatted python data structure to IPTV Manager"""
-        today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
-        day_duration = 24 * 60 * 60
-        programs = []
-
-        for day in range(0, 6):
-            period_start = (today + day_duration * day) * 1000
-            period_end = period_start + (day_duration * 1000)
-            programs.extend(get_programs(period_start=period_start, period_end=period_end))
-
+        programs = self.fetch_programs()
         epg = {}
 
         for program in programs:
