@@ -6,7 +6,7 @@ import xbmc
 import xbmcaddon
 
 from lib import M3UGenerator, XMLTVGenerator
-from lib.orange import get_channels, get_programs
+from lib.providers.orange import get_channels, get_programs
 from lib.utils import log
 
 ADDON = xbmcaddon.Addon()
