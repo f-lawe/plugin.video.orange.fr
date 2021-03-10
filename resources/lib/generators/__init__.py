@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-module-docstring
-from .m3u8_generator import M3U8Generator
+from .epg_generator import EPGGenerator
+from .playlist_generator import PlaylistGenerator
