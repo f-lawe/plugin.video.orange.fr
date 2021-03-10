@@ -4,20 +4,23 @@ import os
 
 import xbmc
 import xbmcaddon
+import xbmcvfs
 
-from lib import M3UGenerator, XMLTVGenerator
+from lib import XMLTVGenerator
+from lib.generators import M3U8Generator
+from lib.providers import Provider
 from lib.providers.orange import get_channels, get_programs
 from lib.utils import log
 
 ADDON = xbmcaddon.Addon()
 
 def generate_m3u():
-    """Load channels into m3u list"""
-    filepath = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'data', 'orange-fr.m3u')
+    """Load channels into m3u8 list"""
+    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'playlist.m3u8')
     log(filepath, 'debug')
 
-    generator = M3UGenerator()
-    generator.append_channels(get_channels())
+    generator = M3U8Generator()
+    generator.append_streams(Provider().get_streams())
     generator.write(filepath=filepath)
 
 def generate_xmltv():
