@@ -7,7 +7,7 @@ import xbmcaddon
 import xbmcvfs
 
 from lib.generators import EPGGenerator, PlaylistGenerator
-from lib.providers import Provider
+from lib.providers import provider
 from lib.utils import log
 
 ADDON = xbmcaddon.Addon()
@@ -18,7 +18,7 @@ def generate_playlist():
     log(filepath, 'debug')
 
     generator = PlaylistGenerator()
-    generator.append_streams(Provider().get_streams())
+    generator.append_streams(provider().get_streams())
     generator.write(filepath=filepath)
 
 def generate_epg():
@@ -26,10 +26,9 @@ def generate_epg():
     filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'epg.xml')
     log(filepath, 'debug')
 
-    provider = Provider()
     generator = EPGGenerator()
-    generator.append_streams(provider.get_streams())
-    generator.append_epg(provider.get_epg(days=6))
+    generator.append_streams(provider().get_streams())
+    generator.append_epg(provider().get_epg(days=6))
     generator.write(filepath=filepath)
 
 def run():
