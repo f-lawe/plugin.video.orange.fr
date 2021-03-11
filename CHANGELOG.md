@@ -1,4 +1,6 @@
-## [Unreleased]()
+# 1.x
+
+## [1.2.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-12
 
 ### Added
 
