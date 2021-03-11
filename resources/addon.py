@@ -6,7 +6,7 @@ import xbmcplugin
 import xbmcgui
 
 from lib.iptvmanager import IPTVManager
-from lib.providers import provider
+from lib.providers import Provider
 from lib.utils import dialog, log
 
 plugin = routing.Plugin()
@@ -16,7 +16,7 @@ def channel(channel_id: str):
     """Load stream for the required channel id"""
     log('Loading channel {}'.format(channel_id), 'info')
 
-    stream = provider().get_stream_info(channel_id)
+    stream = Provider().get_stream_info(channel_id)
     if not stream:
         dialog('This channel is not part of your current registration.')
         return
@@ -39,14 +39,14 @@ def iptv_channels():
     """Return JSON-STREAMS formatted data for all live channels"""
     log('Loading channels for IPTV Manager', 'info')
     port = int(plugin.args.get('port')[0])
-    IPTVManager(port, provider()).send_channels()
+    IPTVManager(port, Provider()).send_channels()
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
     """Return JSON-EPG formatted data for all live channel EPG data"""
     log('Loading EPG for IPTV Manager', 'info')
     port = int(plugin.args.get('port')[0])
-    IPTVManager(port, provider()).send_epg()
+    IPTVManager(port, Provider()).send_epg()
 
 if __name__ == '__main__':
     plugin.run()

@@ -7,7 +7,7 @@ import xbmcaddon
 import xbmcvfs
 
 from lib.generators import EPGGenerator, PlaylistGenerator
-from lib.providers import provider
+from lib.providers import Provider
 from lib.utils import log
 
 ADDON = xbmcaddon.Addon()
@@ -16,20 +16,13 @@ def generate_playlist():
     """Load channels into playlist"""
     filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'playlist.m3u8')
     log(filepath, 'debug')
-
-    generator = PlaylistGenerator()
-    generator.append_streams(provider().get_streams())
-    generator.write(filepath=filepath)
+    PlaylistGenerator(Provider()).write(filepath=filepath)
 
 def generate_epg():
     """Load channels and programs data for the 6 next days into EPG"""
     filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'epg.xml')
     log(filepath, 'debug')
-
-    generator = EPGGenerator()
-    generator.append_streams(provider().get_streams())
-    generator.append_epg(provider().get_epg(days=6))
-    generator.write(filepath=filepath)
+    EPGGenerator(Provider()).write(filepath=filepath)
 
 def run():
     """Run data generators"""

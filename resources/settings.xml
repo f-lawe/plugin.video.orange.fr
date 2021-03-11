@@ -12,4 +12,8 @@
         <setting id="basic.enabled" label="Enable basic integration" type="bool" default="false" />
         <setting id="basic.interval" enable="eq(-1,true)" label="Refresh time interval in minutes" type="number" default="120" subsetting="true"/>
     </category>
+    <category label="Provider">
+        <setting id="provider.country" enable="false" label="Country" type="select" lvalues="France"/>
+        <setting id="provider.name" visible="eq(-1,France)" enable="false" label="Name" type="labelenum" lvalues="Orange"/>
+    </category>
 </settings>
