@@ -4,37 +4,27 @@ import os
 
 import xbmc
 import xbmcaddon
+import xbmcvfs
 
-from lib import M3UGenerator, XMLTVGenerator
-from lib.orange import get_channels, get_programs
+from lib.generators import EPGGenerator, PlaylistGenerator
+from lib.providers import Provider
 from lib.utils import log
 
 ADDON = xbmcaddon.Addon()
 
-def generate_m3u():
-    """Load channels into m3u list"""
-    filepath = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'data', 'orange-fr.m3u')
-    log(filepath, 'debug')
-
-    generator = M3UGenerator()
-    generator.append_channels(get_channels())
-    generator.write(filepath=filepath)
-
-def generate_xmltv():
-    """Load channels and programs data for the 6 next days into XMLTV file"""
-    filepath = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'data', 'orange-fr.xml')
-    log(filepath, 'debug')
-
-    generator = XMLTVGenerator()
-    generator.append_channels(get_channels())
-    generator.append_programs(get_programs(days=6))
-    generator.write(filepath=filepath)
-
 def run():
     """Run data generators"""
     log('Updating data...', 'info')
-    generate_m3u()
-    generate_xmltv()
+    provider = Provider()
+
+    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'playlist.m3u8')
+    log(filepath, 'debug')
+    PlaylistGenerator(provider=provider).write(filepath=filepath)
+
+    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'epg.xml')
+    log(filepath, 'debug')
+    EPGGenerator(provider=provider).write(filepath=filepath)
+
     log('Channels and programs data updated', 'info')
 
 def main():
