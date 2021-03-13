@@ -1,0 +1,59 @@
+# Kodi Media Center language file
+# Addon Name: Orange TV France
+# Addon id: plugin.video.orange.fr
+# Addon Provider: BreizhReloaded
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: BreizhReloaded\n"
+"Language-Team: Français\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Integration settings (from 30100 to 30199)
+
+msgctxt "#30100"
+msgid "Intégration TV"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Activer l'intégration avec IPTV Manager"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Installer IPTV Manager"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Ouvrir les paramètres de IPTV Manager"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Activer l'intégration basique"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Fréquence de rafraîchissemen [I](en minutes)[/I]"
+msgstr ""
+
+# Provider settings (from 30200 to 30299)
+
+msgctxt "#30200"
+msgid "Fournisseur"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Country"
+msgstr ""
+
+# Dialogs (from 30500 to 30599)
+
+msgctxt "#30500"
+msgid "Cette chaîne ne fait pas partie de votre abonnement."
+msgstr ""
+
+msgctxt "#30501"
+msgid "InputStream n'a pas pu être chargé."
+msgstr ""
