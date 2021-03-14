@@ -1,3 +1,13 @@
+## [Unreleased]()
+
+### Added
+
+- French translations for settings and dialogs
+
+### Fixed
+
+- Audio doesn't drop anymore when timeshifting ([issue #612](https://github.com/xbmc/inputstream.adaptive/issues/612))
+
 # 1.x
 
 ## [1.2.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-12
