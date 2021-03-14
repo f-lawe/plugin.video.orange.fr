@@ -1,4 +1,6 @@
-## [Unreleased]()
+# 1.x
+
+## [1.2.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-14
 
 ### Added
 
@@ -15,8 +17,6 @@
 ### Removed
 
 - Remove basic interval setting (now use TV Guide update value)
-
-# 1.x
 
 ## [1.2.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-12
 
