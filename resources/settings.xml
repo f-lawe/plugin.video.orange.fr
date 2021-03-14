@@ -8,7 +8,6 @@
         <setting visible="System.HasAddon(service.iptv.manager)" enable="eq(-2,true)" label="30103" type="action" action="Addon.OpenSettings(service.iptv.manager)" option="close" subsetting="true" />
         <setting type="sep"/>
         <setting id="basic.enabled" label="30111" type="bool" default="false" />
-        <setting id="basic.interval" enable="eq(-1,true)" label="30112" type="number" default="120" subsetting="true"/>
     </category>
 
     <category label="30200">

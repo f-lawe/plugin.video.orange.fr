@@ -4,9 +4,17 @@
 
 - French translations for settings and dialogs
 
+### Changed
+
+- EPG now loaded following TV Guide past and future days settings 
+
 ### Fixed
 
 - Audio doesn't drop anymore when timeshifting ([issue #612](https://github.com/xbmc/inputstream.adaptive/issues/612))
+
+### Removed
+
+- Remove basic interval setting (now use TV Guide update value)
 
 # 1.x
 

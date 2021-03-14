@@ -6,7 +6,8 @@ class ProviderInterface:
 
     def get_stream_info(self, channel_id: int) -> dict:
         """
-            Get stream information (MPD address, Widewine key) for the specified id
+            Get stream information (MPD address, Widewine key) for the specified id.
+            Required keys: path, mime_type, manifest_type, drm, license_type, license_key
         """
 
     def get_streams(self) -> list:
@@ -16,7 +17,7 @@ class ProviderInterface:
             (https://github.com/add-ons/service.iptv.manager/wiki/JSON-STREAMS-format)
         """
 
-    def get_epg(self, days: int) -> dict:
+    def get_epg(self) -> dict:
         """
             Returns EPG data for the specified period following JSON-EPG format
             (https://github.com/add-ons/service.iptv.manager/wiki/JSON-EPG-format)

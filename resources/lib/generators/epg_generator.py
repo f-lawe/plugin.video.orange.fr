@@ -36,7 +36,7 @@ class EPGGenerator:
 
     def _load_epg(self):
         """Add programs to the XML document"""
-        for channel_id, programs in self.provider.get_epg(days=6).items():
+        for channel_id, programs in self.provider.get_epg().items():
             for program in programs:
                 program_element = self.document.createElement('programme')
                 program_element.setAttribute(
