@@ -2,7 +2,7 @@
 <addon id="plugin.video.orange.fr" name="Orange TV France" version="1.2.0" provider-name="BreizhReloaded">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.routing" version="0.2.3"/>
+        <import addon="script.module.routing" version="0.2.3+matrix"/>
         <import addon="script.module.inputstreamhelper" version="0.5.2"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/addon.py">
