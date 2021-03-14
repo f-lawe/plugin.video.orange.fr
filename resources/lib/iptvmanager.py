@@ -36,4 +36,4 @@ class IPTVManager:
     @via_socket
     def send_epg(self) -> dict:
         """Return JSON-EPG formatted python data structure to IPTV Manager"""
-        return { 'version': 1, 'epg': self.provider.get_epg(days=6) }
+        return { 'version': 1, 'epg': self.provider.get_epg() }

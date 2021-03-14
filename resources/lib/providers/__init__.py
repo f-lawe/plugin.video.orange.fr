@@ -3,10 +3,14 @@
 from .provider_interface import ProviderInterface
 from .fr import OrangeFranceProvider
 
-PROVIDERS = {
+_PROVIDERS = {
     'France.Orange': OrangeFranceProvider
 }
 
-KEY = 'France.Orange'
+_KEY = 'France.Orange'
 
-Provider = PROVIDERS[KEY]
+_PROVIDER = _PROVIDERS[_KEY]()
+
+def get_provider() -> ProviderInterface:
+    """Return the selected provider"""
+    return _PROVIDER
