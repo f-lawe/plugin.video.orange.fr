@@ -48,12 +48,12 @@ msgctxt "#30201"
 msgid "Pays"
 msgstr ""
 
-# Dialogs (from 30500 to 30599)
+# Dialogs (from 30900 to 30999)
 
-msgctxt "#30500"
+msgctxt "#30900"
 msgid "This channel is not part of your current registration."
 msgstr ""
 
-msgctxt "#30501"
+msgctxt "#30901"
 msgid "InputStream cannot be loaded."
 msgstr ""
