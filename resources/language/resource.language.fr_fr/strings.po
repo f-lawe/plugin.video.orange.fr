@@ -23,16 +23,32 @@ msgid "Enable IPTV Manager integration"
 msgstr "Activer l'intégration avec IPTV Manager"
 
 msgctxt "#30102"
-msgid "Install IPTV Manager"
-msgstr "Installer IPTV Manager"
+msgid "Help 30102"
+msgstr ""
 
 msgctxt "#30103"
+msgid "Install IPTV Manager"
+msgstr "Installer IPTV Manager…"
+
+msgctxt "#30104"
+msgid "Help 30104"
+msgstr ""
+
+msgctxt "#30105"
 msgid "Go to IPTV Manager settings"
-msgstr "Ouvrir les paramètres de IPTV Manager"
+msgstr "Ouvrir les paramètres de IPTV Manager…"
+
+msgctxt "#30106"
+msgid "Help 30106"
+msgstr ""
 
 msgctxt "#30111"
 msgid "Enable basic integration"
 msgstr "Activer l'intégration basique"
+
+msgctxt "#30112"
+msgid "Help 30112"
+msgstr ""
 
 # Provider settings (from 30200 to 30299)
 
@@ -42,6 +58,18 @@ msgstr "Fournisseur"
 
 msgctxt "#30201"
 msgid "Country"
+msgstr "Pays"
+
+msgctxt "#30202"
+msgid "Help 30202"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Internet service provider"
+msgstr "Fournisseur d'accès à internet"
+
+msgctxt "#30204"
+msgid "Help 30204"
 msgstr ""
 
 # Dialogs (from 30900 to 30999)
@@ -53,3 +81,7 @@ msgstr "Cette chaîne ne fait pas partie de votre abonnement."
 msgctxt "#30901"
 msgid "InputStream cannot be loaded."
 msgstr "InputStream n'a pas pu être chargé."
+
+msgctxt "#30902"
+msgid "Orange TV France must be used from the Kodi TV section."
+msgstr "Orange TV France doit être utilisé depuis la section TV de Kodi."

@@ -13,7 +13,7 @@ This addon brings Orange TV to Kodi. All channels included in your registration 
 ## Installation
 Download the latest [ZIP archive](https://github.com/BreizhReloaded/plugin.video.orange.fr/archive/master.zip) and install it into Kodi (Settings > Addons > Install from ZIP).
 
-Integration to Kodi TV is handled via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). Once installed on your system, channels and TV guide will be loaded automatically.
+Integration to Kodi TV is handled via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). You can install and activate it from the addon settings. Once set up on your system, channels and TV guide will be loaded automatically.
 
 _NB: you can also choose the basic integration, in that case you need to manually pass to [IPTV Simple](https://github.com/kodi-pvr/pvr.iptvsimple) the .m3u8 and .xml files located within the data directory._
 
