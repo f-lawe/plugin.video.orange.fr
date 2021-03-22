@@ -16,7 +16,7 @@ class PlaylistGenerator:
 
         stream_template = [
             '## {name}',
-            '#EXTINF:-1 tvg-name="{name}" tvg-id="{id}" tvg-logo="{logo}" tvg-chno="{chno}" group-title="Orange TV France,{group}",{name}',
+            '#EXTINF:-1 tvg-name="{name}" tvg-id="{id}" tvg-logo="{logo}" tvg-chno="{chno}" group-title="Orange TV France;{group}",{name}',
             '{stream}',
             ''
         ]

@@ -1,3 +1,10 @@
+## [Unreleased]()
+
+### Fixed
+
+- Channel groups for basic integration
+- Settings translations
+
 # 1.x
 
 ## [1.2.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-14

@@ -27,7 +27,7 @@ msgid "Help 30102"
 msgstr ""
 
 msgctxt "#30103"
-msgid "Install IPTV Manager"
+msgid "Install IPTV Manager…"
 msgstr "Installer IPTV Manager…"
 
 msgctxt "#30104"
@@ -35,7 +35,7 @@ msgid "Help 30104"
 msgstr ""
 
 msgctxt "#30105"
-msgid "Go to IPTV Manager settings"
+msgid "Go to IPTV Manager settings…"
 msgstr "Ouvrir les paramètres de IPTV Manager…"
 
 msgctxt "#30106"
