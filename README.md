@@ -11,7 +11,9 @@ _This addon is not officially commissioned/supported by Orange. All product name
 This addon brings Orange TV to Kodi. All channels included in your registration are now directly available from Kodi!
 
 ## Installation
-Download the latest [ZIP archive](https://github.com/BreizhReloaded/plugin.video.orange.fr/archive/master.zip) and install it into Kodi (Settings > Addons > Install from ZIP).
+Download the latest [ZIP archive](https://github.com/BreizhReloaded/plugin.video.orange.fr/archive/master.zip) and install it into Kodi (Settings > Addons > Install from ZIP). Then install the dependencies from the addon screen (My addons > Video addons > Orange TV France > Dependencies).
+
+_The Routing addon is not currently available from the main Kodi repository, you may need to install it from [there](https://mirrors.kodi.tv/addons/matrix/script.module.routing/script.module.routing-0.2.3+matrix.zip)._
 
 Integration to Kodi TV is handled via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). You can install and activate it from the addon settings. Once set up on your system, channels and TV guide will be loaded automatically.
 
