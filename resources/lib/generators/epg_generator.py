@@ -8,7 +8,7 @@ from lib.providers import ProviderInterface
 class EPGGenerator:
     """This class provides tools to generate an XMLTV file based on the given channel and program information"""
 
-    def __init__(self, provider: ProviderInterface):
+    def __init__(self, provider: ProviderInterface) -> None:
         implementation = minidom.getDOMImplementation('')
         doctype = implementation.createDocumentType('tv', None, 'xmltv.dtd')
         self.document = implementation.createDocument(None, 'tv', doctype)
@@ -18,7 +18,7 @@ class EPGGenerator:
         self._load_streams()
         self._load_epg()
 
-    def _load_streams(self):
+    def _load_streams(self) -> None:
         """Add channels to the XML document"""
         for stream in self.provider.get_streams():
             channel_element = self.document.createElement('channel')
@@ -34,7 +34,7 @@ class EPGGenerator:
 
             self.document.documentElement.appendChild(channel_element)
 
-    def _load_epg(self):
+    def _load_epg(self) -> None:
         """Add programs to the XML document"""
         for channel_id, programs in self.provider.get_epg().items():
             for program in programs:
@@ -79,7 +79,7 @@ class EPGGenerator:
 
                 self.document.documentElement.appendChild(program_element)
 
-    def write(self, filepath):
+    def write(self, filepath) -> None:
         """Write the loaded channels and programs into XMLTV file"""
         with open(filepath, 'wb') as file:
             file.write(self.document.toprettyxml(indent='  ', encoding='utf-8'))
