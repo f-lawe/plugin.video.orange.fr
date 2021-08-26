@@ -81,6 +81,5 @@ class EPGGenerator:
 
     def write(self, filepath):
         """Write the loaded channels and programs into XMLTV file"""
-        file = open(filepath, "wb")
-        file.write(self.document.toprettyxml(indent="  ", encoding='utf-8'))
-        file.close()
+        with open(filepath, 'wb') as file:
+            file.write(self.document.toprettyxml(indent='  ', encoding='utf-8'))
