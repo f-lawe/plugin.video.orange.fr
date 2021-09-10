@@ -1,5 +1,12 @@
 # 1.x
 
+## [1.3.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.0) - 2021-09-11
+
+### Added
+
+- Provider emplates now allow to easily support similar backends
+- Support for Orange Réunion
+
 ## [1.2.2](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.2) - 2021-03-23
 
 ### Fixed
