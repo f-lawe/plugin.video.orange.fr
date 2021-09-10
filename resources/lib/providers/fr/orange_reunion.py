@@ -9,7 +9,7 @@ class OrangeReunionProvider(OrangeTemplate):
     def __init__(self) -> None:
         super().__init__(
             endpoint_stream_info = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/users/me/channels/{channel_id}/stream?terminalModel=WEB_PC',
-            endpoint_streams = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/channels&mco=ORE',
+            endpoint_streams = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/channels?mco=ORE',
             endpoint_programs = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/programs?period={period}&mco=ORE',
             groups = {
                 'Généralistes': \
