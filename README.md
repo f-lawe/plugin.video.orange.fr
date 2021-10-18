@@ -19,7 +19,7 @@ _NB: you can also choose the basic integration, in that case you need to manuall
 
 You should now be able to view all the channels grouped by category in the TV section. If that's not already installed, Kodi will ask you to install the decrypting tool when accessing a channel for the first time.
 
-Do no forget to select the right TV provider in the settings!
+Do not forget to select the right TV provider in the settings!
 
 ## Available providers
 | Country   | Provider name     |  |
