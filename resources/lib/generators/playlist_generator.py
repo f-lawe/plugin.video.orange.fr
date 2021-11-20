@@ -36,4 +36,4 @@ class PlaylistGenerator:
     def write(self, filepath: str):
         """Write the loaded channels into M3U8 file"""
         with open(filepath, 'wb') as file:
-            file.writelines('{}\n'.format(entry).encode('utf-8') for entry in self.entries)
+            file.writelines(f'{entry}\n'.encode('utf-8') for entry in self.entries)

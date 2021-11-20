@@ -84,7 +84,7 @@ def localize(string_id: int, **kwargs):
 
 def log(msg: str, level: LogLevel):
     """Wrapper around the Kodi log function"""
-    xbmc.log('{}: {}'.format(get_addon_name(), msg), level.value)
+    xbmc.log(f'{get_addon_name()}: {msg}', level.value)
 
 def ok_dialog(msg: str):
     """Wrapper around the Kodi dialop function, display a popup window with a button"""
