@@ -19,7 +19,7 @@ def index():
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id: str):
     """Load stream for the required channel id"""
-    log('Loading channel {}'.format(channel_id), LogLevel.INFO)
+    log(f'Loading channel {channel_id}', LogLevel.INFO)
 
     stream = get_provider().get_stream_info(channel_id)
     if not stream:

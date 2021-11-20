@@ -46,7 +46,7 @@ class OrangeTemplate(ProviderInterface):
             if system.get('keySystem') == drm.value:
                 license_server_url = system.get('laUrl')
 
-        headers = 'Content-Type=&User-Agent={}&Host={}'.format(random_ua(), urlparse(license_server_url).netloc)
+        headers = f'Content-Type=&User-Agent={random_ua()}&Host={urlparse(license_server_url).netloc}'
         post_data = 'R{SSM}'
         response = ''
 
@@ -56,7 +56,7 @@ class OrangeTemplate(ProviderInterface):
             'manifest_type': 'mpd',
             'drm': drm.name.lower(),
             'license_type': drm.value,
-            'license_key': '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
+            'license_key': f'{license_server_url}|{headers}|{post_data}|{response}'
         }
 
         log(stream_info, LogLevel.DEBUG)
@@ -146,7 +146,7 @@ class OrangeTemplate(ProviderInterface):
     def _get_programs(self, period_start: int = None, period_end: int = None) -> list:
         """Returns the programs for today (default) or the specified period"""
         try:
-            period = '{start},{end}'.format(start=int(period_start), end=int(period_end))
+            period = f'{int(period_start)},{int(period_end)}'
         except ValueError:
             period = 'today'
 
