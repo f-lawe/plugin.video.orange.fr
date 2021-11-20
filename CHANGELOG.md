@@ -1,8 +1,10 @@
 # 1.x
 
+## [1.4.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.4.0) - 2021-11-21
+
 ### Added
 
-- Cache management over get_streams() to prevent Kodi from removing all channels
+- Cache management over get_streams() to prevent Kodi from removing all channels using IPTV Manager
 
 ### Fixed
 
