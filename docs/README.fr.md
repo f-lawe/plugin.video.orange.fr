@@ -1,14 +1,12 @@
-# Orange TV France for Kodi
+# Orange TV France pour Kodi
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BreizhReloaded/plugin.video.orange.fr)](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases)
 [![Kodi version](https://img.shields.io/badge/kodi%20version-v19-blue)](https://kodi.tv/)
 [![GitHub](https://img.shields.io/github/license/BreizhReloaded/plugin.video.orange.fr)](https://github.com/BreizhReloaded/plugin.video.orange.fr/blob/master/LICENSE)
 
-__→__ _[Lisez-moi](docs/README.fr.md) en français_
-
-_This addon is not officially commissioned/supported by Orange. All product names, logos, and trademarks mentionned in this project are property of their respective owners._
+_Cet addon n'est pas officiellement supporté par Orange. Tous les produits, logos et marques déposées mentionnés dans ce projet sont la propriété de leurs propriétaires respectifs._
 
 ## Description
-This addon brings Orange TV to Kodi. All channels included in your registration are now directly available from Kodi!
+Cet addon ajoute la TV d'Orange à Kodi. Toutes les chaînes inclues dans votre abonnement sont maintenant directement accessibles depuis Kodi !
 
 ## Installation
 Download the latest ZIP archive from the [releases page](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases) and install it into Kodi (Settings > Addons > Install from ZIP). Then install the dependencies from the addon screen (My addons > Video addons > Orange TV France > Dependencies).
@@ -22,10 +20,10 @@ You should now be able to view all the channels grouped by category in the TV se
 Do not forget to select your TV provider in the settings!
 
 ## Available providers
-| Country   | Provider          |  |
+| Pays      | Fournisseur       |  |
 |:---------:|:------------------|:-|
 | 🇫🇷        | Orange            |  |
-| 🇫🇷        | Orange Réunion    | thanks to [@starmate](https://github.com/starmate) and [@sae-gfc](https://github.com/sae-gfc) |
+| 🇫🇷        | Orange Réunion    | merci à [@starmate](https://github.com/starmate) et [@sae-gfc](https://github.com/sae-gfc) |
 
 ## Support
 Bug reports or suggestions are more than welcome. I don't have any paid channels so I don't know what happens when watching Canal+ or beIN, feedbacks on this topic are welcome too. Feel also free to open a pull request!
