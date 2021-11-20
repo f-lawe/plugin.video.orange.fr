@@ -10,7 +10,7 @@ _PROVIDERS = {
     'France.Orange Réunion': OrangeReunionProvider
 }
 
-name: str = get_addon_setting('name')
+name: str = get_addon_setting('provider.name')
 country: str = get_addon_setting('provider.country')
 
 _KEY = f'{country}.{name}'

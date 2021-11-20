@@ -1,6 +1,10 @@
 # 1.x
 
-## [1.3.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.1) - 2021-09-11
+### Fixed
+
+- Provider load from settings
+
+## [1.3.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.1) - 2021-11-21
 
 ### Fixed
 
