@@ -17,16 +17,17 @@ _NB: you can also choose the basic integration, in that case you need to manuall
 
 You should now be able to view all the channels grouped by category in the TV section. If that's not already installed, Kodi will ask you to install the decrypting tool when accessing a channel for the first time.
 
-Do not forget to select your TV provider in the settings!
+N'oubliez pas de sélectionner le bon fournisseur dans les paramètres !
 
 ## Available providers
 | Pays      | Fournisseur       |  |
 |:---------:|:------------------|:-|
 | 🇫🇷        | Orange            |  |
+| 🇫🇷        | Orange Caraïbe    |  |
 | 🇫🇷        | Orange Réunion    | merci à [@starmate](https://github.com/starmate) et [@sae-gfc](https://github.com/sae-gfc) |
 
 ## Support
-Bug reports or suggestions are more than welcome. I don't have any paid channels so I don't know what happens when watching Canal+ or beIN, feedbacks on this topic are welcome too. Feel also free to open a pull request!
+Les signalements de bugs ou les suggestions sont les bienvenus. Je n'ai malheureusement pas de bouquets payants, donc je ne sais pas ce qui se passe avec Canal+ ou beIn, les retours sur ce sujet sont les bienvenus égakement. N'hésitez pas aussi à ouvrir une pull request!
 
-## Known limitations and issues
-This addons does not provide any catchup functionnalities, for that you can have a look at the great [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/).
+## Limites connues
+Cet addon ne propose pas le replay TV. Pour cela, vous pouvez aller voir du côté du très bon [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/).

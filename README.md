@@ -25,6 +25,7 @@ Do not forget to select your TV provider in the settings!
 | Country   | Provider          |  |
 |:---------:|:------------------|:-|
 | 🇫🇷        | Orange            |  |
+| 🇫🇷        | Orange Caraïbe    |  |
 | 🇫🇷        | Orange Réunion    | thanks to [@starmate](https://github.com/starmate) and [@sae-gfc](https://github.com/sae-gfc) |
 
 ## Support
