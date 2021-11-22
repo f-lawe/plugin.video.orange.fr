@@ -34,4 +34,5 @@ class OrangeReunionProvider(OrangeTemplate):
                     [234, 481, 226, 112, 2111, 529, 1073],
                 'Information internationale': \
                     [671, 53, 51, 410, 19, 525, 70239, 70240, 70241, 70242, 781, 830, 70246, 70503]
-        })
+            }
+        )
