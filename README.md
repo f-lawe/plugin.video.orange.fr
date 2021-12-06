@@ -28,8 +28,5 @@ Do not forget to select your TV provider in the settings!
 | 🇫🇷        | Orange Caraïbe    |  |
 | 🇫🇷        | Orange Réunion    | thanks to [@starmate](https://github.com/starmate) and [@sae-gfc](https://github.com/sae-gfc) |
 
-## Support
-Bug reports or suggestions are more than welcome. I don't have any paid channels so I don't know what happens when watching Canal+ or beIN, feedbacks on this topic are welcome too. Feel also free to open a pull request!
-
-## Known limitations and issues
+## Known limitations
 This addons does not provide any catchup functionnalities, for that you can have a look at the great [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/).
