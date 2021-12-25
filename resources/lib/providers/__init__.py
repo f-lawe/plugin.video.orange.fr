@@ -4,12 +4,14 @@ from lib.utils import get_addon_setting, log, LogLevel
 
 from .provider_interface import ProviderInterface
 from .provider_wrapper import ProviderWrapper
-from .fr import OrangeFranceProvider, OrangeCaraibeProvider, OrangeReunionProvider
+
+from . import fr
 
 _PROVIDERS = {
-    'France.Orange': OrangeFranceProvider,
-    'France.Orange Caraïbe': OrangeCaraibeProvider,
-    'France.Orange Réunion': OrangeReunionProvider
+    'France.Orange': fr.OrangeFranceProvider,
+    'France.Orange Caraïbe': fr.OrangeCaraibeProvider,
+    'France.Orange Réunion': fr.OrangeReunionProvider,
+    'France.SFR': fr.SFRProvider
 }
 
 name: str = get_addon_setting('provider.name')
@@ -21,6 +23,8 @@ _PROVIDER = _PROVIDERS[_KEY]() if _PROVIDERS.get(_KEY) is not None else None
 
 if not _PROVIDER:
     log(f'Cannot instanciate provider: {_KEY}', LogLevel.ERROR)
+else:
+    log(f'Using {_KEY}', LogLevel.INFO)
 
 def get_provider() -> ProviderInterface:
     """Return the selected provider"""

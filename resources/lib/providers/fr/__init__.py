@@ -3,3 +3,4 @@
 from .orange import OrangeFranceProvider
 from .orange_caraibe import OrangeCaraibeProvider
 from .orange_reunion import OrangeReunionProvider
+from .sfr import SFRProvider
