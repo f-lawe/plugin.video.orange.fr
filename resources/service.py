@@ -26,17 +26,16 @@ def run():
 
 def main():
     """Service initialisation"""
-    log('Initialise service', LogLevel.INFO)
-    interval = 10
-    monitor = xbmc.Monitor()
+    if get_addon_setting('basic.enabled') == 'true':
+        log('Initialising service', LogLevel.INFO)
+        interval = 10
+        monitor = xbmc.Monitor()
 
-    while not monitor.abortRequested():
-        if monitor.waitForAbort(interval):
-            break
+        while not monitor.abortRequested():
+            if monitor.waitForAbort(interval):
+                break
 
-        interval = int(get_global_setting('epg.epgupdate')) * 60
-
-        if get_addon_setting('basic.enabled') == 'true':
+            interval = int(get_global_setting('epg.epgupdate')) * 60
             run()
 
 if __name__ == '__main__':
