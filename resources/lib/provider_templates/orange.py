@@ -19,12 +19,12 @@ class OrangeTemplate(ProviderInterface):
         self,
         endpoint_stream_info: str,
         endpoint_streams: str,
-        endpoint_programs: str,
+        endpoint_epg: str,
         groups: dict = None
     ) -> None:
         self.endpoint_stream_info = endpoint_stream_info
         self.endpoint_streams = endpoint_streams
-        self.endpoint_programs = endpoint_programs
+        self.endpoint_epg = endpoint_epg
         self.groups = groups
 
     def get_stream_info(self, channel_id: int) -> dict:
@@ -101,7 +101,7 @@ class OrangeTemplate(ProviderInterface):
         programs = []
 
         for chunk in range(0, days_to_display * self.chunks_per_day):
-            programs.extend(self._get_programs(
+            programs.extend(self._get_epg_chunk(
                 period_start=(start_day + chunk_duration * chunk) * 1000,
                 period_end=(start_day + chunk_duration * (chunk + 1)) * 1000
             ))
@@ -143,16 +143,16 @@ class OrangeTemplate(ProviderInterface):
         return epg
 
     # pylint: disable=no-self-use
-    def _get_programs(self, period_start: int = None, period_end: int = None) -> list:
+    def _get_epg_chunk(self, period_start: int = None, period_end: int = None) -> list:
         """Returns the programs for today (default) or the specified period"""
         try:
             period = f'{int(period_start)},{int(period_end)}'
         except ValueError:
             period = 'today'
 
-        req = Request(self.endpoint_programs.format(period=period), headers={
+        req = Request(self.endpoint_epg.format(period=period), headers={
             'User-Agent': random_ua(),
-            'Host': urlparse(self.endpoint_programs).netloc
+            'Host': urlparse(self.endpoint_epg).netloc
         })
 
         with urlopen(req) as res:

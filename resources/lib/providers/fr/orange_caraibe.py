@@ -10,6 +10,6 @@ class OrangeCaraibeProvider(OrangeTemplate):
         super().__init__(
             endpoint_stream_info = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/users/me/channels/{channel_id}/stream?terminalModel=WEB_PC',
             endpoint_streams = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/channels?mco=OCA',
-            endpoint_programs = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/programs?period={period}&mco=OCA',
+            endpoint_epg = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/programs?period={period}&mco=OCA',
             groups = {}
         )

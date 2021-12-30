@@ -10,7 +10,7 @@ class OrangeFranceProvider(OrangeTemplate):
         super().__init__(
             endpoint_stream_info = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/users/me/channels/{channel_id}/stream?terminalModel=WEB_PC',
             endpoint_streams = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/channels?mco=OFR',
-            endpoint_programs = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/programs?period={period}&mco=OFR',
+            endpoint_epg = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/programs?period={period}&mco=OFR',
             groups = {
                 'TNT': \
                     [192, 4, 80, 34, 47, 118, 111, 445, 119, 195, 446, 444, 234, 78, 481, 226, 458, 482, 3163, 1404, 1401, 1403, 1402, 1400, 1399, 112, 2111],
