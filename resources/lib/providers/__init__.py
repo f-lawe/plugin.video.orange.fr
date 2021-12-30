@@ -8,10 +8,11 @@ from .provider_wrapper import ProviderWrapper
 from . import fr
 
 _PROVIDERS = {
+    'France.Free (beta)': fr.FreeProvider,
     'France.Orange': fr.OrangeFranceProvider,
     'France.Orange Caraïbe': fr.OrangeCaraibeProvider,
     'France.Orange Réunion': fr.OrangeReunionProvider,
-    'France.SFR': fr.SFRProvider
+    'France.SFR (beta)': fr.SFRProvider
 }
 
 name: str = get_addon_setting('provider.name')

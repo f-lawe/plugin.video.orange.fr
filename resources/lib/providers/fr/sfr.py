@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Orange France"""
+"""SFR"""
 
 # https://ncdn-live-pctv.pfd.sfr.net/sdash/LIVE$TF1/index.mpd/Manifest?start=LIVE&end=END&device=dash_dyn_wide
 # https://ncdn-live-pctv.pfd.sfr.net/sdash/LIVE$NEUF_FRANCE2/index.mpd/Manifest?start=LIVE&end=END&device=dash_dyn_wide
