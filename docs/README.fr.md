@@ -17,7 +17,7 @@ _NB: vous pouvez également choisir l'intégration basique, dans ce cas vous dev
 
 Vous devriez maintenant voir toutes les chaînes regroupées par categories dans la section TV. S'il n'est pas déjà installé, Kodi vous demandera d'installer l'outil de décryptage quand vous regarderez une chaîne pour la première fois.
 
-N'oubliez pas de sélectionner le bon fournisseur dans les paramètres !
+N'oubliez pas de configurer IPTV Manager correctement et de sélectionner le bon fournisseur dans les paramètres !
 
 ## Available providers
 | Pays      | Fournisseur       |  |
