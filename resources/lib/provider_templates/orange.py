@@ -79,7 +79,7 @@ class OrangeTemplate(ProviderInterface):
                 'id': channel_id,
                 'name': channel['name'],
                 'preset': channel['zappingNumber'],
-                'logo': channel['logos']['square'] if 'square' in channel['logos'] else None,
+                'logo': channel['logos']['square'].replace('%2F/', '%2F') if 'square' in channel['logos'] else None,
                 'stream': f'plugin://plugin.video.orange.fr/channel/{channel_id}',
                 'group': [group_name for group_name in self.groups if int(channel['id']) in self.groups[group_name]]
             })
