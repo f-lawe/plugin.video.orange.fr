@@ -120,7 +120,10 @@ class OrangeTemplate(ProviderInterface):
                 title = program['season']['serie']['title']
                 subtitle = program['title']
                 season_number = program['season']['number']
-                episode_number = program['episodeNumber']
+                if 'episodeNumber' in program:
+                    episode_number = program['episodeNumber']
+                else:
+                    episode_number = None
                 episode = f'S{season_number}E{episode_number}'
 
             image = None
