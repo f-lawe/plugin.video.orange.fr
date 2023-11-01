@@ -3,12 +3,15 @@
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 import json
+import os
+import re
+import xbmcvfs
 from urllib.error import HTTPError
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 from urllib.request import Request, urlopen
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua
+from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile
 
 @dataclass
 class OrangeTemplate(ProviderInterface):
@@ -28,9 +31,35 @@ class OrangeTemplate(ProviderInterface):
         self.groups = groups
 
     def get_stream_info(self, channel_id: int) -> dict:
+        delai = 30
+        timestamp = datetime.timestamp(datetime.today())
+        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
+        try:
+            with open(filepath) as file:
+                auth = json.loads(file.read())
+        except FileNotFoundError:
+            auth = {'timestamp': 0}
+        if timestamp - auth['timestamp'] < delai * 60:
+            cookie = auth['cookie']
+            tv_token = auth['tv_token']
+        else:
+            req = Request("https://chaines-tv.orange.fr", headers={
+                'User-Agent': random_ua(),
+                'Host': 'chaines-tv.orange.fr',
+            })
+            res = urlopen(req)
+            cookie = res.headers['Set-Cookie'].split(";")[0]
+            tv_token = "Bearer %s" % re.sub('.*token:"', '', str(res.read()), 1)
+            tv_token = re.sub('",claims:.*', '', tv_token, 1)
+            auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
+            with open(filepath, 'w') as file:
+                file.write(json.dumps(auth))
+
         req = Request(self.endpoint_stream_info.format(channel_id=channel_id), headers={
             'User-Agent': random_ua(),
-            'Host': urlparse(self.endpoint_stream_info).netloc
+            'Host': urlparse(self.endpoint_stream_info).netloc,
+            'Cookie': cookie,
+            'tv_token': tv_token,
         })
 
         try:
@@ -47,6 +76,8 @@ class OrangeTemplate(ProviderInterface):
                 license_server_url = system.get('laUrl')
 
         headers = f'Content-Type=&User-Agent={random_ua()}&Host={urlparse(license_server_url).netloc}'
+        headers += '&Cookie=%s' % quote(cookie)
+        headers += '&tv_token=%s' % quote(tv_token)
         post_data = 'R{SSM}'
         response = ''
 
