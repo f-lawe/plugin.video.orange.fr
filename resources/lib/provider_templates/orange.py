@@ -125,6 +125,8 @@ class OrangeTemplate(ProviderInterface):
                 channel_name = channel_name[7:]
             if channel_name.endswith("_ctv"):
                 channel_name = channel_name[:-4]
+            if channel_name == "acces_limite":
+                continue
             streams.append({
                 'id': channel_id,
                 'name': channel_name,
