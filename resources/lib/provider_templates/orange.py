@@ -30,19 +30,17 @@ class OrangeTemplate(ProviderInterface):
         self.endpoint_programs = endpoint_programs
         self.groups = groups
 
-    def get_stream_info(self, channel_id: int) -> dict:
-        delai = 30
+    def auth(self, reset=False):
         timestamp = datetime.timestamp(datetime.today())
         filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
+
         try:
             with open(filepath) as file:
                 auth = json.loads(file.read())
         except FileNotFoundError:
-            auth = {'timestamp': 0}
-        if timestamp - auth['timestamp'] < delai * 60:
-            cookie = auth['cookie']
-            tv_token = auth['tv_token']
-        else:
+            auth = {'timestamp': timestamp}
+
+        if 'cookie' not in auth or reset is True:
             req = Request("https://chaines-tv.orange.fr", headers={
                 'User-Agent': random_ua(),
                 'Host': 'chaines-tv.orange.fr',
@@ -55,19 +53,30 @@ class OrangeTemplate(ProviderInterface):
             with open(filepath, 'w') as file:
                 file.write(json.dumps(auth))
 
-        req = Request(self.endpoint_stream_info.format(channel_id=channel_id), headers={
-            'User-Agent': random_ua(),
-            'Host': urlparse(self.endpoint_stream_info).netloc,
-            'Cookie': cookie,
-            'tv_token': tv_token,
-        })
+        return auth
 
-        try:
-            with urlopen(req) as res:
-                stream_info = json.loads(res.read())
-        except HTTPError as error:
-            if error.code == 403:
-                return False
+
+    def get_stream_info(self, channel_id: int) -> dict:
+        timestamp = datetime.timestamp(datetime.today())
+        for trie in range(2):
+            auth = self.auth()
+            req = Request(self.endpoint_stream_info.format(channel_id=channel_id), headers={
+                'User-Agent': random_ua(),
+                'Host': urlparse(self.endpoint_stream_info).netloc,
+                'Cookie': auth["cookie"],
+                'tv_token': auth["tv_token"],
+            })
+
+            try:
+                with urlopen(req) as res:
+                    stream_info = json.loads(res.read())
+            except HTTPError as error:
+                if error.code in (403, 401):
+                    if trie == 0:
+                        log("cookie/token invalide, âge = %d" % (timestamp - auth["timestamp"]), LogLevel.DEBUG)
+                        self.auth(reset=True)
+                    else:
+                        raise error
 
         drm = get_drm()
         license_server_url = None
@@ -76,8 +85,8 @@ class OrangeTemplate(ProviderInterface):
                 license_server_url = system.get('laUrl')
 
         headers = f'Content-Type=&User-Agent={random_ua()}&Host={urlparse(license_server_url).netloc}'
-        headers += '&Cookie=%s' % quote(cookie)
-        headers += '&tv_token=%s' % quote(tv_token)
+        headers += '&Cookie=%s' % quote(auth["cookie"])
+        headers += '&tv_token=%s' % quote(auth["tv_token"])
         post_data = 'R{SSM}'
         response = ''
 
@@ -94,25 +103,34 @@ class OrangeTemplate(ProviderInterface):
         return stream_info
 
     def get_streams(self) -> list:
+        auth = self.auth()
         req = Request(self.endpoint_streams, headers={
             'User-Agent': random_ua(),
-            'Host': urlparse(self.endpoint_streams).netloc
+            'Host': urlparse(self.endpoint_streams).netloc,
+            'Cookie': auth["cookie"],
+            'tv_token': auth["tv_token"],
         })
 
-        with urlopen(req) as res:
+        with urlopen(req, timeout=60) as res:
             channels = json.loads(res.read())
 
         streams = []
 
         for channel in channels:
-            channel_id: str = channel['id']
+            channel_infos = channels[channel][0]
+            channel_id: str = channel
+            channel_name = channel_infos['externalId']
+            if channel_name.startswith("livetv_"):
+                channel_name = channel_name[7:]
+            if channel_name.endswith("_ctv"):
+                channel_name = channel_name[:-4]
             streams.append({
                 'id': channel_id,
-                'name': channel['name'],
-                'preset': channel['zappingNumber'],
-                'logo': channel['logos']['square'].replace('%2F/', '%2F') if 'square' in channel['logos'] else None,
+                'name': channel_name,
+                'preset': channel_infos['channelZappingNumber'],
+                'logo': None,
                 'stream': f'plugin://plugin.video.orange.fr/channel/{channel_id}',
-                'group': [group_name for group_name in self.groups if int(channel['id']) in self.groups[group_name]]
+                'group': [group_name for group_name in self.groups if int(channel_id) in self.groups[group_name]]
             })
 
         return streams
