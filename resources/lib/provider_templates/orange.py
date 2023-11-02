@@ -72,9 +72,14 @@ class OrangeTemplate(ProviderInterface):
                     stream_info = json.loads(res.read())
                 break
             except HTTPError as error:
+                reason = json.loads(error.read().decode())
+                if reason["message"] == "Channel not subscribed":
+                    return False
+                log("HTTPError raised (auth {}s old): {}".format(
+                    timestamp - auth["timestamp"],
+                    error.read().decode()), LogLevel.INFO)
                 if error.code in (403, 401):
                     if trie == 0:
-                        log("cookie/token invalide, âge = %d" % (timestamp - auth["timestamp"]), LogLevel.DEBUG)
                         self.auth(reset=True)
                     else:
                         raise error
@@ -100,7 +105,7 @@ class OrangeTemplate(ProviderInterface):
             'license_key': f'{license_server_url}|{headers}|{post_data}|{response}'
         }
 
-        log(stream_info, LogLevel.DEBUG)
+        log(stream_info, LogLevel.INFO)
         return stream_info
 
     def get_streams(self) -> list:
