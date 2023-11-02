@@ -70,6 +70,7 @@ class OrangeTemplate(ProviderInterface):
             try:
                 with urlopen(req) as res:
                     stream_info = json.loads(res.read())
+                break
             except HTTPError as error:
                 if error.code in (403, 401):
                     if trie == 0:
