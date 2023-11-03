@@ -5,10 +5,10 @@ from datetime import date, datetime, timedelta
 import json
 import os
 import re
-import xbmcvfs
 from urllib.error import HTTPError
 from urllib.parse import urlparse, quote
 from urllib.request import Request, urlopen
+import xbmcvfs
 
 from lib.providers.provider_interface import ProviderInterface
 from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile
@@ -37,7 +37,7 @@ class OrangeTemplate(ProviderInterface):
         filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
 
         try:
-            with open(filepath) as file:
+            with open(filepath, encoding='UTF-8') as file:
                 auth = json.loads(file.read())
         except FileNotFoundError:
             auth = {'timestamp': timestamp}
@@ -54,9 +54,9 @@ class OrangeTemplate(ProviderInterface):
                             return res.read(), auth['cookie'], auth['tv_token']
                 except HTTPError as error:
                     if error.code in (401, 403):
-                        log("cookie/token invalide, âge = %d" % (timestamp - auth['timestamp']), LogLevel.INFO)
+                        log(f"cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
                     else:
-                        log("erreur %s" % error, LogLevel.INFO)
+                        log(f"erreur {error}", LogLevel.INFO)
                         raise
 
             req = Request("https://chaines-tv.orange.fr", headers={
@@ -66,11 +66,13 @@ class OrangeTemplate(ProviderInterface):
 
             with urlopen(req) as res:
                 cookie = res.headers['Set-Cookie'].split(";")[0]
-                tv_token = "Bearer %s" % re.sub('.*token:"', '', str(res.read()), 1)
+                tv_token = re.sub('.*token:"', 'Bearer ', str(res.read()), 1)
                 tv_token = re.sub('",claims:.*', '', tv_token, 1)
                 auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
-                with open(filepath, 'w') as file:
+                with open(filepath, 'w', encoding='UTF-8') as file:
                     file.write(json.dumps(auth))
+
+        return None
 
     def get_stream_info(self, channel_id: int) -> dict:
         res, cookie, tv_token = self._auth_urlopen(self.endpoint_stream_info.format(channel_id=channel_id), headers={
@@ -87,7 +89,7 @@ class OrangeTemplate(ProviderInterface):
                 license_server_url = system.get('laUrl')
 
         headers = f'Content-Type=&User-Agent={random_ua()}&Host={urlparse(license_server_url).netloc}'
-        headers += '&Cookie=%s&tv_token=%s' % (quote(cookie), quote(tv_token))
+        headers += f'&Cookie={quote(cookie)}&tv_token={quote(tv_token)}'
         post_data = 'R{SSM}'
         response = ''
 
@@ -104,6 +106,7 @@ class OrangeTemplate(ProviderInterface):
         return stream_info
 
     def get_streams(self) -> list:
+        # pylint: disable=unreachable
         return []
 
         res, _, _ = self._auth_urlopen(self.endpoint_streams, headers={
