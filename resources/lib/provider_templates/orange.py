@@ -3,12 +3,15 @@
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 import json
+import os
+import re
+import xbmcvfs
 from urllib.error import HTTPError
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 from urllib.request import Request, urlopen
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua
+from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile
 
 @dataclass
 class OrangeTemplate(ProviderInterface):
@@ -27,18 +30,55 @@ class OrangeTemplate(ProviderInterface):
         self.endpoint_programs = endpoint_programs
         self.groups = groups
 
+    def _auth_urlopen(self, url: str, headers: dict = None) -> tuple:
+        if headers is None:
+            headers = {}
+        timestamp = datetime.timestamp(datetime.today())
+        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
+
+        try:
+            with open(filepath) as file:
+                auth = json.loads(file.read())
+        except FileNotFoundError:
+            auth = {'timestamp': timestamp}
+
+        for _ in range(2):
+            if 'cookie' in auth:
+                headers['cookie'] = auth['cookie']
+                headers['tv_token'] = auth['tv_token']
+                req = Request(url, headers=headers)
+
+                try:
+                    with urlopen(req) as res:
+                        if res.code == 200:
+                            return res.read(), auth['cookie'], auth['tv_token']
+                except HTTPError as error:
+                    if error.code in (401, 403):
+                        log("cookie/token invalide, âge = %d" % (timestamp - auth['timestamp']), LogLevel.INFO)
+                    else:
+                        log("erreur %s" % error, LogLevel.INFO)
+                        raise
+
+            req = Request("https://chaines-tv.orange.fr", headers={
+                'User-Agent': random_ua(),
+                'Host': 'chaines-tv.orange.fr',
+            })
+
+            with urlopen(req) as res:
+                cookie = res.headers['Set-Cookie'].split(";")[0]
+                tv_token = "Bearer %s" % re.sub('.*token:"', '', str(res.read()), 1)
+                tv_token = re.sub('",claims:.*', '', tv_token, 1)
+                auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
+                with open(filepath, 'w') as file:
+                    file.write(json.dumps(auth))
+
     def get_stream_info(self, channel_id: int) -> dict:
-        req = Request(self.endpoint_stream_info.format(channel_id=channel_id), headers={
+        res, cookie, tv_token = self._auth_urlopen(self.endpoint_stream_info.format(channel_id=channel_id), headers={
             'User-Agent': random_ua(),
             'Host': urlparse(self.endpoint_stream_info).netloc
         })
 
-        try:
-            with urlopen(req) as res:
-                stream_info = json.loads(res.read())
-        except HTTPError as error:
-            if error.code == 403:
-                return False
+        stream_info = json.loads(res)
 
         drm = get_drm()
         license_server_url = None
@@ -47,6 +87,7 @@ class OrangeTemplate(ProviderInterface):
                 license_server_url = system.get('laUrl')
 
         headers = f'Content-Type=&User-Agent={random_ua()}&Host={urlparse(license_server_url).netloc}'
+        headers += '&Cookie=%s&tv_token=%s' % (quote(cookie), quote(tv_token))
         post_data = 'R{SSM}'
         response = ''
 
@@ -63,13 +104,14 @@ class OrangeTemplate(ProviderInterface):
         return stream_info
 
     def get_streams(self) -> list:
-        req = Request(self.endpoint_streams, headers={
+        return []
+
+        res, _, _ = self._auth_urlopen(self.endpoint_streams, headers={
             'User-Agent': random_ua(),
             'Host': urlparse(self.endpoint_streams).netloc
         })
 
-        with urlopen(req) as res:
-            channels = json.loads(res.read())
+        channels = json.loads(res)
 
         streams = []
 
