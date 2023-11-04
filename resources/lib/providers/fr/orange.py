@@ -9,7 +9,7 @@ class OrangeFranceProvider(OrangeTemplate):
     def __init__(self) -> None:
         super().__init__(
             endpoint_stream_info = 'https://mediation-tv.orange.fr/all/api-gw/live/v3/auth/accountToken/applications/PC/channels/{channel_id}/stream?terminalModel=WEB_PC',
-            endpoint_streams = 'https://mediation-tv.orange.fr/all/api-gw/live/v3/auth/accountToken/applications/PC/channels?mco=OFR',
+            endpoint_streams = 'https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/PC/programs?groupBy=channel&mco=OFR',
             endpoint_programs = 'https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/PC/programs?period={period}&mco=OFR',
             groups = {
                 'TNT': \

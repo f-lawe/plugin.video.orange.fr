@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 import xbmcvfs
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile
+from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile, get_addon_path
 
 @dataclass
 class OrangeTemplate(ProviderInterface):
@@ -29,6 +29,27 @@ class OrangeTemplate(ProviderInterface):
         self.endpoint_streams = endpoint_streams
         self.endpoint_programs = endpoint_programs
         self.groups = groups
+
+    def _get_auth(self) -> tuple:
+        timestamp = datetime.timestamp(datetime.today())
+        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
+
+        req = Request("https://chaines-tv.orange.fr", headers={
+            'User-Agent': random_ua(),
+            'Host': 'chaines-tv.orange.fr',
+        })
+
+        with urlopen(req) as res:
+            nuxt = re.sub('.*<script>window', 'window', str(res.read()), 1)
+            nuxt = re.sub('</script>.*', '', nuxt, 1)
+            cookie = res.headers['Set-Cookie'].split(";")[0]
+            tv_token = re.sub('.*token:"', 'Bearer ', nuxt, 1)
+            tv_token = re.sub('",claims:.*', '', tv_token, 1)
+            auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
+            with open(filepath, 'w', encoding='UTF-8') as file:
+                file.write(json.dumps(auth))
+
+        return nuxt, cookie, tv_token
 
     def _auth_urlopen(self, url: str, headers: dict = None) -> tuple:
         if headers is None:
@@ -59,18 +80,7 @@ class OrangeTemplate(ProviderInterface):
                         log(f"erreur {error}", LogLevel.INFO)
                         raise
 
-            req = Request("https://chaines-tv.orange.fr", headers={
-                'User-Agent': random_ua(),
-                'Host': 'chaines-tv.orange.fr',
-            })
-
-            with urlopen(req) as res:
-                cookie = res.headers['Set-Cookie'].split(";")[0]
-                tv_token = re.sub('.*token:"', 'Bearer ', str(res.read()), 1)
-                tv_token = re.sub('",claims:.*', '', tv_token, 1)
-                auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
-                with open(filepath, 'w', encoding='UTF-8') as file:
-                    file.write(json.dumps(auth))
+            _, auth['cookie'], auth['tv_token'] = self._get_auth()
 
         return None
 
@@ -106,27 +116,26 @@ class OrangeTemplate(ProviderInterface):
         return stream_info
 
     def get_streams(self) -> list:
-        # pylint: disable=unreachable
-        return []
-
-        res, _, _ = self._auth_urlopen(self.endpoint_streams, headers={
-            'User-Agent': random_ua(),
-            'Host': urlparse(self.endpoint_streams).netloc
-        })
-
-        channels = json.loads(res)
+        filepath = os.path.join(xbmcvfs.translatePath(get_addon_path()), 'channels.json')
+        with open(filepath, encoding='UTF-8') as file:
+            channels = json.load(file)
 
         streams = []
 
         for channel in channels:
-            channel_id: str = channel['id']
+            channel_id = str(channel['idEPG'])
+            logourl = None
+            for logo in channel['logos']:
+                if logo['definitionType'] == 'webTVSquare':
+                    logourl = logo['listLogos'][0]['path']
+                    break
             streams.append({
                 'id': channel_id,
                 'name': channel['name'],
-                'preset': channel['zappingNumber'],
-                'logo': channel['logos']['square'].replace('%2F/', '%2F') if 'square' in channel['logos'] else None,
+                'preset': str(channel['displayOrder']),
+                'logo': logourl,
                 'stream': f'plugin://plugin.video.orange.fr/channel/{channel_id}',
-                'group': [group_name for group_name in self.groups if int(channel['id']) in self.groups[group_name]]
+                'group': [group_name for group_name in self.groups if int(channel_id) in self.groups[group_name]]
             })
 
         return streams
