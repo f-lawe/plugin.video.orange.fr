@@ -74,21 +74,27 @@ class OrangeTemplate(ProviderInterface):
                         if res.code == 200:
                             return res.read(), auth['cookie'], auth['tv_token']
                 except HTTPError as error:
-                    if error.code in (401, 403):
+                    if error.code == 401:
                         log(f"cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
+                    if error.code == 403:
+                        log(f"cette chaine ne fait pas partie de votre offre.", LogLevel.INFO)
+                        break
                     else:
                         log(f"erreur {error}", LogLevel.INFO)
                         raise
 
             _, auth['cookie'], auth['tv_token'] = self._get_auth()
 
-        return None
+        return None, None, None
 
     def get_stream_info(self, channel_id: int) -> dict:
         res, cookie, tv_token = self._auth_urlopen(self.endpoint_stream_info.format(channel_id=channel_id), headers={
             'User-Agent': random_ua(),
             'Host': urlparse(self.endpoint_stream_info).netloc
         })
+
+        if res is None:
+            return False
 
         stream_info = json.loads(res)
 
