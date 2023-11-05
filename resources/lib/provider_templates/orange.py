@@ -74,11 +74,11 @@ class OrangeTemplate(ProviderInterface):
                         if res.code == 200:
                             return res.read(), auth['cookie'], auth['tv_token']
                 except HTTPError as error:
-                    if error.code == 401:
-                        log(f"cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
                     if error.code == 403:
                         log("cette chaine ne fait pas partie de votre offre.", LogLevel.INFO)
                         break
+                    if error.code == 401:
+                        log(f"cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
                     else:
                         log(f"erreur {error}", LogLevel.INFO)
                         raise
