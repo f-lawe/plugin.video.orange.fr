@@ -77,7 +77,7 @@ class OrangeTemplate(ProviderInterface):
                     if error.code == 401:
                         log(f"cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
                     if error.code == 403:
-                        log(f"cette chaine ne fait pas partie de votre offre.", LogLevel.INFO)
+                        log("cette chaine ne fait pas partie de votre offre.", LogLevel.INFO)
                         break
                     else:
                         log(f"erreur {error}", LogLevel.INFO)
