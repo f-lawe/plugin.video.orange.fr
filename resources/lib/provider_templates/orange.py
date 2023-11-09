@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 import xbmcvfs
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile, get_addon_path
+from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile
 
 @dataclass
 class OrangeTemplate(ProviderInterface):
@@ -29,63 +29,6 @@ class OrangeTemplate(ProviderInterface):
         self.endpoint_streams = endpoint_streams
         self.endpoint_programs = endpoint_programs
         self.groups = groups
-
-    def _get_auth(self) -> tuple:
-        timestamp = datetime.timestamp(datetime.today())
-        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
-
-        req = Request("https://chaines-tv.orange.fr", headers={
-            'User-Agent': random_ua(),
-            'Host': 'chaines-tv.orange.fr',
-        })
-
-        with urlopen(req) as res:
-            nuxt = re.sub('.*<script>window', 'window', str(res.read()), 1)
-            nuxt = re.sub('</script>.*', '', nuxt, 1)
-            cookie = res.headers['Set-Cookie'].split(";")[0]
-            tv_token = re.sub('.*token:"', 'Bearer ', nuxt, 1)
-            tv_token = re.sub('",claims:.*', '', tv_token, 1)
-            auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
-            with open(filepath, 'w', encoding='UTF-8') as file:
-                file.write(json.dumps(auth))
-
-        return nuxt, cookie, tv_token
-
-    def _auth_urlopen(self, url: str, headers: dict = None) -> tuple:
-        if headers is None:
-            headers = {}
-        timestamp = datetime.timestamp(datetime.today())
-        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
-
-        try:
-            with open(filepath, encoding='UTF-8') as file:
-                auth = json.loads(file.read())
-        except FileNotFoundError:
-            auth = {'timestamp': timestamp}
-
-        for _ in range(2):
-            if 'cookie' in auth:
-                headers['cookie'] = auth['cookie']
-                headers['tv_token'] = auth['tv_token']
-                req = Request(url, headers=headers)
-
-                try:
-                    with urlopen(req) as res:
-                        if res.code == 200:
-                            return res.read(), auth['cookie'], auth['tv_token']
-                except HTTPError as error:
-                    if error.code == 403:
-                        log("cette chaine ne fait pas partie de votre offre.", LogLevel.INFO)
-                        break
-                    if error.code == 401:
-                        log(f"cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
-                    else:
-                        log(f"erreur {error}", LogLevel.INFO)
-                        raise
-
-            _, auth['cookie'], auth['tv_token'] = self._get_auth()
-
-        return None, None, None
 
     def get_stream_info(self, channel_id: int) -> dict:
         res, cookie, tv_token = self._auth_urlopen(self.endpoint_stream_info.format(channel_id=channel_id), headers={
@@ -122,26 +65,27 @@ class OrangeTemplate(ProviderInterface):
         return stream_info
 
     def get_streams(self) -> list:
-        filepath = os.path.join(xbmcvfs.translatePath(get_addon_path()), 'channels.json')
-        with open(filepath, encoding='UTF-8') as file:
-            channels = json.load(file)
+        nuxt, _, _ = self._get_auth()
+        params = re.search(r'}\((.*?)\)\);', nuxt).expand(r'\1')
+        params = re.sub(r'Array\(.*?\)', '[]', params)
+        params = json.loads(f'[{params}]')
+        channels = re.search(r'{channels:(\[.*?\]),channelsPC', nuxt).expand(r'\1')
+        for rep in [ ('{', '{"'), ('}', '"}'), (':', '":"'), (',', '","'), ('}","{', '},{') ]:
+            channels = channels.replace(*rep)
+        channels = json.loads(channels)
 
         streams = []
 
         for channel in channels:
-            channel_id = str(channel['idEPG'])
-            logourl = None
-            for logo in channel['logos']:
-                if logo['definitionType'] == 'webTVSquare':
-                    logourl = logo['listLogos'][0]['path']
-                    break
+            channel_id = params[self._index(channel['idEPG'])]
+            logoindex = re.search(re.escape(channel['logos']) + r'\[3\]=.*?path:(.*?)}', nuxt).expand(r'\1')
             streams.append({
-                'id': channel_id,
-                'name': channel['name'],
-                'preset': str(channel['displayOrder']),
-                'logo': logourl,
+                'id': str(channel_id),
+                'name': params[self._index(channel['name'])],
+                'preset': str(params[self._index(channel['lcn'])]),
+                'logo': params[self._index(logoindex)],
                 'stream': f'plugin://plugin.video.orange.fr/channel/{channel_id}',
-                'group': [group_name for group_name in self.groups if int(channel_id) in self.groups[group_name]]
+                'group': [group_name for group_name in self.groups if channel_id in self.groups[group_name]]
             })
 
         return streams
@@ -201,6 +145,77 @@ class OrangeTemplate(ProviderInterface):
             })
 
         return epg
+
+    def _index(self, name):
+        table = {}
+        for i in range(26):
+            table[chr(97+i)] = i + 1
+            table[chr(65+i)] = i + 27
+        table['_'] = 53
+        table['$'] = 54
+        index = 0
+        for car in name:
+            if car == "0":
+                break
+            index *= 54
+            index += table[car]
+        return index - 1
+
+    def _get_auth(self) -> tuple:
+        timestamp = datetime.timestamp(datetime.today())
+        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
+
+        req = Request("https://chaines-tv.orange.fr", headers={
+            'User-Agent': random_ua(),
+            'Host': 'chaines-tv.orange.fr',
+        })
+
+        with urlopen(req) as res:
+            html = res.read().decode()
+            nuxt = re.search('<script>(window.*?)</script>', html).expand(r'\1')
+            cookie = res.headers['Set-Cookie'].split(";")[0]
+            tv_token = 'Bearer ' + re.search('token:"(.*?)"', nuxt).expand(r'\1')
+            auth = {'timestamp': timestamp, 'cookie': cookie, 'tv_token': tv_token}
+            with open(filepath, 'w', encoding='UTF-8') as file:
+                file.write(json.dumps(auth))
+
+        return nuxt, cookie, tv_token
+
+    def _auth_urlopen(self, url: str, headers: dict = None) -> tuple:
+        if headers is None:
+            headers = {}
+        timestamp = datetime.timestamp(datetime.today())
+        filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
+
+        try:
+            with open(filepath, encoding='UTF-8') as file:
+                auth = json.loads(file.read())
+        except FileNotFoundError:
+            auth = {'timestamp': timestamp}
+
+        for _ in range(2):
+            if 'cookie' in auth:
+                headers['cookie'] = auth['cookie']
+                headers['tv_token'] = auth['tv_token']
+                req = Request(url, headers=headers)
+
+                try:
+                    with urlopen(req) as res:
+                        if res.code == 200:
+                            return res.read(), auth['cookie'], auth['tv_token']
+                except HTTPError as error:
+                    if error.code == 403:
+                        log("Cette chaîne ne fait pas partie de votre offre.", LogLevel.INFO)
+                        break
+                    if error.code == 401:
+                        log(f"Cookie/token invalide, âge = {int(timestamp - auth['timestamp'])}", LogLevel.INFO)
+                    else:
+                        log(f"Erreur {error}", LogLevel.INFO)
+                        raise
+
+            _, auth['cookie'], auth['tv_token'] = self._get_auth()
+
+        return None, None, None
 
     def _get_programs(self, period_start: int = None, period_end: int = None) -> list:
         """Returns the programs for today (default) or the specified period"""

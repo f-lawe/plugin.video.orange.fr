@@ -38,6 +38,7 @@ def channel(channel_id: str):
     listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
     listitem.setProperty('inputstream.adaptive.license_type', stream['license_type'])
     listitem.setProperty('inputstream.adaptive.license_key', stream['license_key'])
+    listitem.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
     xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=listitem)
 
 @plugin.route('/iptv/channels')
