@@ -51,10 +51,6 @@ def get_addon_name():
     """Return the addon info name property"""
     return _ADDON.getAddonInfo('name')
 
-def get_addon_path():
-    """Return the addon info path property"""
-    return _ADDON.getAddonInfo('path')
-
 def get_addon_profile():
     """Return the addon info profile property"""
     return _ADDON.getAddonInfo('profile')
