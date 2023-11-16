@@ -9,6 +9,12 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
+import urllib.request
+import socks
+from sockshandler import SocksiPyHandler
+import socket
+import ssl
+
 _ADDON = xbmcaddon.Addon()
 
 _USER_AGENTS = [
@@ -93,3 +99,29 @@ def ok_dialog(msg: str):
 def random_ua() -> str:
     """Get a random user agent in the list"""
     return _USER_AGENTS[randint(0, len(_USER_AGENTS) - 1)]
+
+if _ADDON.getSetting('connect.ip') and _ADDON.getSetting('connect.port'):
+      ip = _ADDON.getSetting('connect.ip')
+      port = _ADDON.getSetting('connect.port')      
+      protocol = _ADDON.getSetting('connect.protocol')
+      proxies = {
+        'https': 'http://%s:%s' % (ip, port),
+        'http': 'http://%s:%s' % (ip, port),
+      }      
+else:
+    proxies = "Disabled"
+
+
+def enable_proxy():
+    if proxies != "Disabled":                 
+        if protocol == 'HTTP':
+          proxy_support = urllib.request.ProxyHandler(proxies)
+        elif protocol == 'Socks5 Local DNS':
+          proxy_support = SocksiPyHandler(socks.SOCKS5, ip, int(port), False)
+        elif protocol == 'Socks5 Remote DNS':
+          proxy_support = SocksiPyHandler(socks.SOCKS5, ip, int(port), True)
+        print(proxy_support)
+        print(ip, port)
+        
+        opener = urllib.request.build_opener(proxy_support)
+        urllib.request.install_opener(opener)
