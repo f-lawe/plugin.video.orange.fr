@@ -9,9 +9,10 @@ from urllib.error import HTTPError
 from urllib.parse import urlparse, quote
 from urllib.request import Request, urlopen
 import xbmcvfs
+import urllib.request
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile
+from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua, get_addon_profile, enable_proxy
 
 @dataclass
 class OrangeTemplate(ProviderInterface):
@@ -31,6 +32,9 @@ class OrangeTemplate(ProviderInterface):
         self.groups = groups
 
     def get_stream_info(self, channel_id: int) -> dict:
+
+        enable_proxy()
+
         res, cookie, tv_token = self._auth_urlopen(self.endpoint_stream_info.format(channel_id=channel_id), headers={
             'User-Agent': random_ua(),
             'Host': urlparse(self.endpoint_stream_info).netloc
@@ -165,6 +169,8 @@ class OrangeTemplate(ProviderInterface):
         timestamp = datetime.timestamp(datetime.today())
         filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'auth')
 
+        enable_proxy()
+
         req = Request("https://chaines-tv.orange.fr", headers={
             'User-Agent': random_ua(),
             'Host': 'chaines-tv.orange.fr',
@@ -197,6 +203,9 @@ class OrangeTemplate(ProviderInterface):
             if 'cookie' in auth:
                 headers['cookie'] = auth['cookie']
                 headers['tv_token'] = auth['tv_token']
+
+                enable_proxy()
+
                 req = Request(url, headers=headers)
 
                 try:
@@ -223,6 +232,8 @@ class OrangeTemplate(ProviderInterface):
             period = f'{int(period_start)},{int(period_end)}'
         except ValueError:
             period = 'today'
+
+        enable_proxy()
 
         req = Request(self.endpoint_programs.format(period=period), headers={
             'User-Agent': random_ua(),
