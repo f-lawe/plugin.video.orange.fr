@@ -14,4 +14,11 @@
 		<setting id="provider.country" label="30201" type="select" values="France" default="France"/>
         <setting id="provider.name" visible="eq(-1,France)" label="30203" type="labelenum" values="Orange|Orange Caraïbe|Orange Réunion" default="Orange"/>
     </category>
+        
+    <category label="Proxy">
+            <setting label="Type" id="connect.protocol" type="labelenum" values="None|HTTP|Socks5 Local DNS|Socks5 Remote DNS" default="None"/>
+            <setting label="IP" type="text" id="connect.ip" default=""/>
+            <setting label="Port" type="text" id="connect.port" default=""/>
+    </category>
+    
 </settings>
