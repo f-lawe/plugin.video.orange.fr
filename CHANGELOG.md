@@ -1,3 +1,22 @@
+# 2.x
+
+## [2.0.0+beta.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v2.0.0+beta.1) - 2024-06-13
+
+## Changed
+
+- Remove provider templates and move methods to utils
+- Rename ProviderWrapper to CacheProvider
+- Use Ruff
+
+## Removed
+
+- Remove service entry point
+- Removed basic Kodi integration
+
+## Fixed
+
+- Load data from Orange using new TV token
+
 # 1.x
 
 ## [1.5.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.5.0) - 2021-11-22
