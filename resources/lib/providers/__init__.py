@@ -1,27 +1,29 @@
-# -*- coding: utf-8 -*-
-"""List all available providers and return the provider selected by the user"""
-from lib.utils import get_addon_setting, log, LogLevel
+"""List all available providers and return the provider selected by the user."""
 
+import xbmc
+
+from lib.utils.xbmc import get_addon_setting, log
+
+from .cache_provider import CacheProvider
+from .fr import OrangeCaraibeProvider, OrangeFranceProvider, OrangeReunionProvider
 from .provider_interface import ProviderInterface
-from .provider_wrapper import ProviderWrapper
-from .fr import OrangeFranceProvider, OrangeCaraibeProvider, OrangeReunionProvider
 
 _PROVIDERS = {
-    'France.Orange': OrangeFranceProvider,
-    'France.Orange Caraïbe': OrangeCaraibeProvider,
-    'France.Orange Réunion': OrangeReunionProvider
+    "France.Orange": OrangeFranceProvider,
+    "France.Orange Caraïbe": OrangeCaraibeProvider,
+    "France.Orange Réunion": OrangeReunionProvider,
 }
 
-name: str = get_addon_setting('provider.name')
-country: str = get_addon_setting('provider.country')
+_PROVIDER_NAME: str = get_addon_setting("provider.name")
+_PROVIDER_COUNTRY: str = get_addon_setting("provider.country")
+_PROVIDER_KEY = f"{_PROVIDER_COUNTRY}.{_PROVIDER_NAME}"
 
-_KEY = f'{country}.{name}'
-
-_PROVIDER = _PROVIDERS[_KEY]() if _PROVIDERS.get(_KEY) is not None else None
+_PROVIDER = _PROVIDERS[_PROVIDER_KEY]() if _PROVIDERS.get(_PROVIDER_KEY) is not None else None
 
 if not _PROVIDER:
-    log(f'Cannot instanciate provider: {_KEY}', LogLevel.ERROR)
+    log(f"Cannot instanciate provider: {_PROVIDER_KEY}", xbmc.LOGERROR)
+
 
 def get_provider() -> ProviderInterface:
-    """Return the selected provider"""
-    return ProviderWrapper(_PROVIDER)
+    """Return the selected provider."""
+    return CacheProvider(_PROVIDER)
