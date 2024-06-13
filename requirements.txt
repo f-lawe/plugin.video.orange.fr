@@ -1,2 +1,2 @@
-kodistubs==19.*
-pylint==2.14.*
+kodistubs==21.*
+ruff==0.3.*
