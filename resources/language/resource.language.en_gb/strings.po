@@ -19,35 +19,19 @@ msgid "TV Integration"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Enable IPTV Manager integration"
+msgid "Install IPTV Manager…"
 msgstr ""
 
 msgctxt "#30102"
-msgid "Help 30102"
-msgstr ""
+msgid "Help 30104"
+msgstr "
 
 msgctxt "#30103"
-msgid "Install IPTV Manager…"
+msgid "Go to IPTV Manager settings…"
 msgstr ""
 
 msgctxt "#30104"
 msgid "Help 30104"
-msgstr ""
-
-msgctxt "#30105"
-msgid "Go to IPTV Manager settings…"
-msgstr ""
-
-msgctxt "#30106"
-msgid "Help 30106"
-msgstr ""
-
-msgctxt "#30111"
-msgid "Enable basic integration"
-msgstr ""
-
-msgctxt "#30112"
-msgid "Help 30112"
 msgstr ""
 
 # Provider settings (from 30200 to 30299)

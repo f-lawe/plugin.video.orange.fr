@@ -1,0 +1,27 @@
+[project]
+requires-python = ">=3.8"
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.format]
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
+indent-style = "space"
+line-ending = "auto"
+quote-style = "double"
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+ignore = ["D203", "D213"]
+select = [
+    "E",    # pycodestyle
+    "F",    # Pyflakes
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "I",    # isort
+    "D",    # pydocstyle
+]

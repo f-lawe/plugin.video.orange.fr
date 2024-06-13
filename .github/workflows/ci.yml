@@ -15,26 +15,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kodi-version: [ matrix ]
-        python-version: [ 3.9 ]
+        kodi-version: [ nexus ]
+        python-version: [ 3.8 ]
     steps:
     - name: Check out ${{ github.sha }} from repository ${{ github.repository }}
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: pip install -r ./requirements.txt
 
-    - name: Run pylint
-      run: pylint ./resources
+    - name: Run ruff
+      run: ruff check .
 
     - name: Run kodi-addon-checker
       uses: xbmc/action-kodi-addon-checker@v1.2
       with:
-        rewrite-for-matrix: true
+        is-pr: true
+        rewrite-for-matrix: false
         kodi-version: ${{ matrix.kodi-version }}
         addon-id: ${{ github.event.repository.name }}
