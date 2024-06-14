@@ -25,4 +25,5 @@ N'oubliez pas de configurer IPTV Manager correctement et de sélectionner le bon
 | 🇫🇷        | Orange Réunion    | merci à [@starmate](https://github.com/starmate) et [@sae-gfc](https://github.com/sae-gfc)
 
 ## Limites connues
-Cet addon ne propose pas le replay TV. Pour cela, vous pouvez aller voir du côté du très bon [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/).
+- Cet addon ne propose pas le replay TV. Pour cela, vous pouvez aller voir du côté du très bon [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/)
+- Qualité vidéo limitée à 720p en raison de limitations techniques du côté d'Orange (ils ne proposent pas plus sur leur plateforme web)

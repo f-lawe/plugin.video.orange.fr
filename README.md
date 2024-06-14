@@ -27,4 +27,5 @@ Do not forget to properly configure IPTV Manager and select your TV provider in 
 | 🇫🇷        | Orange Réunion    | thanks to [@starmate](https://github.com/starmate) and [@sae-gfc](https://github.com/sae-gfc) |
 
 ## Known limitations
-This addons does not provide any catchup functionnalities, for that you can have a look at the great [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/).
+- This addons does not provide any catchup functionnalities, for that you can have a look at the great [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/)
+- Limited to 720p due to Orange limitations (they don't provide higher quality on their web service)

@@ -23,7 +23,9 @@ def index():
 def channel(channel_id: str):
     """Load stream for the required channel id."""
     log(f"Loading channel {channel_id}", xbmc.LOGINFO)
-    xbmcplugin.setResolvedUrl(router.handle, True, listitem=ChannelManager().load_channel_listitem(channel_id))
+    listitem = ChannelManager().load_channel_listitem(channel_id)
+    if listitem is not None:
+        xbmcplugin.setResolvedUrl(router.handle, True, listitem=listitem)
 
 
 @router.route("/iptv/channels")
