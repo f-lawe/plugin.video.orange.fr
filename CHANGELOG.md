@@ -6,7 +6,7 @@
 
 - Remove provider templates and move methods to utils
 - Rename ProviderWrapper to CacheProvider
-- Use Ruff
+- Use Ruff for code formatting
 
 ## Removed
 
