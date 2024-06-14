@@ -3,41 +3,6 @@
 from lib.providers.provider_interface import ProviderInterface
 from lib.utils.orange import get_epg, get_stream_info, get_streams
 
-EXTERNAL_ID_MAP = {
-    "canalplus": "canal_plus",
-    "direct8": "c8",
-    "nt1": "tfx",
-    "france4": "france_4",
-    "bfmtv": "bfm_tv",
-    "lcp": "lcp_ps",
-    "itelevision": "cnews",
-    "directstar": "cstar",
-    "hd1": "tf1_series_films",
-    "equipe21": "la_chaine_l_equipe",
-    "numero23": "rmc_story",
-    "rmcdecouverte": "rmc_decouverte",
-    "cherie25": "cherie_25",
-    "lcimobile": "lci",
-    "tv5": "tv5monde",
-    "beinsport1": "beinsports1",
-    "beinsport2": "beinsports_2",
-    "beinsportsmax3": "beinsports_3",
-    "orange_cine_max": "ocsmax",
-    "orange_cine_choc": "ocschoc",
-    "orange_cine_geants": "ocs_geants",
-    "paramount": "paramount_channel",
-    "paramountdec": "paramount_channel_decale",
-    "tcm": "tcmcinema",
-    "cineplus_premier": "cine_premier",
-    "cineplus_frisson": "cine_frisson",
-    "cineplus_emotion": "cine_emotion",
-    "cineplus_famiz": "cine_famiz",
-    "cineplus_club": "cine_club",
-    "cineplus_classic": "cine_classic",
-    "warner_tv": "warnertv",
-    "tlc_wbd": "tlc",
-}
-
 
 class OrangeFranceProvider(ProviderInterface):
     """Orange France provider."""
@@ -68,7 +33,7 @@ class OrangeFranceProvider(ProviderInterface):
 
     def get_streams(self) -> list:
         """Retrieve all the available channels and the the associated information (name, logo, preset, etc.) following JSON-STREAMS format."""  # noqa: E501
-        return get_streams(self.groups, EXTERNAL_ID_MAP, "OFR")
+        return get_streams(self.groups, "OFR")
 
     def get_epg(self) -> dict:
         """Return EPG data for the specified period following JSON-EPG format."""
