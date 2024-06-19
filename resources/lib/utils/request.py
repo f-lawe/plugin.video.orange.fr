@@ -2,6 +2,10 @@
 
 from random import randint
 
+# from socks import SOCKS5
+# from sockshandler import SocksiPyHandler
+from lib.utils.xbmc import get_addon_setting
+
 _USER_AGENTS = [
     # Chrome
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.3",
@@ -25,3 +29,34 @@ _USER_AGENTS = [
 def get_random_ua() -> str:
     """Get a randomised user agent."""
     return _USER_AGENTS[randint(0, len(_USER_AGENTS) - 1)]
+
+
+def install_proxy():
+    """Install proxy server for the next requests."""
+    if get_addon_setting("proxy.enabled") != "true":
+        return
+
+    ip = get_addon_setting("proxy.ip")
+    port = get_addon_setting("proxy.port")
+
+    if ip == "" or port == "":
+        return
+
+    # protocol = get_addon_setting('proxy.protocol')
+
+    # if protocol == 'HTTP':
+    #     proxies = {
+    #         'https': f"http://{ip}:{port}",
+    #         'http': f"http://{ip}:{port}"
+    #     }
+    #     log(proxies, xbmc.LOGDEBUG)
+    #     proxy_support = ProxyHandler(proxies)
+
+    # elif protocol == 'Socks5 Local DNS':
+    #     proxy_support = SocksiPyHandler(SOCKS5, ip, int(port), False)
+
+    # elif protocol == 'Socks5 Remote DNS':
+    #     proxy_support = SocksiPyHandler(SOCKS5, ip, int(port), True)
+
+    # opener = build_opener(proxy_support)
+    # install_opener(opener)

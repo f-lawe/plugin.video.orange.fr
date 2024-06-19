@@ -2,7 +2,6 @@
 
 import json
 import os
-from urllib.error import URLError
 
 import xbmc
 import xbmcvfs
@@ -38,8 +37,8 @@ class CacheProvider(ProviderInterface):
             streams = self.provider.get_streams()
             with open(os.path.join(self.cache_folder, "streams.json"), "wb") as file:
                 file.write(json.dumps(streams).encode("utf-8"))
-        except URLError:
-            log("Can't reach server: load streams from cache", xbmc.LOGWARNING)
+        except Exception:
+            log("Can't load streams: using cache instead", xbmc.LOGWARNING)
             with open(os.path.join(self.cache_folder, "streams.json"), encoding="utf-8") as file:
                 streams = json.loads("".join(file.readlines()))
 

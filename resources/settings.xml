@@ -11,4 +11,11 @@
 		<setting id="provider.country" label="30201" help="30202" type="select" values="France" default="France"/>
         <setting id="provider.name" visible="eq(-1,France)" label="30203" help="30204" type="labelenum" values="Orange|Orange Caraïbe|Orange Réunion" default="Orange"/>
     </category>
+
+    <category label="30300">
+        <setting id="proxy.enabled" label="30301" help="30302" type="bool" default="false" />
+        <setting id="proxy.protocol" label="30303" help="30304" enable="eq(-1,true)"  type="labelenum" values="HTTP|Socks5 Local DNS|Socks5 Remote DNS" default="HTTP"/>
+        <setting id="proxy.ip" label="30305" help="30306" enable="eq(-2,true)" type="text" default=""/>
+        <setting id="proxy.port" label="30307" help="30308" enable="eq(-3,true)" type="text" default=""/>
+    </category>
 </settings>

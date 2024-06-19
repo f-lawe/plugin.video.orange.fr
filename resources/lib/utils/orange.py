@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 
 import xbmc
 
-from lib.utils.request import get_random_ua
+from lib.utils.request import get_random_ua, install_proxy
 from lib.utils.xbmc import get_drm, get_global_setting, log
 
 _EPG_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
@@ -204,6 +204,8 @@ def _build_request(url: str, additional_headers: dict = None) -> Request:
     """Build request."""
     if additional_headers is None:
         additional_headers = {}
+
+    install_proxy()
 
     return Request(url, headers={"User-Agent": get_random_ua(), "Host": urlparse(url).netloc, **additional_headers})
 
