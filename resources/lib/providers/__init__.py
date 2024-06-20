@@ -2,7 +2,7 @@
 
 import xbmc
 
-from lib.utils.xbmc import get_addon_setting, log
+from lib.utils.xbmctools import get_addon_setting, log
 
 from .cache_provider import CacheProvider
 from .fr import OrangeCaraibeProvider, OrangeFranceProvider, OrangeReunionProvider

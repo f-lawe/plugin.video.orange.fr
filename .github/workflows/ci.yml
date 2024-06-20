@@ -32,10 +32,5 @@ jobs:
     - name: Run ruff
       run: ruff check .
 
-    - name: Run kodi-addon-checker
-      uses: xbmc/action-kodi-addon-checker@v1.2
-      with:
-        is-pr: true
-        rewrite-for-matrix: false
-        kodi-version: ${{ matrix.kodi-version }}
-        addon-id: ${{ github.event.repository.name }}
+    - name: Run Kodi Addon checker
+      run: kodi-addon-checker --branch ${{ matrix.kodi-version }} --PR

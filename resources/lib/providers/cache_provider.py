@@ -6,7 +6,7 @@ import os
 import xbmc
 import xbmcvfs
 
-from lib.utils.xbmc import get_addon_info, log
+from lib.utils.xbmctools import get_addon_info, log
 
 from .provider_interface import ProviderInterface
 

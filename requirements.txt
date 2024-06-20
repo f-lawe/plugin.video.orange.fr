@@ -1,2 +1,3 @@
+kodi-addon-checker==0.0.*
 kodistubs==21.*
 ruff==0.3.*
