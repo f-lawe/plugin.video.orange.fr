@@ -1,5 +1,10 @@
 # 2.x
 
+## [2.0.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.0.0) - 2024-06-20
+
+### Added
+- Ready to publish on Kodi main repository!
+
 ## [2.0.0+beta.3](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.0.0+beta.3) - 2024-06-20
 
 ### Added
