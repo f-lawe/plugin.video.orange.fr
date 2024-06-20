@@ -1,12 +1,17 @@
 # 2.x
 
-## [2.0.0+beta.2](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v2.0.0+beta.2) - 2024-06-19
+## [2.0.0+beta.3](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.0.0+beta.3) - 2024-06-20
+
+### Added
+- Proxy settings (not active yet)
+
+## [2.0.0+beta.2](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.0.0+beta.2) - 2024-06-19
 
 ### Fixed
 - Load channels event if not found in EPG
 - Prevent crash on unavailable paid channels
 
-## [2.0.0+beta.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v2.0.0+beta.1) - 2024-06-13
+## [2.0.0+beta.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.0.0+beta.1) - 2024-06-13
 
 ### Changed
 - Remove provider templates and move methods to utils
@@ -22,12 +27,12 @@
 
 # 1.x
 
-## [1.5.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.5.0) - 2021-11-22
+## [1.5.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.5.0) - 2021-11-22
 
 ### Added
 - Support for Orange Caraïbe
 
-## [1.4.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.4.0) - 2021-11-21
+## [1.4.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.4.0) - 2021-11-21
 
 ### Added
 - Cache management over get_streams() to prevent Kodi from removing all channels using IPTV Manager
@@ -35,24 +40,24 @@
 ### Fixed
 - Provider load from settings
 
-## [1.3.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.1) - 2021-11-21
+## [1.3.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.3.1) - 2021-11-21
 
 ### Fixed
-- Channel update when no logo available [#14](https://github.com/BreizhReloaded/plugin.video.orange.fr/issues/14)
+- Channel update when no logo available [#14](https://github.com/f-lawe/plugin.video.orange.fr/issues/14)
 
-## [1.3.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.0) - 2021-09-11
+## [1.3.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.3.0) - 2021-09-11
 
 ### Added
 - Provider templates now allow to easily support similar backends
 - Support for Orange Réunion
 
-## [1.2.2](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.2) - 2021-03-23
+## [1.2.2](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.2.2) - 2021-03-23
 
 ### Fixed
 - Channel groups for basic integration
 - Settings translations
 
-## [1.2.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.1) - 2021-03-14
+## [1.2.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.2.1) - 2021-03-14
 
 ### Added
 - French translations for settings and dialogs
@@ -66,7 +71,7 @@
 ### Removed
 - Remove basic interval setting (now use TV Guide update value)
 
-## [1.2.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-12
+## [1.2.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-12
 
 ### Added
 - Provider interface to allow multi ISP support
@@ -77,7 +82,7 @@
 - Update generators to write data from JSON-STREAMS and JSON-EPG formats
 - Data files now written into user data folder
 
-## [1.1.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.1.0) - 2021-03-04
+## [1.1.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.1.0) - 2021-03-04
 
 ### Added
 - API calls to Orange now use a randomised user agent string
@@ -90,6 +95,6 @@
 ### Fixed
 - Programs responses reduced by half to avoid IncompleteRead error
 
-## [1.0.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.0.0) - 2021-03-01
+## [1.0.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v1.0.0) - 2021-03-01
 
 - Initial release
