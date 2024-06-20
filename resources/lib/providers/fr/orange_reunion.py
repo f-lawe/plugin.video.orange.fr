@@ -21,14 +21,18 @@ class OrangeReunionProvider(ProviderInterface):
         "Information internationale": [671, 53, 51, 410, 19, 525, 70239, 70240, 70241, 70242, 781, 830, 70246, 70503],
     }
 
-    def get_stream_info(self, channel_id: str) -> dict:
-        """Get stream information (MPD address, Widewine key) for the specified id. Required keys: path, mime_type, manifest_type, drm, license_type, license_key."""  # noqa: E501
-        return get_stream_info(channel_id, "ORE")
-
     def get_streams(self) -> list:
         """Retrieve all the available channels and the the associated information (name, logo, preset, etc.) following JSON-STREAMS format."""  # noqa: E501
-        return get_streams(self.groups, "ORE")
+        return get_streams(self.groups)
 
     def get_epg(self) -> dict:
         """Return EPG data for the specified period following JSON-EPG format."""
         return get_epg(2, "ORE")
+
+    def get_live_stream_info(self, channel_id: str) -> dict:
+        """Get live stream information (MPD address, Widewine key) for the specified id. Required keys: path, mime_type, manifest_type, drm, license_type, license_key."""  # noqa: E501
+        return get_stream_info("live", "channels", channel_id, "ORE")
+
+    def get_catchup_channel_listitems(self) -> list:
+        """Return a listitem list of available catchup channels."""
+        return []

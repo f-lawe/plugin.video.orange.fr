@@ -2,7 +2,7 @@
 
 import xbmc
 
-from lib.utils.xbmctools import get_addon_setting, log
+from lib.utils.kodi import get_addon_setting, log
 
 from .cache_provider import CacheProvider
 from .fr import OrangeCaraibeProvider, OrangeFranceProvider, OrangeReunionProvider
@@ -24,6 +24,6 @@ if not _PROVIDER:
     log(f"Cannot instanciate provider: {_PROVIDER_KEY}", xbmc.LOGERROR)
 
 
-def get_provider() -> ProviderInterface:
+def get_provider(use_cache: bool = False) -> ProviderInterface:
     """Return the selected provider."""
-    return CacheProvider(_PROVIDER)
+    return CacheProvider(_PROVIDER) if use_cache else _PROVIDER

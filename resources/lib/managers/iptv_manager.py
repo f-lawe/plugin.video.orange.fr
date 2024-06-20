@@ -13,7 +13,7 @@ class IPTVManager:
     def __init__(self, port: int):
         """Initialize IPTV Manager object."""
         self.port = port
-        self.provider = get_provider()
+        self.provider = get_provider(True)
 
     def via_socket(func: Callable[[Any], Any]):
         """Send the output of the wrapped function to socket."""
@@ -30,11 +30,11 @@ class IPTVManager:
         return send
 
     @via_socket
-    def send_channels(self):
+    def send_channels(self) -> dict:
         """Return JSON-STREAMS formatted python datastructure to IPTV Manager."""
         return dict(version=1, streams=self.provider.get_streams())
 
     @via_socket
-    def send_epg(self):
+    def send_epg(self) -> dict:
         """Return JSON-EPG formatted python data structure to IPTV Manager."""
         return dict(version=1, epg=self.provider.get_epg())
