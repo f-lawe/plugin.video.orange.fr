@@ -3,7 +3,7 @@
 [![Kodi version](https://img.shields.io/badge/kodi%20version-v21-blue)](https://kodi.tv/)
 [![GitHub](https://img.shields.io/github/license/f-lawe/plugin.video.orange.fr)](https://github.com/f-lawe/plugin.video.orange.fr/blob/master/LICENSE)
 
-__→__ _[Lisez-moi](docs/README.fr.md) en français_
+__→__ _[Lisez-moi](doc/README.fr.md) en français_
 
 _This addon is not officially commissioned/supported by Orange. All product names, logos, and trademarks mentionned in this project are property of their respective owners._
 

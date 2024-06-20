@@ -1,7 +1,15 @@
 """Orange France."""
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.utils.orange import get_epg, get_stream_info, get_streams
+from lib.utils.orange import (
+    get_catchup_articles,
+    get_catchup_categories,
+    get_catchup_channels,
+    get_catchup_videos,
+    get_epg,
+    get_stream_info,
+    get_streams,
+)
 
 
 class OrangeFranceProvider(ProviderInterface):
@@ -27,14 +35,34 @@ class OrangeFranceProvider(ProviderInterface):
         + [313, 635, 645, 639, 643, 648],
     }
 
-    def get_stream_info(self, channel_id: str) -> dict:
-        """Get stream information (MPD address, Widewine key) for the specified id. Required keys: path, mime_type, manifest_type, drm, license_type, license_key."""  # noqa: E501
-        return get_stream_info(channel_id, "OFR")
-
     def get_streams(self) -> list:
         """Retrieve all the available channels and the the associated information (name, logo, preset, etc.) following JSON-STREAMS format."""  # noqa: E501
-        return get_streams(self.groups, "OFR")
+        return get_streams(self.groups)
 
     def get_epg(self) -> dict:
         """Return EPG data for the specified period following JSON-EPG format."""
         return get_epg(2, "OFR")
+
+    def get_live_stream_info(self, stream_id: str) -> dict:
+        """Get live stream information (MPD address, Widewine key) for the specified id. Required keys: path, mime_type, manifest_type, drm, license_type, license_key."""  # noqa: E501
+        return get_stream_info("live", "v3", "channels", stream_id, "OFR")
+
+    def get_catchup_stream_info(self, stream_id: str) -> dict:
+        """Get catchup stream information (MPD address, Widewine key) for the specified id. Required keys: path, mime_type, manifest_type, drm, license_type, license_key."""  # noqa: E501
+        return get_stream_info("catchup", "v4", "videos", stream_id, "OFR")
+
+    def get_catchup_channels(self) -> list:
+        """Return a listitem list of available catchup channels."""
+        return get_catchup_channels()
+
+    def get_catchup_categories(self, catchup_channel_id: str) -> list:
+        """Return a list of catchup categories for the specified channel id."""
+        return get_catchup_categories(catchup_channel_id)
+
+    def get_catchup_articles(self, catchup_channel_id: str, category_id: str) -> list:
+        """Return a list of catchup articles for the specified channel id and category id."""
+        return get_catchup_articles(catchup_channel_id, category_id)
+
+    def get_catchup_videos(self, catchup_channel_id: str, article_id: str) -> list:
+        """Return a list of catchup videos for the specified channel id and article id."""
+        return get_catchup_videos(catchup_channel_id, article_id)
