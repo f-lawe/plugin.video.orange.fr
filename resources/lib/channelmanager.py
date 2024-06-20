@@ -4,7 +4,7 @@ import inputstreamhelper
 import xbmcgui
 
 from lib.providers import get_provider
-from lib.utils.xbmc import localize, ok_dialog
+from lib.utils.xbmctools import localize, ok_dialog
 
 
 class ChannelManager:

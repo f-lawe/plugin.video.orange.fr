@@ -6,7 +6,7 @@ import xbmc
 import xbmcplugin
 from lib.channelmanager import ChannelManager
 from lib.iptvmanager import IPTVManager
-from lib.utils.xbmc import log, ok_dialog
+from lib.utils.xbmctools import log, ok_dialog
 from routing import Plugin
 
 router = Plugin()

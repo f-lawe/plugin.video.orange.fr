@@ -4,7 +4,7 @@ from random import randint
 
 # from socks import SOCKS5
 # from sockshandler import SocksiPyHandler
-from lib.utils.xbmc import get_addon_setting
+from lib.utils.xbmctools import get_addon_setting
 
 _USER_AGENTS = [
     # Chrome

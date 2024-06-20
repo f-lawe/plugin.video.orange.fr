@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 import xbmc
 
 from lib.utils.request import get_random_ua, install_proxy
-from lib.utils.xbmc import get_drm, get_global_setting, log
+from lib.utils.xbmctools import get_drm, get_global_setting, log
 
 _EPG_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
 _STREAM_INFO_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/live/v3/auth/accountToken/applications/PC/channels/{channel_id}/stream?terminalModel=WEB_PC"
@@ -99,7 +99,9 @@ def get_streams(groups: dict, external_id_map: dict, mco: str = "OFR") -> list:
     channels = _load_channel_presets(channels, mco)
     log(f"{len(channels)} channels found", xbmc.LOGINFO)
 
-    channels_without_id = {external_id: channel for external_id, channel in channels.items() if channel["id"] == ""}
+    channels_without_id = {
+        external_id: channel for external_id, channel in list(channels.items()) if channel["id"] == ""
+    }
     log(f"{len(channels_without_id)} channels without id", xbmc.LOGINFO)
 
     for external_id in channels_without_id:
@@ -114,7 +116,7 @@ def get_streams(groups: dict, external_id_map: dict, mco: str = "OFR") -> list:
             "stream": "plugin://plugin.video.orange.fr/channels/{channel_id}".format(channel_id=channel["id"]),
             "group": [group_name for group_name in groups if int(channel["id"]) in groups[group_name]],
         }
-        for channel in channels.values()
+        for channel in list(channels.values())
         if channel["id"] != "" and "preset" in channel
     ]
 
@@ -270,7 +272,9 @@ def _load_channel_logos(channels: dict, mco: str = "OFR") -> dict:
     with urlopen(req) as res:
         programs_by_channel = json.loads(res.read())
 
-    channel_ids = {programs[0]["externalId"]: programs[0]["channelId"] for programs in programs_by_channel.values()}
+    channel_ids = {
+        programs[0]["externalId"]: programs[0]["channelId"] for programs in list(programs_by_channel.values())
+    }
 
     for external_id in channels:
         epg_external_id = _get_external_id(external_id)
