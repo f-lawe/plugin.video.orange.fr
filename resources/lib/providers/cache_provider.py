@@ -6,7 +6,7 @@ import os
 import xbmc
 import xbmcvfs
 
-from lib.utils.xbmctools import get_addon_info, log
+from lib.utils.kodi import get_addon_info, log
 
 from .provider_interface import ProviderInterface
 
@@ -24,10 +24,6 @@ class CacheProvider(ProviderInterface):
 
         if not os.path.exists(self.cache_folder):
             os.makedirs(self.cache_folder)
-
-    def get_stream_info(self, channel_id: int) -> dict:
-        """Get stream information (MPD address, Widewine key) for the specified id. Required keys: path, mime_type, manifest_type, drm, license_type, license_key."""  # noqa: E501
-        return self.provider.get_stream_info(channel_id)
 
     def get_streams(self) -> list:
         """Retrieve all the available channels and the the associated information (name, logo, preset, etc.) following JSON-STREAMS format."""  # noqa: E501

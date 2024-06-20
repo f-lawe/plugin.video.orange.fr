@@ -1,72 +1,56 @@
 """."""
 
-import codecs
 import json
 import re
 from datetime import date, datetime, timedelta
 from urllib.error import HTTPError
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import urlopen
 
 import xbmc
 
-from lib.utils.request import get_random_ua, install_proxy
-from lib.utils.xbmctools import get_drm, get_global_setting, log
+from lib.utils.kodi import get_addon_info, get_drm, get_global_setting, log
+from lib.utils.request import build_request, get_random_ua, get_win10_x64_firefox_ua
 
-_EPG_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
-_STREAM_INFO_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/live/v3/auth/accountToken/applications/PC/channels/{channel_id}/stream?terminalModel=WEB_PC"
-_STREAM_LOGO_ENDPOINT = "https://proxymedia.woopic.com/api/v1/images/2090%2Flogos%2Fv2%2Flogos%2F{external_id}%2F{hash}%2F{type}%2Flogo_{width}x{height}.png"
+_PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
+_CATCHUP_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels"
+_CATCHUP_ARTICLES_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels/{catchup_channel_id}/categories/{category_id}"
+_CATCHUP_VIDEOS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/groups/{group_id}"
+_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/pds/v1/live/ew?everywherePopulation=OTT_Metro"
+_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/{stream_type}/{version}/auth/accountToken/applications/PC/{item_type}/{stream_id}/stream?terminalModel=WEB_PC&terminalId=Windows10-x64-Firefox-{household_id}"
 
-_HOMEPAGE_ENDPOINTS = [
-    "https://chaines-tv.orange.fr/",
-    "https://chaines-tv.orange.fr/ce-soir?filtres=all",
-    "https://chaines-tv.orange.fr/programme-tv?filtres=all",
-]
-
-_EXTERNAL_ID_MAP = {
-    "canalplus": "canal_plus",
-    "lcp": "lcp_ps",
-    "france4": "france_4",
-    "itelevision": "cnews",
-    "directstar": "cstar",
-    "lcimobile": "lci",
-    "tcm": "tcmcinema",
-    # livetv_canal_sport
-    "gameone": "game_one",
-    "chasseetpeche": "chasse_peche",
-    "toute_l_histoire": "toute_histoire",
-    "ushuaia": "ushuaia_tv",
-    "natgeo": "national_geographic",
-    "planeteplus": "planete_plus",
-    "m6_music": "m6music",
-    "equidia": "equidia_live",
-    "luxe": "luxe_tv",
-    "deutschewelle": "deutsche_welle_english",
-    "france3corsevs": "f3_corse_via_stella",
-    "rai_tre": "raitre",
-}
-
-_NO_PRESET_START = 1000
+_STREAM_LOGO_URL = "https://proxymedia.woopic.com/api/v1/images/2090{path}"
+_LIVE_HOMEPAGE_URL = "https://chaines-tv.orange.fr/"
+_CATCHUP_VIDEO_URL = "https://replay.orange.fr/videos/{stream_id}"
 
 
-def get_stream_info(channel_id: str, mco: str = "OFR") -> dict:
+def get_stream_info(stream_type: str, version: str, item_type: str, stream_id: str, mco: str = "OFR") -> dict:
     """Load stream info from Orange."""
-    tv_token = _extract_tv_token()
-    log(tv_token, xbmc.LOGINFO)
+    url = _LIVE_HOMEPAGE_URL if stream_type == "live" else _CATCHUP_VIDEO_URL.format(stream_id=stream_id)
+    tv_token, household_id = _fetch_auth_tokens(url)
 
-    url = _STREAM_INFO_ENDPOINT.format(channel_id=channel_id)
-    req = _build_request(url, {"tv_token": f"Bearer {tv_token}"})
+    url = _STREAM_ENDPOINT.format(
+        stream_type=stream_type, version=version, item_type=item_type, stream_id=stream_id, household_id=household_id
+    )
+    req = build_request(url, {"User-Agent": get_win10_x64_firefox_ua(), "tv_token": f"Bearer {tv_token}"})
 
     try:
         with urlopen(req) as res:
             stream_info = json.loads(res.read())
     except HTTPError as error:
-        if error.code == 403:
+        log(error)
+        if error.code == 403 or error.code == 401:
             return False
 
     drm = get_drm()
+    protectionData = (
+        stream_info.get("protectionData", None)
+        if stream_info.get("protectionData", None) is not None
+        else stream_info.get("protectionDatas")
+    )
     license_server_url = None
-    for system in stream_info.get("protectionData"):
+
+    for system in protectionData:
         if system.get("keySystem") == drm.value:
             license_server_url = system.get("laUrl")
 
@@ -92,32 +76,28 @@ def get_stream_info(channel_id: str, mco: str = "OFR") -> dict:
     return stream_info
 
 
-def get_streams(groups: dict, external_id_map: dict, mco: str = "OFR") -> list:
+def get_streams(groups: dict) -> list:
     """Load stream data from Orange and convert it to JSON-STREAMS format."""
-    channels = _discover_channels()
-    channels = _load_channel_logos(channels)
-    channels = _load_channel_presets(channels, mco)
+    req = build_request(_CHANNELS_ENDPOINT)
+
+    with urlopen(req) as res:
+        channels = list(json.loads(res.read())["channels"])
+
     log(f"{len(channels)} channels found", xbmc.LOGINFO)
-
-    channels_without_id = {
-        external_id: channel for external_id, channel in list(channels.items()) if channel["id"] == ""
-    }
-    log(f"{len(channels_without_id)} channels without id", xbmc.LOGINFO)
-
-    for external_id in channels_without_id:
-        log(f" => {external_id}", xbmc.LOGDEBUG)
+    channels.sort(key=lambda channel: channel["displayOrder"])
 
     return [
         {
-            "id": channel["id"],
+            "id": str(channel["idEPG"]),
             "name": channel["name"],
-            "preset": channel["preset"],
-            "logo": channel.get("logo", None),
-            "stream": "plugin://plugin.video.orange.fr/channels/{channel_id}".format(channel_id=channel["id"]),
-            "group": [group_name for group_name in groups if int(channel["id"]) in groups[group_name]],
+            "preset": str(channel["displayOrder"]),
+            "logo": _extract_logo(channel["logos"]),
+            "stream": "plugin://{addon_id}/live-streams/{channel_id}".format(
+                addon_id=get_addon_info("id"), channel_id=channel["idEPG"]
+            ),
+            "group": [group_name for group_name in groups if int(channel["idEPG"]) in groups[group_name]],
         }
-        for channel in list(channels.values())
-        if channel["id"] != "" and "preset" in channel
+        for channel in channels
     ]
 
 
@@ -178,6 +158,88 @@ def get_epg(chunks_per_day: int = 2, mco: str = "OFR") -> dict:
     return epg
 
 
+def get_catchup_channels() -> list:
+    """Load available catchup channels."""
+    req = build_request(_CATCHUP_CHANNELS_ENDPOINT)
+
+    with urlopen(req) as res:
+        channels = list(json.loads(res.read()))
+
+    log(f"{len(channels)} catchup channels found", xbmc.LOGINFO)
+
+    return [
+        {
+            "is_folder": True,
+            "label": str(channel["name"]).upper(),
+            "path": "plugin://{addon_id}/channels/{catchup_channel_id}/categories".format(
+                addon_id=get_addon_info("id"), catchup_channel_id=channel["id"]
+            ),
+            "art": {"thumb": channel["logos"]["ref_millenials_partner_white_logo"]},
+        }
+        for channel in channels
+    ]
+
+
+def get_catchup_categories(catchup_channel_id: str) -> list:
+    """Return a list of catchup categories for the specified channel id."""
+    req = build_request(_CATCHUP_CHANNELS_ENDPOINT + "/" + catchup_channel_id)
+
+    with urlopen(req) as res:
+        categories = list(json.loads(res.read())["categories"])
+
+    return [
+        {
+            "is_folder": True,
+            "label": category["name"][0].upper() + category["name"][1:],
+            "path": "plugin://{addon_id}/channels/{catchup_channel_id}/categories/{category_id}/articles".format(
+                addon_id=get_addon_info("id"), catchup_channel_id=catchup_channel_id, category_id=category["id"]
+            ),
+        }
+        for category in categories
+    ]
+
+
+def get_catchup_articles(catchup_channel_id: str, category_id: str) -> list:
+    """Return a list of catchup groups for the specified channel id and category id."""
+    req = build_request(
+        _CATCHUP_ARTICLES_ENDPOINT.format(catchup_channel_id=catchup_channel_id, category_id=category_id)
+    )
+
+    with urlopen(req) as res:
+        articles = list(json.loads(res.read())["articles"])
+
+    return [
+        {
+            "is_folder": True,
+            "label": article["title"],
+            "path": "plugin://{addon_id}/channels/{catchup_channel_id}/articles/{article_id}/videos".format(
+                addon_id=get_addon_info("id"), catchup_channel_id=catchup_channel_id, article_id=article["id"]
+            ),
+        }
+        for article in articles
+    ]
+
+
+def get_catchup_videos(catchup_channel_id: str, article_id: str) -> list:
+    """Return a list of catchup videos for the specified channel id and article id."""
+    req = build_request(_CATCHUP_VIDEOS_ENDPOINT.format(group_id=article_id))
+
+    with urlopen(req) as res:
+        videos = list(json.loads(res.read())["videos"])
+
+    return [
+        {
+            "is_folder": False,
+            "label": video["title"],
+            "path": "plugin://{addon_id}/videos/{stream_id}".format(
+                addon_id=get_addon_info("id"), stream_id=video["id"]
+            ),
+            "art": {"thumb": video["covers"]["ref_4_3"]},
+        }
+        for video in videos
+    ]
+
+
 def _get_programs(start_day: int, days_to_display: int, chunks_per_day: int = 2, mco: str = "OFR") -> list:
     """Return the programs for today (default) or the specified period."""
     programs = []
@@ -192,8 +254,8 @@ def _get_programs(start_day: int, days_to_display: int, chunks_per_day: int = 2,
         except ValueError:
             period = "today"
 
-        url = _EPG_ENDPOINT.format(period=period, mco=mco)
-        req = _build_request(url)
+        url = _PROGRAMS_ENDPOINT.format(period=period, mco=mco)
+        req = build_request(url)
         log(f"Fetching: {url}", xbmc.LOGINFO)
 
         with urlopen(req) as res:
@@ -202,126 +264,22 @@ def _get_programs(start_day: int, days_to_display: int, chunks_per_day: int = 2,
     return programs
 
 
-def _build_request(url: str, additional_headers: dict = None) -> Request:
-    """Build request."""
-    if additional_headers is None:
-        additional_headers = {}
+def _extract_logo(logos: list, definition_type: str = "mobileAppliDark") -> str:
+    for logo in logos:
+        if logo["definitionType"] == definition_type:
+            return _STREAM_LOGO_URL.format(path=logo["listLogos"][0]["path"])
 
-    install_proxy()
-
-    return Request(url, headers={"User-Agent": get_random_ua(), "Host": urlparse(url).netloc, **additional_headers})
+    return None
 
 
-def _extract_tv_token() -> str:
-    """Extract TV token."""
-    req = _build_request(_HOMEPAGE_ENDPOINTS[0])
+def _fetch_auth_tokens(url: str):
+    """Fetch auth token."""
+    req = build_request(url, {"User-Agent": get_win10_x64_firefox_ua()})
 
     with urlopen(req) as res:
         html = res.read().decode("utf-8")
 
-    return re.search('instanceInfo:{token:"([a-zA-Z0-9-_.]+)"', html).group(1)
+    tv_token = re.search('instanceInfo:{token:"([a-zA-Z0-9-_.]+)"', html).group(1)
+    household_id = re.search('householdId:"([A-Z0-9]+)"', html).group(1)
 
-
-def _discover_channels() -> list:
-    """Load available channels from homepages."""
-    channels = {}
-
-    pattern = '"([A-Z0-9+/\': ]*[A-Z][A-Z0-9+/\': ]*)","(livetv_[a-zA-Z0-9_]+)",([0-9]*)'
-
-    for url in _HOMEPAGE_ENDPOINTS:
-        req = _build_request(url)
-
-        with urlopen(req) as res:
-            html = codecs.decode(res.read().decode("utf-8"), "unicode-escape")
-
-        matches = re.findall(pattern, html)
-
-        for match in matches:
-            channels[match[1]] = {"name": match[0], "id": match[2]}
-
-    return channels
-
-
-def _load_channel_logos(channels: dict, mco: str = "OFR") -> dict:
-    """Load channel logos from homepage."""
-    req = _build_request(_HOMEPAGE_ENDPOINTS[0])
-
-    with urlopen(req) as res:
-        html = codecs.decode(res.read().decode("utf-8"), "unicode-escape")
-
-    matches = re.findall(
-        'path:"%2Flogos%2Fv2%2Flogos%2F(livetv_[a-zA-Z0-9_]+)%2F([0-9]+_[0-9]+)%2FmobileAppliDark%2Flogo_([0-9]+)x([0-9]+)\.png"',
-        html,
-    )
-
-    for match in matches:
-        if match[0] not in channels:
-            continue
-
-        channels[match[0]]["logo"] = _STREAM_LOGO_ENDPOINT.format(
-            external_id=match[0],
-            hash=match[1],
-            type="mobileAppliDark",
-            width=match[2],
-            height=match[3],
-        )
-
-    # Fill missing channel ids from EPG when possible
-    req = _build_request(_EPG_ENDPOINT.format(period="today", mco=mco) + "&groupBy=channel")
-
-    with urlopen(req) as res:
-        programs_by_channel = json.loads(res.read())
-
-    channel_ids = {
-        programs[0]["externalId"]: programs[0]["channelId"] for programs in list(programs_by_channel.values())
-    }
-
-    for external_id in channels:
-        epg_external_id = _get_external_id(external_id)
-
-        if epg_external_id in channel_ids and channels[external_id]["id"] == "":
-            log(f" => Fill missing channel id for {external_id}", xbmc.LOGDEBUG)
-            channels[external_id]["id"] = channel_ids[epg_external_id]
-
-    return channels
-
-
-def _load_channel_presets(channels: dict, mco: str = "OFR") -> dict:
-    """Load presets from EPG."""
-    req = _build_request(_EPG_ENDPOINT.format(period="today", mco=mco) + "&groupBy=channel")
-
-    with urlopen(req) as res:
-        programs_by_channel = json.loads(res.read())
-
-    preset = _NO_PRESET_START
-
-    for external_id in channels:
-        if channels[external_id]["id"] in programs_by_channel:
-            program = programs_by_channel[channels[external_id]["id"]][0]
-            channels[external_id]["preset"] = program["channelZappingNumber"]
-        else:
-            result = re.findall("90([0-9]+)", channels[external_id]["id"])
-
-            if len(result) > 0:
-                channels[external_id]["preset"] = result[0]
-            else:
-                channels[external_id]["preset"] = preset
-                preset = preset + 1
-                log(
-                    "=> Force preset {preset} for {channel_name} ({channel_id})".format(
-                        preset=preset,
-                        channel_name=channels[external_id]["name"],
-                        channel_id=channels[external_id]["id"],
-                    ),
-                    xbmc.LOGDEBUG,
-                )
-
-    return channels
-
-
-def _get_external_id(stream_external_id: str) -> str:
-    """Format original external id to EPG external id."""
-    epg_external_id = stream_external_id.lower().replace("_umts", "").replace("livetv_", "")
-    epg_external_id = "livetv_" + _EXTERNAL_ID_MAP.get(epg_external_id, epg_external_id) + "_ctv"
-    log(f"{stream_external_id} => {epg_external_id}".format(stream_external_id, epg_external_id), xbmc.LOGDEBUG)
-    return epg_external_id
+    return tv_token, household_id
