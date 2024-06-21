@@ -1,5 +1,10 @@
 # 2.x
 
+## [2.1.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.1.0) - 2024-06-21
+
+### Added
+- Catchup TV
+
 ## [2.0.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.0.1) - 2024-06-20
 
 ### Changed
