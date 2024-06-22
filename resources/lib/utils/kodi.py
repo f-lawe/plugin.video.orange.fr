@@ -19,6 +19,11 @@ class DRM(Enum):
     PLAYREADY = "com.microsoft.playready"
 
 
+def build_addon_url(path: str = "") -> str:
+    """Build addon URL from path."""
+    return f"plugin://{get_addon_info('id')}{path}"
+
+
 def log(msg: str, log_level: int = xbmc.LOGINFO):
     """Prefix logs with addon name."""
     xbmc.log(f"{ADDON_NAME}: {msg}", log_level)

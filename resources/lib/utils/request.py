@@ -33,11 +33,6 @@ def get_random_ua() -> str:
     return _USER_AGENTS[randint(0, len(_USER_AGENTS) - 1)]
 
 
-def get_win10_x64_firefox_ua() -> str:
-    """Get Win10 x64 Firefox user agent."""
-    return _USER_AGENTS[5]
-
-
 def build_request(url: str, additional_headers: dict = None) -> Request:
     """Build HTTP request."""
     if additional_headers is None:
