@@ -10,6 +10,11 @@ _This addon is not officially commissioned/supported by Orange. All product name
 ## Description
 This addon brings Orange TV to Kodi. All channels included in your registration are now directly available from Kodi!
 
+This addon features:
+- Watching TV with Kodi TV (using [IPTV Simple PVR](https://github.com/kodi-pvr/pvr.iptvsimple))
+- Watching catchup TV content
+- Access to paid channels included into your subscription (for both live and catchup TV)
+
 ## Installation
 Download the latest ZIP archive from the [releases page](https://github.com/f-lawe/plugin.video.orange.fr/releases/latest) and install it into Kodi (Settings > Addons > Install from ZIP). Then install the dependencies from the addon screen (My addons > Video addons > Orange TV France > Dependencies).
 
