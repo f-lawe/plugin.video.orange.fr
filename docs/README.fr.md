@@ -9,13 +9,13 @@ _Cet addon n'est pas officiellement supporté par Orange. Tous les produits, log
 Cet addon ajoute la TV d'Orange à Kodi. Toutes les chaînes inclues dans votre abonnement sont maintenant directement accessibles depuis Kodi !
 
 ## Installation
-Download the latest ZIP archive from the [releases page](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases) and install it into Kodi (Settings > Addons > Install from ZIP). Then install the dependencies from the addon screen (My addons > Video addons > Orange TV France > Dependencies).
+Téléchargez l'archive de la [dernière version](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/latest) et installez-la directement depuis Kodi (Settings > Addons > Install from ZIP). Installez ensuite les dépendences depuis l'écan de l'adddon (My addons > Video addons > Orange TV France > Dependencies).
 
-Integration to Kodi TV is handled via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). You can install and activate it from the addon settings. Once set up on your system, channels and TV guide are loaded automatically.
+L'intégration à la télévision sur Kodi se fait via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). Vous pouvez l'installer et l'activer directement depuis les réglages de l'addon. Une fois configuré, les chaînes et le programme TV se chargent automatiquement.
 
-_NB: you can also choose the basic integration, in that case you need to manually pass to [IPTV Simple](https://github.com/kodi-pvr/pvr.iptvsimple) the .m3u8 and .xml files located within the data directory._
+_NB: vous pouvez également choisir l'intégration basique, dans ce cas vous devez passer manuellement à [IPTV Simple](https://github.com/kodi-pvr/pvr.iptvsimple) les fichiers .m3u8 et .xml situés dans le dossier data._
 
-You should now be able to view all the channels grouped by category in the TV section. If that's not already installed, Kodi will ask you to install the decrypting tool when accessing a channel for the first time.
+Vous devriez maintenant voir toutes les chaînes regroupées par categories dans la section TV. S'il n'est pas déjà installé, Kodi vous demandera d'installer l'outil de décryptage quand vous regarderez une chaîne pour la première fois.
 
 N'oubliez pas de sélectionner le bon fournisseur dans les paramètres !
 
