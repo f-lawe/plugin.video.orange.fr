@@ -34,10 +34,6 @@ msgctxt "#30111"
 msgid "Enable basic integration"
 msgstr ""
 
-msgctxt "#30112"
-msgid "Refresh time interval [I](in minutes)[/I]"
-msgstr ""
-
 # Provider settings (from 30200 to 30299)
 
 msgctxt "#30200"

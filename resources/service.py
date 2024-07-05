@@ -3,33 +3,30 @@
 import os
 
 import xbmc
-import xbmcaddon
 import xbmcvfs
 
 from lib.generators import EPGGenerator, PlaylistGenerator
-from lib.providers import Provider
-from lib.utils import log
-
-ADDON = xbmcaddon.Addon()
+from lib.providers import get_provider
+from lib.utils import get_addon_profile, get_addon_setting, get_global_setting, log, LogLevel
 
 def run():
     """Run data generators"""
-    log('Updating data...', 'info')
-    provider = Provider()
+    log('Updating data...', LogLevel.INFO)
+    provider = get_provider()
 
-    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'playlist.m3u8')
-    log(filepath, 'debug')
+    filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'playlist.m3u8')
+    log(filepath, LogLevel.DEBUG)
     PlaylistGenerator(provider=provider).write(filepath=filepath)
 
-    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'epg.xml')
-    log(filepath, 'debug')
+    filepath = os.path.join(xbmcvfs.translatePath(get_addon_profile()), 'epg.xml')
+    log(filepath, LogLevel.DEBUG)
     EPGGenerator(provider=provider).write(filepath=filepath)
 
-    log('Channels and programs data updated', 'info')
+    log('Channels and programs data updated', LogLevel.INFO)
 
 def main():
     """Service initialisation"""
-    log('Initialise service', 'info')
+    log('Initialise service', LogLevel.INFO)
     interval = 10
     monitor = xbmc.Monitor()
 
@@ -37,9 +34,9 @@ def main():
         if monitor.waitForAbort(interval):
             break
 
-        interval = int(ADDON.getSetting('basic.interval')) * 60
+        interval = int(get_global_setting('epg.epgupdate')) * 60
 
-        if ADDON.getSetting('basic.enabled') == 'true':
+        if get_addon_setting('basic.enabled') == 'true':
             run()
 
 if __name__ == '__main__':

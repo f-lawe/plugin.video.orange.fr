@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 """Orange France"""
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import json
 from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from lib.providers.provider_interface import ProviderInterface
-from lib.types import DRM
-from lib.utils import log, random_ua
+from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua
 
 class OrangeFranceProvider(ProviderInterface):
     """Orange France provider"""
     chunks_per_day = 2
-    drm = DRM.WIDEVINE
     groups = {
         'TNT':                          [192, 4, 80, 34, 47, 118, 111, 445, 119, 195, 446, 444, 234, 78, 481, 226,
                                             458, 482, 3163, 1404, 1401, 1403, 1402, 1400, 1399, 112, 2111],
@@ -52,9 +50,10 @@ class OrangeFranceProvider(ProviderInterface):
             if error.code == 403:
                 return False
 
+        drm = get_drm()
         license_server_url = None
         for system in stream_info.get('protectionData'):
-            if system.get('keySystem') == self.drm.value:
+            if system.get('keySystem') == drm.value:
                 license_server_url = system.get('laUrl')
 
         headers = 'Content-Type=&User-Agent={}&Host={}'.format(random_ua(), urlparse(license_server_url).netloc)
@@ -65,12 +64,12 @@ class OrangeFranceProvider(ProviderInterface):
             'path': stream_info['url'],
             'mime_type': 'application/xml+dash',
             'manifest_type': 'mpd',
-            'drm': self.drm.name.lower(),
-            'license_type': self.drm.value,
+            'drm': drm.name.lower(),
+            'license_type': drm.value,
             'license_key': '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
         }
 
-        log(stream_info, 'debug')
+        log(stream_info, LogLevel.DEBUG)
         return stream_info
 
     def get_streams(self) -> list:
@@ -97,16 +96,24 @@ class OrangeFranceProvider(ProviderInterface):
 
         return streams
 
-    def get_epg(self, days: int) -> dict:
-        today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
-        chunk_duration = 24 * 60 * 60 / self.chunks_per_day
+    def get_epg(self) -> dict:
+        start_day = datetime.timestamp(
+            datetime.combine(
+                date.today() - timedelta(days=int(get_global_setting('epg.pastdaystodisplay'))),
+                datetime.min.time()
+            )
+        )
 
+        days_to_display = int(get_global_setting('epg.futuredaystodisplay')) \
+            + int(get_global_setting('epg.pastdaystodisplay'))
+
+        chunk_duration = 24 * 60 * 60 / self.chunks_per_day
         programs = []
 
-        for chunk in range(0, days * self.chunks_per_day):
+        for chunk in range(0, days_to_display * self.chunks_per_day):
             programs.extend(self._get_programs(
-                period_start=(today + chunk_duration * chunk) * 1000,
-                period_end=(today + chunk_duration * (chunk + 1)) * 1000
+                period_start=(start_day + chunk_duration * chunk) * 1000,
+                period_end=(start_day + chunk_duration * (chunk + 1)) * 1000
             ))
 
         epg = {}

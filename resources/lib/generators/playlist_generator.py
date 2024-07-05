@@ -12,11 +12,11 @@ class PlaylistGenerator:
 
     # pylint: disable=line-too-long
     def _load_streams(self):
-        """Load streams from provider and add them to the current list"""
+        """Load streams from provider"""
 
         stream_template = [
             '## {name}',
-            '#EXTINF:-1 tvg-name="{name}" tvg-id="{id}" tvg-logo="{logo}" tvg-chno="{chno}" group-title="Orange TV France",{name}',
+            '#EXTINF:-1 tvg-name="{name}" tvg-id="{id}" tvg-logo="{logo}" tvg-chno="{chno}" group-title="Orange TV France,{group}",{name}',
             '{stream}',
             ''
         ]
@@ -27,7 +27,8 @@ class PlaylistGenerator:
                 name=stream['name'],
                 id=stream['id'],
                 logo=stream['logo'],
-                chno=stream['preset']
+                chno=stream['preset'],
+                group=','.join(stream['group'])
             ))
             self.entries.append(stream_template[2].format(stream=stream['stream']))
             self.entries.append(stream_template[3])
