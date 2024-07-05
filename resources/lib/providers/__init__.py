@@ -10,15 +10,15 @@ _PROVIDERS = {
     'France.Orange Réunion': OrangeReunionProvider
 }
 
-_KEY = '{country}.{name}'.format(
-    country=get_addon_setting('provider.country'),
-    name=get_addon_setting('provider.name')
-)
+name: str = get_addon_setting('name')
+country: str = get_addon_setting('provider.country')
+
+_KEY = f'{country}.{name}'
 
 _PROVIDER = _PROVIDERS[_KEY]() if _PROVIDERS.get(_KEY) is not None else None
 
 if not _PROVIDER:
-    log('Cannot instanciate provider: {}'.format(_KEY), LogLevel.ERROR)
+    log(f'Cannot instanciate provider: {_KEY}', LogLevel.ERROR)
 
 def get_provider() -> ProviderInterface:
     """Return the selected provider"""

@@ -74,12 +74,13 @@ class OrangeTemplate(ProviderInterface):
         streams = []
 
         for channel in channels:
+            channel_id: str = channel['id']
             streams.append({
-                'id': channel['id'],
+                'id': channel_id,
                 'name': channel['name'],
                 'preset': channel['zappingNumber'],
-                'logo': channel['logos']['square'],
-                'stream': 'plugin://plugin.video.orange.fr/channel/{id}'.format(id=channel['id']),
+                'logo': channel['logos']['square'] if 'square' in channel['logos'] else None,
+                'stream': f'plugin://plugin.video.orange.fr/channel/{channel_id}',
                 'group': [group_name for group_name in self.groups if int(channel['id']) in self.groups[group_name]]
             })
 
@@ -111,9 +112,6 @@ class OrangeTemplate(ProviderInterface):
             if not program['channelId'] in epg:
                 epg[program['channelId']] = []
 
-            start = datetime.fromtimestamp(program['diffusionDate']).astimezone().replace(microsecond=0)
-            stop = datetime.fromtimestamp(program['diffusionDate'] + program['duration']).astimezone()
-
             if program['programType'] != 'EPISODE':
                 title = program['title']
                 subtitle = None
@@ -121,7 +119,9 @@ class OrangeTemplate(ProviderInterface):
             else:
                 title = program['season']['serie']['title']
                 subtitle = program['title']
-                episode = 'S{s}E{e}'.format(s=program['season']['number'], e=program['episodeNumber'])
+                season_number = program['season']['number']
+                episode_number = program['episodeNumber']
+                episode = f'S{season_number}E{episode_number}'
 
             image = None
             if isinstance(program['covers'], list):
@@ -130,8 +130,8 @@ class OrangeTemplate(ProviderInterface):
                         image = program['covers'][0]['url']
 
             epg[program['channelId']].append({
-                'start': start.isoformat(),
-                'stop': stop.isoformat(),
+                'start': datetime.fromtimestamp(program['diffusionDate']).astimezone().replace(microsecond=0).isoformat(),
+                'stop': (datetime.fromtimestamp(program['diffusionDate'] + program['duration']).astimezone()).isoformat(),
                 'title': title,
                 'subtitle': subtitle,
                 'episode': episode,
