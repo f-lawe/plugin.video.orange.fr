@@ -4,7 +4,7 @@
 
 ### Added
 
-- Provider emplates now allow to easily support similar backends
+- Provider templates now allow to easily support similar backends
 - Support for Orange Réunion
 
 ## [1.2.2](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.2) - 2021-03-23
