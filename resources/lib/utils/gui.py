@@ -27,6 +27,8 @@ def create_video_item(stream_info: dict) -> ListItem:
     list_item.setMimeType(stream_info["mime_type"])
     list_item.setContentLookup(False)
     list_item.setProperty("inputstream", "inputstream.adaptive")
+    list_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
+    list_item.setProperty("inputstream.adaptive.manifest_config", '{"timeshift_bufferlimit":14400}')
     list_item.setProperty("inputstream.adaptive.license_type", stream_info["license_type"])
     list_item.setProperty("inputstream.adaptive.license_key", stream_info["license_key"])
 
