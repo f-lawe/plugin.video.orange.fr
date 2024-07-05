@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-from lib.providers.provider_interface import ProviderInterface
+from lib.providers import ProviderInterface
 from lib.utils import get_drm, get_global_setting, log, LogLevel, random_ua
 
 @dataclass

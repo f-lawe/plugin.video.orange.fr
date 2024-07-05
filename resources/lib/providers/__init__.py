@@ -3,6 +3,7 @@
 from lib.utils import get_addon_setting, log, LogLevel
 
 from .provider_interface import ProviderInterface
+from .provider_wrapper import ProviderWrapper
 from .fr import OrangeFranceProvider, OrangeReunionProvider
 
 _PROVIDERS = {
@@ -22,4 +23,4 @@ if not _PROVIDER:
 
 def get_provider() -> ProviderInterface:
     """Return the selected provider"""
-    return _PROVIDER
+    return ProviderWrapper(_PROVIDER)
