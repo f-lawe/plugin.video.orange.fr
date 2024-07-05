@@ -15,45 +15,45 @@ msgstr ""
 # Integration settings (from 30100 to 30199)
 
 msgctxt "#30100"
-msgid "Intégration TV"
-msgstr ""
+msgid "TV Integration"
+msgstr "Intégration TV"
 
 msgctxt "#30101"
-msgid "Activer l'intégration avec IPTV Manager"
-msgstr ""
+msgid "Enable IPTV Manager integration"
+msgstr "Activer l'intégration avec IPTV Manager"
 
 msgctxt "#30102"
-msgid "Installer IPTV Manager"
-msgstr ""
+msgid "Install IPTV Manager"
+msgstr "Installer IPTV Manager"
 
 msgctxt "#30103"
-msgid "Ouvrir les paramètres de IPTV Manager"
-msgstr ""
+msgid "Go to IPTV Manager settings"
+msgstr "Ouvrir les paramètres de IPTV Manager"
 
 msgctxt "#30111"
-msgid "Activer l'intégration basique"
-msgstr ""
+msgid "Enable basic integration"
+msgstr "Activer l'intégration basique"
 
 msgctxt "#30112"
-msgid "Fréquence de rafraîchissemen [I](en minutes)[/I]"
-msgstr ""
+msgid "Refresh time interval [I](in minutes)[/I]"
+msgstr "Fréquence de rafraîchissemen [I](en minutes)[/I]"
 
 # Provider settings (from 30200 to 30299)
 
 msgctxt "#30200"
-msgid "Fournisseur"
-msgstr ""
+msgid "Provider"
+msgstr "Fournisseur"
 
 msgctxt "#30201"
 msgid "Country"
 msgstr ""
 
-# Dialogs (from 30500 to 30599)
+# Dialogs (from 30900 to 30999)
 
-msgctxt "#30500"
-msgid "Cette chaîne ne fait pas partie de votre abonnement."
-msgstr ""
+msgctxt "#30900"
+msgid "This channel is not part of your current registration."
+msgstr "Cette chaîne ne fait pas partie de votre abonnement."
 
-msgctxt "#30501"
-msgid "InputStream n'a pas pu être chargé."
-msgstr ""
+msgctxt "#30901"
+msgid "InputStream cannot be loaded."
+msgstr "InputStream n'a pas pu être chargé."
