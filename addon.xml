@@ -2,7 +2,7 @@
 <addon id="plugin.video.orange.fr" name="Orange TV France" version="1.2.1" provider-name="BreizhReloaded">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.routing" version="0.2.3+matrix"/>
+        <import addon="script.module.routing" version="0.2.3"/>
         <import addon="script.module.inputstreamhelper" version="0.5.2"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/addon.py">
@@ -11,10 +11,10 @@
     <extension point="xbmc.service" library="resources/service.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Watch TV channels provided by your Orange subscription from Kodi!</summary>
-        <description lang="en">This addon brings to Kodi all the TV channels included in your Orange subscription. Easy install via a m3u file you can load with your PVR.</description>
+        <description lang="en">This addon brings to Kodi all the TV channels included in your Orange subscription. Easy install via IPTV Manager.</description>
 
         <summary lang="fr">Regardez les chaînes de télé incluses dans votre abonnement Orange depuis Kodi !</summary>
-        <description lang="fr">Cet addon intègre à Kodi toutes les chaînes de télé incluses dans votre abonnement Orange. L'installation se fait facilement via un fichier m3u que vous pouvez charger avec votre PVR.</description>
+        <description lang="fr">Cet addon intègre à Kodi toutes les chaînes de télé incluses dans votre abonnement Orange. L'installation se fait facilement via IPTV Manager.</description>
 
         <platform>all</platform>
         <license>MIT</license>
