@@ -2,6 +2,7 @@
 """Orange API client"""
 from datetime import date, datetime
 import json
+from numbers import Number
 from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -38,24 +39,25 @@ def get_channel_stream(channel_id):
 
     return json.loads(res.read())
 
-def get_programs(**kwargs):
+def get_programs(days=None, period_start=None, period_end=None):
     """Returns all the programs for the specified period"""
     endpoint = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/programs?period={}&mco=OFR'
 
-    if 'days' in kwargs and kwargs['days'] > 0:
+    if isinstance(days, int) and days > 0:
         today = datetime.timestamp(datetime.combine(date.today(), datetime.min.time()))
-        half_day_duration = 12 * 60 * 60
+        chunks_per_day = 2
+        chunk_duration = 24 * 60 * 60 / chunks_per_day
         programs = []
 
-        for day in range(0, kwargs['days'] * 2):
-            period_start = (today + half_day_duration * day) * 1000
-            period_end = period_start + (half_day_duration * 1000)
+        for chunk in range(0, days * chunks_per_day):
+            period_start = (today + chunk_duration * chunk) * 1000
+            period_end = period_start + (chunk_duration * 1000)
             programs.extend(get_programs(period_start=period_start, period_end=period_end))
 
         return programs
 
-    if 'period_start' in kwargs and 'period_end' in kwargs:
-        period = '{},{}'.format(int(kwargs['period_start']), int(kwargs['period_end']))
+    if isinstance(period_start, Number) and isinstance(period_end, Number):
+        period = '{},{}'.format(int(period_start), int(period_end))
     else:
         period = 'today'
 
