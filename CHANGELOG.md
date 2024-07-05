@@ -1,13 +1,13 @@
-## [Unreleased]()
+# 1.x
+
+## [1.2.2](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.2) - 2021-03-23
 
 ### Fixed
 
 - Channel groups for basic integration
 - Settings translations
 
-# 1.x
-
-## [1.2.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.0) - 2021-03-14
+## [1.2.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.2.1) - 2021-03-14
 
 ### Added
 
@@ -37,8 +37,6 @@
 - Migrate current Orange integration to the new provider interface
 - Update generators to write data from JSON-STREAMS and JSON-EPG formats
 - Data files now written into user data folder
-
-# 1.x
 
 ## [1.1.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.1.0) - 2021-03-04
 
