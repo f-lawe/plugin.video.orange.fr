@@ -4,10 +4,6 @@ from datetime import datetime
 import json
 import socket
 
-import xbmc
-
-from .utils import log
-
 class IPTVManager:
     """IPTV Manager interface"""
 
