@@ -1,5 +1,11 @@
 # 1.x
 
+## [1.3.1](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.1) - 2021-09-11
+
+### Fixed
+
+- Channel update when no logo available [#14](https://github.com/BreizhReloaded/plugin.video.orange.fr/issues/14)
+
 ## [1.3.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.3.0) - 2021-09-11
 
 ### Added
