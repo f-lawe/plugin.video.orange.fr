@@ -4,10 +4,11 @@ from lib.utils import get_addon_setting, log, LogLevel
 
 from .provider_interface import ProviderInterface
 from .provider_wrapper import ProviderWrapper
-from .fr import OrangeFranceProvider, OrangeReunionProvider
+from .fr import OrangeFranceProvider, OrangeCaraibeProvider, OrangeReunionProvider
 
 _PROVIDERS = {
     'France.Orange': OrangeFranceProvider,
+    'France.Orange Caraïbe': OrangeCaraibeProvider,
     'France.Orange Réunion': OrangeReunionProvider
 }
 

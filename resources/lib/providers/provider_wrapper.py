@@ -31,11 +31,9 @@ class ProviderWrapper(ProviderInterface):
             with open(os.path.join(self.cache_folder, 'streams.json'), 'wb') as file:
                 file.write(json.dumps(streams).encode('utf-8'))
         except URLError:
+            log('Can\'t reach server: load streams from cache', LogLevel.WARNING)
             with open(os.path.join(self.cache_folder, 'streams.json'), 'r', encoding='utf-8') as file:
                 streams = json.loads(''.join(file.readlines()))
-            log('Can\'t reach server: load streams from cache', LogLevel.WARNING)
-
-        log(streams, LogLevel.INFO)
 
         return streams
 
