@@ -30,6 +30,7 @@ def channel(channel_id: str):
     listitem.setMimeType(stream['mime_type'])
     listitem.setProperty('inputstream', 'inputstream.adaptive')
     listitem.setProperty('inputstream.adaptive.manifest_type', stream['manifest_type'])
+    listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
     listitem.setProperty('inputstream.adaptive.license_type', stream['license_type'])
     listitem.setProperty('inputstream.adaptive.license_key', stream['license_key'])
     xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=listitem)
