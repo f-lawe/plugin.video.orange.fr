@@ -142,7 +142,6 @@ class OrangeTemplate(ProviderInterface):
 
         return epg
 
-    # pylint: disable=no-self-use
     def _get_programs(self, period_start: int = None, period_end: int = None) -> list:
         """Returns the programs for today (default) or the specified period"""
         try:
