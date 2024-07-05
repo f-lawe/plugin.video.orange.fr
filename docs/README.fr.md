@@ -19,15 +19,12 @@ Vous devriez maintenant voir toutes les chaînes regroupées par categories dans
 
 N'oubliez pas de sélectionner le bon fournisseur dans les paramètres !
 
-## Available providers
+## Fournisseurs disponibles
 | Pays      | Fournisseur       |  |
 |:---------:|:------------------|:-|
 | 🇫🇷        | Orange            |  |
 | 🇫🇷        | Orange Caraïbe    |  |
-| 🇫🇷        | Orange Réunion    | merci à [@starmate](https://github.com/starmate) et [@sae-gfc](https://github.com/sae-gfc) |
-
-## Support
-Les signalements de bugs ou les suggestions sont les bienvenus. Je n'ai malheureusement pas de bouquets payants, donc je ne sais pas ce qui se passe avec Canal+ ou beIn, les retours sur ce sujet sont les bienvenus égakement. N'hésitez pas aussi à ouvrir une pull request!
+| 🇫🇷        | Orange Réunion    | merci à [@starmate](https://github.com/starmate) et [@sae-gfc](https://github.com/sae-gfc)
 
 ## Limites connues
 Cet addon ne propose pas le replay TV. Pour cela, vous pouvez aller voir du côté du très bon [Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore/).
