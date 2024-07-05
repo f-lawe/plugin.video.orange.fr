@@ -22,7 +22,7 @@
         <source>https://github.com/BreizhReloaded/plugin.video.orange.fr</source>
         <email>breizhreloaded@outlook.com</email>
         <assets>
-            <icon>resources/media/icon.jpg</icon>
+            <icon>resources/media/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>
             <screenshot>resources/media/screenshot_1.jpg</screenshot>
             <screenshot>resources/media/screenshot_2.jpg</screenshot>
