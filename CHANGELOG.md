@@ -8,6 +8,7 @@
 
 - Migrate current Orange integration to the new provider interface
 - Update generators to write data from JSON-STREAMS and JSON-EPG formats
+- Data files now written into user data folder
 
 # 1.x
 
