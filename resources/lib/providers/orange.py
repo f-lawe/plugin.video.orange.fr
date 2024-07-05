@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-from .utils import random_ua
+from ..utils import random_ua
 
 def get_channels():
     """Retrieve all the available channels and the the associated information (name, logo, zapping number, etc.)"""
