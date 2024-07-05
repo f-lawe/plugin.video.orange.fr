@@ -1,5 +1,9 @@
 # 1.x
 
+### Added
+
+- Cache management over get_streams() to prevent Kodi from removing all channels
+
 ### Fixed
 
 - Provider load from settings
@@ -32,7 +36,7 @@
 
 ### Changed
 
-- EPG now loaded following TV Guide past and future days settings 
+- EPG now loaded following TV Guide past and future days settings
 
 ### Fixed
 
