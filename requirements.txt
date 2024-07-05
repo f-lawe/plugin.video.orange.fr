@@ -1,2 +1,2 @@
-kodistubs
-pylint
+kodistubs==19.*
+pylint==2.12.*
