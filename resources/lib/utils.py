@@ -39,14 +39,14 @@ LOG_LEVELS = {
     'warning': xbmc.LOGWARNING
 }
 
-def log(msg, level):
+def log(msg: str, level: str):
     """Wrapper around the Kodi log function"""
     xbmc.log('{}: {}'.format(ADDON_NAME, msg), LOG_LEVELS.get(level))
 
-def dialog(msg):
+def dialog(msg: str):
     """Wrapper around the Kodi dialop function, display a popup window with a button"""
     xbmcgui.Dialog().ok(ADDON_NAME, msg)
 
-def random_ua():
+def random_ua() -> str:
     """Get a random user agent in the list"""
     return USER_AGENTS[randint(0, len(USER_AGENTS) - 1)]

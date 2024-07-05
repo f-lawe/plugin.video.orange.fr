@@ -3,6 +3,7 @@
 ### Added
 
 - Provider interface to allow multi ISP support
+- Support for Orange TV groups
 
 ### Changed
 

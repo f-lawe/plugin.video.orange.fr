@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Orange France provider"""
+"""Orange France"""
 from datetime import date, datetime
 import json
 from urllib.error import HTTPError
@@ -11,11 +11,14 @@ from lib.types import DRM
 from lib.utils import log, random_ua
 
 class OrangeFranceProvider(ProviderInterface):
-    """Orange France"""
+    """Orange France provider"""
     chunks_per_day: int = 2
-
-    def __init__(self):
-        self.drm = DRM.WIDEVINE
+    drm: DRM = DRM.WIDEVINE
+    groups: dict = {
+        'TNT': [192, 4, 80, 34, 47, 118, 111, 445, 119, 195, 446, 444, 234, 78, 481, 226, 458, 482, 3163, 1404, 1401,
+                1403, 1402, 1400, 1399, 112, 2111],
+        'Généralistes': [205, 191, 145, 115, 225]
+    }
 
     # pylint: disable=line-too-long
     def get_stream_info(self, channel_id: int) -> dict:
@@ -72,7 +75,8 @@ class OrangeFranceProvider(ProviderInterface):
                 'name': channel['name'],
                 'preset': channel['zappingNumber'],
                 'logo': channel['logos']['square'],
-                'stream': 'plugin://plugin.video.orange.fr/channel/{id}'.format(id=channel['id'])
+                'stream': 'plugin://plugin.video.orange.fr/channel/{id}'.format(id=channel['id']),
+                'group': [group_name for group_name in self.groups if int(channel['id']) in self.groups[group_name]]
             })
 
         return streams

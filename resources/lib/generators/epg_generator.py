@@ -3,19 +3,24 @@
 from datetime import datetime
 from xml.dom import minidom
 
+from lib.providers import ProviderInterface
+
 class EPGGenerator:
     """This class provides tools to generate an XMLTV file based on the given channel and program information"""
 
-    def __init__(self):
+    def __init__(self, provider: ProviderInterface):
         implementation = minidom.getDOMImplementation('')
         doctype = implementation.createDocumentType('tv', None, 'xmltv.dtd')
         self.document = implementation.createDocument(None, 'tv', doctype)
         self.document.documentElement.setAttribute('source-info-url', 'https://mediation-tv.orange.fr')
         self.document.documentElement.setAttribute('source-data-url', 'https://mediation-tv.orange.fr')
+        self.provider = provider
+        self._load_streams()
+        self._load_epg()
 
-    def append_streams(self, streams):
+    def _load_streams(self):
         """Add channels to the XML document"""
-        for stream in streams:
+        for stream in self.provider.get_streams():
             channel_element = self.document.createElement('channel')
             channel_element.setAttribute('id', stream['id'])
 
@@ -29,9 +34,9 @@ class EPGGenerator:
 
             self.document.documentElement.appendChild(channel_element)
 
-    def append_epg(self, epg):
+    def _load_epg(self):
         """Add programs to the XML document"""
-        for channel_id, programs in epg.items():
+        for channel_id, programs in self.provider.get_epg(days=6).items():
             for program in programs:
                 program_element = self.document.createElement('programme')
                 program_element.setAttribute(
