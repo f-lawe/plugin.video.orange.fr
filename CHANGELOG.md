@@ -1,5 +1,10 @@
 # 2.x
 
+## [2.1.2](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.1.2) - 2024-07-05
+
+### Changed
+- Better timeshift management
+
 ## [2.1.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.1.1) - 2024-06-23
 
 ### Changed

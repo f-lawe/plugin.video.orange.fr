@@ -16,13 +16,13 @@ This addon features:
 - Access to paid channels included into your subscription (for both live and catchup TV)
 
 ## Installation
-Download the latest ZIP archive from the [releases page](https://github.com/f-lawe/plugin.video.orange.fr/releases/latest) and install it into Kodi (Settings > Addons > Install from ZIP). Then install the dependencies from the addon screen (My addons > Video addons > Orange TV France > Dependencies).
+Orange TV France is available directly from Kodi's main repository. Integration is handled via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). You can install and activate it from the addon settings. Once set up on your system, channels and TV guide are loaded automatically.
 
-Integration to Kodi TV is handled via [IPTV Manager](https://github.com/add-ons/service.iptv.manager). You can install and activate it from the addon settings. Once set up on your system, channels and TV guide are loaded automatically.
-
-You should now be able to view all the channels grouped by category in the TV section. If that's not already installed, Kodi will ask you to install the decrypting tool when accessing a channel for the first time.
+You should now be able to view all the channels grouped by category in the TV section. If not already installed, Kodi will ask you to install the decrypting tool when accessing a channel for the first time.
 
 Do not forget to properly configure IPTV Manager and select your TV provider in the settings!
+
+If you need the latest update, you can download the latest ZIP archive from the [releases page](https://github.com/f-lawe/plugin.video.orange.fr/releases/latest) and manually install it into Kodi (Settings > Addons > Install from ZIP). Then install the dependencies from the addon screen (My addons > Video addons > Orange TV France > Dependencies).
 
 ## Available providers
 | Country   | Provider          |  |
@@ -32,4 +32,4 @@ Do not forget to properly configure IPTV Manager and select your TV provider in 
 | 🇫🇷        | Orange Réunion    | thanks to [@starmate](https://github.com/starmate) and [@sae-gfc](https://github.com/sae-gfc) |
 
 ## Known limitations
-- Limited to 720p due to Orange limitations (they don't provide higher quality on their web service)
+- Limited to 720p because Orange don't provide higher quality on their web TV
