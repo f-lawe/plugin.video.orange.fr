@@ -1,7 +1,7 @@
 # Orange TV France
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BreizhReloaded/plugin.video.orange.fr)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BreizhReloaded/plugin.video.orange.fr)](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases)
 [![Kodi version](https://img.shields.io/badge/kodi%20version-v19-blue)](https://kodi.tv/)
-![GitHub](https://img.shields.io/github/license/BreizhReloaded/plugin.video.orange.fr)
+[![GitHub](https://img.shields.io/github/license/BreizhReloaded/plugin.video.orange.fr)](https://github.com/BreizhReloaded/plugin.video.orange.fr/blob/master/LICENSE)
 
 ## Disclaimer
 This plugin is not officially commissioned/supported by Orange. It has not been tested with paid channel packs or from any other internet provider.
