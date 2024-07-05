@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Channel stream management'''
+"""Channel stream management"""
 from urllib.parse import urlparse
 
 import inputstreamhelper # pylint: disable=import-error
@@ -10,7 +10,7 @@ from .orange import get_channel_stream, USER_AGENT
 from .utils import dialog, log
 
 def extract_stream_info(license_type, channel_stream):
-    '''Extract Widevine licence information from stream details'''
+    """Extract Widevine licence information from stream details"""
     path = channel_stream.get('url')
 
     license_server_url = None
@@ -21,7 +21,7 @@ def extract_stream_info(license_type, channel_stream):
     return path, license_server_url
 
 def format_inputstream_properties(stream, drm):
-    '''Format parameters to be sent to InputStream list item'''
+    """Format parameters to be sent to InputStream list item"""
     license_types = {
         'widevine': 'com.widevine.alpha'
     }
@@ -36,7 +36,7 @@ def format_inputstream_properties(stream, drm):
     return path, 'mpd', license_type, license_key
 
 def build_channel_listitem(channel_id):
-    '''Retreive stream information and load InputStream'''
+    """Retreive stream information and load InputStream"""
     stream = get_channel_stream(channel_id)
     drm = 'widevine'
 
