@@ -15,6 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        kodi-version: [ matrix ]
         python-version: [ 3.9 ]
     steps:
     - name: Check out ${{ github.sha }} from repository ${{ github.repository }}
@@ -30,3 +31,10 @@ jobs:
 
     - name: Run pylint
       run: pylint ./resources
+
+    - name: Run kodi-addon-checker
+      uses: xbmc/action-kodi-addon-checker@v1.2
+      with:
+        rewrite-for-matrix: true
+        kodi-version: ${{ matrix.kodi-version }}
+        addon-id: ${{ github.event.repository.name }}
