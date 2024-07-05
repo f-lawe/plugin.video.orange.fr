@@ -17,8 +17,8 @@ class OrangeFranceProvider(ProviderInterface):
     def __init__(self):
         self.drm = DRM.WIDEVINE
 
+    # pylint: disable=line-too-long
     def get_stream_info(self, channel_id: int) -> dict:
-        # pylint: disable=line-too-long
         endpoint = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/users/me/channels/{channel_id}/stream?terminalModel=WEB_PC'
 
         req = Request(endpoint.format(channel_id=channel_id), headers={
@@ -28,13 +28,13 @@ class OrangeFranceProvider(ProviderInterface):
 
         try:
             res = urlopen(req)
-            stream = json.loads(res.read())
+            stream_info = json.loads(res.read())
         except HTTPError as error:
             if error.code == 403:
                 return False
 
         license_server_url = None
-        for system in stream.get('protectionData'):
+        for system in stream_info.get('protectionData'):
             if system.get('keySystem') == self.drm.value:
                 license_server_url = system.get('laUrl')
 
@@ -42,8 +42,8 @@ class OrangeFranceProvider(ProviderInterface):
         post_data = 'R{SSM}'
         response = ''
 
-        stream = {
-            'path': stream['url'],
+        stream_info = {
+            'path': stream_info['url'],
             'mime_type': 'application/xml+dash',
             'manifest_type': 'mpd',
             'drm': self.drm.name.lower(),
@@ -51,8 +51,8 @@ class OrangeFranceProvider(ProviderInterface):
             'license_key': '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
         }
 
-        log(stream, 'debug')
-        return stream
+        log(stream_info, 'debug')
+        return stream_info
 
     def get_streams(self) -> list:
         endpoint = 'https://mediation-tv.orange.fr/all/live/v3/applications/PC/channels'
