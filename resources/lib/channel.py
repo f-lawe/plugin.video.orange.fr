@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 import inputstreamhelper # pylint: disable=import-error
 import xbmcgui
 
-from .orange import USER_AGENT
+from .utils import random_ua
 
 LICENSE_TYPES = {
     'widevine': 'com.widevine.alpha'
@@ -26,7 +26,7 @@ def extract_stream_info(stream, drm):
 def format_inputstream_properties(stream, drm):
     """Format parameters to be sent to InputStream list item"""
     path, license_server_url = extract_stream_info(stream, drm)
-    headers = 'Content-Type=&User-Agent={}&Host={}'.format(USER_AGENT, urlparse(license_server_url).netloc)
+    headers = 'Content-Type=&User-Agent={}&Host={}'.format(random_ua(), urlparse(license_server_url).netloc)
     post_data = 'R{SSM}'
     response = ''
     license_key = '{}|{}|{}|{}'.format(license_server_url, headers, post_data, response)
