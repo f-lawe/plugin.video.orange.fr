@@ -4,14 +4,18 @@ from datetime import datetime
 import json
 import socket
 
+import xbmc
+
+from .utils import log
+
 class IPTVManager:
     """IPTV Manager interface"""
 
     def __init__(self, port, **kwargs):
         """Initialize IPTV Manager object"""
         self.port = port
-        self.channels = kwargs.get('channels')
-        self.programs = kwargs.get('programs')
+        self.fetch_channels = kwargs.get('channels_loader')
+        self.fetch_programs = kwargs.get('programs_loader')
 
     def via_socket(func): # pylint: disable=no-self-argument
         """Send the output of the wrapped function to socket"""
@@ -30,9 +34,10 @@ class IPTVManager:
     @via_socket
     def send_channels(self):
         """Return JSON-STREAMS formatted python datastructure to IPTV Manager"""
+        channels = self.fetch_channels()
         streams = []
 
-        for channel in self.channels:
+        for channel in channels:
             streams.append({
                 'id': channel['id'],
                 'name': channel['name'],
@@ -46,9 +51,10 @@ class IPTVManager:
     @via_socket
     def send_epg(self):
         """Return JSON-EPG formatted python data structure to IPTV Manager"""
+        programs = self.fetch_programs()
         epg = {}
 
-        for program in self.programs:
+        for program in programs:
             if not program['channelId'] in epg:
                 epg[program['channelId']] = []
 
