@@ -12,23 +12,19 @@ from lib.utils import log
 
 ADDON = xbmcaddon.Addon()
 
-def generate_playlist():
-    """Load channels into playlist"""
-    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'playlist.m3u8')
-    log(filepath, 'debug')
-    PlaylistGenerator(Provider()).write(filepath=filepath)
-
-def generate_epg():
-    """Load channels and programs data for the 6 next days into EPG"""
-    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'epg.xml')
-    log(filepath, 'debug')
-    EPGGenerator(Provider()).write(filepath=filepath)
-
 def run():
     """Run data generators"""
     log('Updating data...', 'info')
-    generate_playlist()
-    generate_epg()
+    provider = Provider()
+
+    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'playlist.m3u8')
+    log(filepath, 'debug')
+    PlaylistGenerator(provider=provider).write(filepath=filepath)
+
+    filepath = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), 'epg.xml')
+    log(filepath, 'debug')
+    EPGGenerator(provider=provider).write(filepath=filepath)
+
     log('Channels and programs data updated', 'info')
 
 def main():

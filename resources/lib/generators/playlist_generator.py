@@ -15,7 +15,7 @@ class PlaylistGenerator:
         """Load streams from provider and add them to the current list"""
 
         stream_template = [
-            '##\t{name}',
+            '## {name}',
             '#EXTINF:-1 tvg-name="{name}" tvg-id="{id}" tvg-logo="{logo}" tvg-chno="{chno}" group-title="Orange TV France",{name}',
             '{stream}',
             ''
