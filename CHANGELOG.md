@@ -1,5 +1,11 @@
 # 1.x
 
+## [1.5.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.5.0) - 2021-11-22
+
+### Added
+
+- Support for Orange Caraïbe
+
 ## [1.4.0](https://github.com/BreizhReloaded/plugin.video.orange.fr/releases/tag/v1.4.0) - 2021-11-21
 
 ### Added
