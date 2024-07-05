@@ -11,6 +11,11 @@ from lib.utils import localize, log, LogLevel, ok_dialog
 
 plugin = routing.Plugin()
 
+@plugin.route('/')
+def index():
+    """Addon index"""
+    ok_dialog(localize(30902))
+
 @plugin.route('/channel/<channel_id>')
 def channel(channel_id: str):
     """Load stream for the required channel id"""
