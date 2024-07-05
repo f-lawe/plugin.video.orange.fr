@@ -7,9 +7,11 @@ import socket
 class IPTVManager:
     """IPTV Manager interface"""
 
-    def __init__(self, port):
+    def __init__(self, port, **kwargs):
         """Initialize IPTV Manager object"""
         self.port = port
+        self.channels = kwargs.get('channels')
+        self.programs = kwargs.get('programs')
 
     def via_socket(func): # pylint: disable=no-self-argument
         """Send the output of the wrapped function to socket"""
@@ -26,11 +28,11 @@ class IPTVManager:
         return send
 
     @via_socket
-    def send_channels(self, channels):
+    def send_channels(self):
         """Return JSON-STREAMS formatted python datastructure to IPTV Manager"""
         streams = []
 
-        for channel in channels:
+        for channel in self.channels:
             streams.append({
                 'id': channel['id'],
                 'name': channel['name'],
@@ -42,11 +44,11 @@ class IPTVManager:
         return { 'version': 1, 'streams': streams }
 
     @via_socket
-    def send_epg(self, programs):
+    def send_epg(self):
         """Return JSON-EPG formatted python data structure to IPTV Manager"""
         epg = {}
 
-        for program in programs:
+        for program in self.programs:
             if not program['channelId'] in epg:
                 epg[program['channelId']] = []
 
