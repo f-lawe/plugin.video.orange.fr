@@ -43,7 +43,7 @@ def build_request(url: str, additional_headers: dict = None) -> Request:
     return Request(url, headers={"User-Agent": get_random_ua(), "Host": urlparse(url).netloc, **additional_headers})
 
 
-def install_proxy():
+def install_proxy() -> None:
     """Install proxy server for the next requests."""
     if get_addon_setting("proxy.enabled") != "true":
         return
