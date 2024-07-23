@@ -1,12 +1,10 @@
 """Catchup TV Manager."""
 
-import xbmc
 import xbmcplugin
 
 from lib.providers import get_provider
 from lib.router import router
 from lib.utils.gui import create_directory_items
-from lib.utils.kodi import build_addon_url
 
 
 class CatchupManager:
@@ -47,8 +45,3 @@ class CatchupManager:
 
         succeeded = xbmcplugin.addDirectoryItems(router.handle, directory_items, len(directory_items))
         xbmcplugin.endOfDirectory(router.handle, succeeded)
-
-    def play_video(self, video_id: str):
-        """Play catchup video."""
-        player = xbmc.Player()
-        player.play(build_addon_url(f"/catchup-streams/{video_id}"))

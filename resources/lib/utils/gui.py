@@ -8,15 +8,36 @@ def create_directory_items(data: list) -> list:
     items = []
 
     for d in data:
+        is_folder = bool(d["is_folder"])
+
         list_item = ListItem(label=d["label"], path=d["path"])
+        list_item.setIsFolder(is_folder)
 
-        # list_item.setLabel2("LABEL2")
-        # list_item.setInfo("INFO", {"INFO1": "INFO1", "INFO2": "INFO2"})
+        if "art" in d:
+            list_item.setArt(
+                {
+                    "poster": d["art"].get("poster", None),
+                    "thumb": d["art"].get("thumb", None),
+                }
+            )
 
-        if "art" in d and "thumb" in d["art"]:
-            list_item.setArt({"thumb": d["art"]["thumb"]})
+        if not is_folder:
+            list_item.setProperties(
+                {
+                    "inputstream": "inputstream.adaptive",
+                    "IsPlayable": "true",
+                }
+            )
 
-        items.append((d["path"], list_item, bool(d["is_folder"])))
+            if "info" in d:
+                video_info_tag = list_item.getVideoInfoTag()
+                video_info_tag.setDuration(d["info"].get("duration", None))
+                video_info_tag.setGenres(d["info"].get("genres", None))
+                video_info_tag.setPlot(d["info"].get("plot", None))
+                video_info_tag.setYear(d["info"].get("year", None))
+                video_info_tag.setPremiered(d["info"].get("premiered", None))
+
+        items.append((d["path"], list_item, is_folder))
 
     return items
 
