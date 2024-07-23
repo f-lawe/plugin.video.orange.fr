@@ -1,6 +1,7 @@
 """Helpers for Kodi GUI."""
 
 from xbmcgui import ListItem
+import inputstreamhelper
 
 
 def create_directory_items(data: list) -> list:
@@ -44,13 +45,20 @@ def create_directory_items(data: list) -> list:
 
 def create_video_item(stream_info: dict) -> ListItem:
     """Create a video item from stream data."""
-    list_item = ListItem(path=stream_info["path"])
-    list_item.setMimeType(stream_info["mime_type"])
-    list_item.setContentLookup(False)
-    list_item.setProperty("inputstream", "inputstream.adaptive")
-    list_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
-    list_item.setProperty("inputstream.adaptive.manifest_config", '{"timeshift_bufferlimit":14400}')
-    list_item.setProperty("inputstream.adaptive.license_type", stream_info["license_type"])
-    list_item.setProperty("inputstream.adaptive.license_key", stream_info["license_key"])
+
+    is_helper = inputstreamhelper.Helper(stream_info['manifest_type'],
+                                         drm = stream_info["license_type"])
+
+    if is_helper.check_inputstream():
+        list_item = ListItem(path=stream_info["path"])
+
+        list_item.setContentLookup(False)
+        list_item.setMimeType(stream_info["mime_type"])
+
+        list_item.setProperty('inputstream', is_helper.inputstream_addon)
+
+        list_item.setProperty('inputstream.adaptive.manifest_type', stream_info['manifest_type'])
+        list_item.setProperty('inputstream.adaptive.license_type', stream_info["license_type"])
+        list_item.setProperty("inputstream.adaptive.license_key", stream_info["license_key"])
 
     return list_item
