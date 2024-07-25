@@ -125,7 +125,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         return [
             {
-                "is_folder": True,
                 "label": str(channel["name"]).upper(),
                 "path": build_addon_url(f"/channels/{channel['id']}/categories"),
                 "art": {"thumb": channel["logos"]["ref_millenials_partner_white_logo"]},
@@ -140,7 +139,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         return [
             {
-                "is_folder": True,
                 "label": category["name"][0].upper() + category["name"][1:],
                 "path": build_addon_url(f"/channels/{catchup_channel_id}/categories/{category['id']}/articles"),
             }
@@ -156,7 +154,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         return [
             {
-                "is_folder": True,
                 "label": article["title"],
                 "path": build_addon_url(f"/channels/{catchup_channel_id}/articles/{article['id']}/videos"),
                 "art": {"poster": article["covers"]["ref_16_9"]},
@@ -171,7 +168,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         return [
             {
-                "is_folder": False,
                 "label": video["title"],
                 "path": build_addon_url(f"/catchup-streams/{video['id']}"),
                 "art": {"poster": video["covers"]["ref_16_9"]},
@@ -230,7 +226,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             "path": stream_info["url"],
             "mime_type": "application/xml+dash",
             "manifest_type": "mpd",
-            "drm": drm.name.lower(),
             "license_type": drm.value,
             "license_key": f"{license_server_url}|{headers}|{post_data}|{response}",
         }
