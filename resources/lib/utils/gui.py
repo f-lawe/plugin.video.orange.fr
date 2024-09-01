@@ -1,5 +1,6 @@
 """Helpers for Kodi GUI."""
 
+import inputstreamhelper
 from xbmcgui import ListItem
 
 
@@ -40,8 +41,11 @@ def create_play_item(stream_info: dict, inputstream_addon: str) -> ListItem:
     play_item.setContentLookup(False)
     play_item.setMimeType(stream_info["mime_type"])
 
-    play_item.setProperty("inputstream", inputstream_addon)
+    is_helper = inputstreamhelper.Helper(stream_info['manifest_type'],
+                                         drm = stream_info["license_type"])
+    play_item.setProperty("inputstream", is_helper.inputstream_addon)
     # play_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
+    play_item.setProperty("inputstream.adaptive.manifest_type", stream_info['manifest_type'])
     # play_item.setProperty("inputstream.adaptive.manifest_config", '{"timeshift_bufferlimit":14400}')
     play_item.setProperty("inputstream.adaptive.license_type", stream_info["license_type"])
     play_item.setProperty("inputstream.adaptive.license_key", stream_info["license_key"])
