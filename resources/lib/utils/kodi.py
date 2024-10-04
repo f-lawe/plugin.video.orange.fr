@@ -15,8 +15,10 @@ ADDON_ID = ADDON.getAddonInfo("id")
 class DRM(Enum):
     """List DRM providers."""
 
+    CLEAR_KEY = "org.w3.clearkey"
+    PLAY_READY = "com.microsoft.playready"
     WIDEVINE = "com.widevine.alpha"
-    PLAYREADY = "com.microsoft.playready"
+    WISEPLAY = "com.huawei.wiseplay"
 
 
 def build_addon_url(path: str = "") -> str:

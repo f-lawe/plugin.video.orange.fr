@@ -1,3 +1,4 @@
 kodi-addon-checker==0.0.*
 kodistubs==21.*
-ruff==0.3.*
+requests==2.31.0
+ruff==0.6.*

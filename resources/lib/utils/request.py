@@ -1,16 +1,12 @@
 """Request utils."""
 
-import gzip
-import json
-from http.client import HTTPConnection, HTTPResponse, HTTPSConnection
-from http.cookies import SimpleCookie
+from http.client import HTTPConnection, HTTPSConnection
 from random import randint
-from socket import gaierror
 from typing import Mapping, TypeVar, Union
-from urllib.error import URLError
-from urllib.parse import unquote_plus, urlparse
 
 import xbmc
+from requests import Response, Session
+from requests.exceptions import JSONDecodeError, RequestException
 
 # from socks import SOCKS5
 # from sockshandler import SocksiPyHandler
@@ -39,109 +35,48 @@ _USER_AGENTS = [
 C = TypeVar("C", HTTPConnection, HTTPSConnection)
 
 
-def get_cookies(response: HTTPResponse) -> dict:
-    """Get cookies from HTTP response."""
-    cookies = {}
-    for header in response.getheaders():
-        if header[0] == "Set-Cookie":
-            cookie = header[1].split(";")[0]
-            cookies[cookie.split("=")[0]] = cookie.split("=")[1]
-    return cookies
-
-
 def get_random_ua() -> str:
     """Get a randomised user agent."""
     return _USER_AGENTS[randint(0, len(_USER_AGENTS) - 1)]
 
 
-def parse_cookies(cookie_strings: list) -> dict:
-    """Parse cookie strings."""
-    cookies = {}
-
-    for cookie_string in cookie_strings:
-        simple_cookie = SimpleCookie(cookie_string)
-        for key, item in simple_cookie.items():
-            cookies[key] = unquote_plus(item.value)
-
-    return cookies
-
-
-def request(conn: C, url: str, method: str = "GET", headers: Mapping[str, str] = None, body=None) -> C:
-    """Send HTTP request."""
+def request(method: str, url: str, headers: Mapping[str, str] = None, data=None, s: Session = None) -> Response:
+    """Send HTTP request using requests."""
     if headers is None:
         headers = {}
 
     headers = {
         "Accept": "*/*",
-        "Accept-Encoding": "br, gzip, deflate",
+        "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "*",
         "Sec-Fetch-Mode": "cors",
         "User-Agent": get_random_ua(),
         **headers,
     }
 
-    try:
-        log(f"Fetching {url}", xbmc.LOGDEBUG)
-        conn.request(method, url, headers=headers, body=body)
-    except gaierror as e:
-        log(e, xbmc.LOGERROR)
-        return None
-    except URLError as e:
-        log(f"{e.reason}", xbmc.LOGERROR)
-        return None
+    s = s if s is not None else Session()
 
-    res = conn.getresponse()
-
-    if res.status != 200:
-        log(f"Error while fetching: {res.status} {res.reason}", xbmc.LOGERROR)
-        log(res.read(), xbmc.LOGDEBUG)
-        return None
-
-    return res
+    log(f"Fetching {url}", xbmc.LOGDEBUG)
+    return s.request(method, url, headers=headers, data=data)
 
 
 def request_json(url: str, headers: Mapping[str, str] = None, default=None) -> Union[dict, list]:
     """Send HTTP request and load json response."""
-    url = urlparse(url)
-    conn = HTTPConnection(url.netloc) if url.scheme == "http" else HTTPSConnection(url.netloc)
-    res = request(conn, url.geturl(), headers=headers)
-
-    if res is None:
-        conn.close()
+    try:
+        res = request("GET", url, headers=headers)
+        res.raise_for_status()
+    except RequestException as e:
+        log(e, xbmc.LOGERROR)
         return default
 
-    content = res.read()
-    conn.close()
-
-    if res.headers.get("Content-Encoding") == "gzip":
-        content = gzip.decompress(content)
-
     try:
-        content = json.loads(content)
-    except json.decoder.JSONDecodeError:
-        log("Cannot load json content", xbmc.LOGWARNING)
+        content = res.json()
+    except JSONDecodeError:
+        log("Cannot load json content", xbmc.LOGERROR)
+        log(res.text, xbmc.LOGDEBUG)
         return default
 
     return content
-
-
-def request_text(url: str, headers: Mapping[str, str] = None) -> str:
-    """Send HTTP request and load text response."""
-    url = urlparse(url)
-    conn = HTTPConnection(url.netloc) if url.scheme == "http" else HTTPSConnection(url.netloc)
-    res = request(conn, url.geturl(), headers=headers)
-
-    if res is None:
-        conn.close()
-        return None
-
-    content = res.read()
-    conn.close()
-
-    if res.headers.get("Content-Encoding") == "gzip":
-        content = gzip.decompress(content)
-
-    return content.decode("utf-8")
 
 
 def to_cookie_string(cookies: dict, pick: list = None) -> str:
