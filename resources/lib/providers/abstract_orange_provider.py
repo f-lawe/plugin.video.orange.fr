@@ -5,14 +5,15 @@ import json
 import re
 from abc import ABC
 from datetime import date, datetime, timedelta
-from http.client import HTTPSConnection
 from urllib.parse import urlencode
 
 import xbmc
+from requests import Session
+from requests.exceptions import RequestException
 
 from lib.providers.abstract_provider import AbstractProvider
 from lib.utils.kodi import DRM, build_addon_url, get_addon_setting, get_drm, get_global_setting, log
-from lib.utils.request import get_cookies, request, request_json, request_text, to_cookie_string
+from lib.utils.request import request, request_json, to_cookie_string
 
 _PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
 _CATCHUP_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels"
@@ -247,62 +248,55 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         """Retreive auth data from Orange (tv token and terminal id, plus wassup cookie when using credentials)."""
         cookies = {}
 
-        if login is not None and password is not None:
-            conn = HTTPSConnection("login.orange.fr")
-            res = request(conn, "https://login.orange.fr")
+        if login is not None or password is not None:
+            s = Session()
 
-            if res is None:
+            try:
+                res = request("GET", "https://login.orange.fr", s=s)
+                cookies = res.cookies.get_dict()
+            except RequestException:
                 log("Error while authenticating (init)", xbmc.LOGWARNING)
-                conn.close()
                 return None, None, None
 
-            cookies = get_cookies(res)
-            res.read()
-
-            res = request(
-                conn,
-                "https://login.orange.fr/api/login",
-                "POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "Cookie": to_cookie_string(cookies, ["xauth"]),
-                },
-                body=json.dumps({"login": login, "params": {}, "isSosh": False}),
-            )
-
-            if res is None or res.status != 200:
-                log("Error while authenticating (login)", xbmc.LOGERROR)
-                conn.close()
+            try:
+                res = request(
+                    "POST",
+                    "https://login.orange.fr/api/login",
+                    headers={
+                        "Content-Type": "application/json",
+                        "Cookie": to_cookie_string(cookies, ["xauth"]),
+                    },
+                    data=json.dumps({"login": login, "params": {}, "isSosh": False}),
+                    s=s,
+                )
+                cookies = res.cookies.get_dict()
+            except RequestException:
+                log("Error while authenticating (login)", xbmc.LOGWARNING)
                 return None, None, None
 
-            cookies = get_cookies(res)
-            res.read()
-
-            res = request(
-                conn,
-                "https://login.orange.fr/api/password",
-                "POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "Cookie": to_cookie_string(cookies, ["xauth"]),
-                },
-                body=json.dumps({"password": password, "remember": True}),
-            )
-
-            if res is None or res.status != 200:
-                log("Error while authenticating (password)", xbmc.LOGERROR)
-                conn.close()
+            try:
+                res = request(
+                    "POST",
+                    "https://login.orange.fr/api/password",
+                    headers={
+                        "Content-Type": "application/json",
+                        "Cookie": to_cookie_string(cookies, ["xauth"]),
+                    },
+                    data=json.dumps({"password": password, "params": {}}),
+                    s=s,
+                )
+                cookies = res.cookies.get_dict()
+            except RequestException:
+                log("Error while authenticating (password)", xbmc.LOGWARNING)
                 return None, None, None
 
-            cookies = get_cookies(res)
-            res.read()
-            conn.close()
-
-        html = request_text(auth_url, headers={"Cookie": to_cookie_string(cookies, ["trust", "wassup"])})
-
-        if html is None:
+        try:
+            res = request("GET", auth_url, headers={"Cookie": to_cookie_string(cookies, ["trust", "wassup"])})
+        except RequestException:
             log("Authentication page load failed", xbmc.LOGERROR)
             return None, None, None
+
+        html = res.text
 
         try:
             tv_token = re.search('instanceInfo:{token:"([a-zA-Z0-9-_.]+)"', html).group(1)
