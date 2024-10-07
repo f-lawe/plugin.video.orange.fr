@@ -208,23 +208,21 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             return None
 
         drm = get_drm()
-        license_server_url = self._extract_license_server_url(stream, drm)
-        headers = urlencode(
-            {
-                "tv_token": f"Bearer {tv_token}",
-                "Content-Type": "",
-                "Cookie": f"wassup={wassup}",
-            }
-        )
-        post_data = "R{SSM}"
-        response_data = ""
-
         stream_info = {
             "path": stream.get("url"),
+            "protocol": "mpd",
             "mime_type": "application/xml+dash",
-            "manifest_type": "mpd",
-            "license_type": drm.value,
-            "license_key": f"{license_server_url}|{headers}|{post_data}|{response_data}",
+            "drm_config": {  # Keeping items in order
+                "drm": drm.value,
+                "license_server_url": self._extract_license_server_url(stream, drm),
+                "headers": urlencode(
+                    {
+                        "tv_token": f"Bearer {tv_token}",
+                        "Content-Type": "",
+                        "Cookie": f"wassup={wassup}",
+                    }
+                ),
+            },
         }
 
         log(stream_info, xbmc.LOGDEBUG)

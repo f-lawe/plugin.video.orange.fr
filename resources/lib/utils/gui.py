@@ -44,9 +44,8 @@ def create_play_item(stream_info: dict = None, inputstream_addon: str = "") -> L
     play_item.setMimeType(stream_info.get("mime_type"))
 
     play_item.setProperty("inputstream", inputstream_addon)
+    play_item.setProperty("inputstream.adaptive.drm_legacy", "|".join(stream_info.get("drm_config", {}).values()))
     # play_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
     # play_item.setProperty("inputstream.adaptive.manifest_config", '{"timeshift_bufferlimit":14400}')
-    play_item.setProperty("inputstream.adaptive.license_type", stream_info.get("license_type"))
-    play_item.setProperty("inputstream.adaptive.license_key", stream_info.get("license_key"))
 
     return play_item
