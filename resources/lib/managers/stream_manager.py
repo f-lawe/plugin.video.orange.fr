@@ -35,7 +35,7 @@ class StreamManager:
             xbmcplugin.setResolvedUrl(router.handle, False, create_play_item())
             return
 
-        is_helper = inputstreamhelper.Helper(stream_info["manifest_type"], drm=stream_info["license_type"])
+        is_helper = inputstreamhelper.Helper(stream_info["protocol"], drm=stream_info["drm_config"]["drm"])
 
         if is_helper.check_inputstream():
             play_item = create_play_item(stream_info, is_helper.inputstream_addon)
