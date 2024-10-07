@@ -1,5 +1,10 @@
 # 2.x
 
+## [2.2.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.2.1) - 2024-10-07
+
+### Changed
+- HTTP requests are now handled with [requests](https://pypi.org/project/requests/) ([#61](https://github.com/f-lawe/plugin.video.orange.fr/issues/61))
+
 ## [2.2.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.2.0) - 2024-10-03
 
 ### Added
