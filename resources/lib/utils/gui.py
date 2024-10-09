@@ -45,7 +45,5 @@ def create_play_item(stream_info: dict = None, inputstream_addon: str = "") -> L
 
     play_item.setProperty("inputstream", inputstream_addon)
     play_item.setProperty("inputstream.adaptive.drm_legacy", "|".join(stream_info.get("drm_config", {}).values()))
-    # play_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
-    # play_item.setProperty("inputstream.adaptive.manifest_config", '{"timeshift_bufferlimit":14400}')
 
     return play_item

@@ -11,7 +11,7 @@ from lib.utils.kodi import localize, log, ok_dialog
 
 
 class StreamManager:
-    """Load streams based using active provider."""
+    """Load video streams using active provider."""
 
     def __init__(self):
         """Initialize Stream Manager object."""
