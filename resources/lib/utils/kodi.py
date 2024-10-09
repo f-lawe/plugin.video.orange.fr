@@ -1,8 +1,9 @@
 """Make the use of some Kodi functions easier."""
 
+import json
 from enum import Enum
-from json import dumps, loads
 from string import Formatter
+from typing import Type, TypeVar
 
 import xbmc
 import xbmcaddon
@@ -10,6 +11,8 @@ import xbmcgui
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo("id")
+
+T = TypeVar("T", str, int, bool, dict)
 
 
 class DRM(Enum):
@@ -36,21 +39,46 @@ def get_addon_info(name: str) -> str:
     return ADDON.getAddonInfo(name)
 
 
-def get_addon_setting(name: str) -> str:
+def get_addon_setting(name: str, t: Type[T] = str) -> T:
     """Get addon setting from name."""
-    return ADDON.getSetting(name)
+    if t is bool:
+        return ADDON.getSettings().getBool(name)
+
+    if t is int:
+        return ADDON.getSettings().getInt(name)
+
+    if t is dict:
+        try:
+            return json.loads(ADDON.getSettings().getString(name))
+        except json.decoder.JSONDecodeError:
+            return {}
+
+    return ADDON.getSettings().getString(name)
 
 
-def get_drm() -> DRM:
+def get_drm() -> str:
     """Return the DRM system available for the current platform."""
-    return DRM.WIDEVINE
+    return DRM.WIDEVINE.value
 
 
-def get_global_setting(name: str):
+def get_global_setting(name: str, t: Type[T] = str) -> T:
     """Get global Kodi setting from name."""
     cmd = {"id": 0, "jsonrpc": "2.0", "method": "Settings.GetSettingValue", "params": {"setting": name}}
+    value = json.loads(xbmc.executeJSONRPC(json.dumps(cmd))).get("result", {}).get("value")
 
-    return loads(xbmc.executeJSONRPC(dumps(cmd))).get("result", {}).get("value")
+    if t is bool:
+        return value == "true"
+
+    if t is int:
+        return int(value)
+
+    if t is dict:
+        try:
+            return json.loads(value)
+        except json.decoder.JSONDecodeError:
+            return {}
+
+    return value
 
 
 def localize(string_id: int, **kwargs) -> str:
@@ -65,3 +93,17 @@ def localize(string_id: int, **kwargs) -> str:
 def ok_dialog(msg: str) -> None:
     """Display a popup window with a button."""
     xbmcgui.Dialog().ok(get_addon_info("name"), msg)
+
+
+def set_addon_setting(name: str, value: T) -> None:
+    """Set addon setting from name."""
+    if isinstance(value, bool):
+        value = "true" if value else "false"
+
+    if isinstance(value, int):
+        value = str(value)
+
+    if isinstance(value, dict):
+        value = json.dumps(value)
+
+    ADDON.setSetting(name, value)

@@ -9,10 +9,11 @@ from urllib.parse import urlencode
 
 import xbmc
 from requests import Session
-from requests.exceptions import RequestException
+from requests.exceptions import JSONDecodeError, RequestException
 
+from lib.exceptions import AuthenticationRequired, StreamDataDecodeError, StreamNotIncluded
 from lib.providers.abstract_provider import AbstractProvider
-from lib.utils.kodi import DRM, build_addon_url, get_addon_setting, get_drm, get_global_setting, log
+from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log, set_addon_setting
 from lib.utils.request import request, request_json, to_cookie_string
 
 _PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
@@ -68,12 +69,12 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         """Load EPG data from Orange and convert it to JSON-EPG format."""
         start_day = datetime.timestamp(
             datetime.combine(
-                date.today() - timedelta(days=int(get_global_setting("epg.pastdaystodisplay"))), datetime.min.time()
+                date.today() - timedelta(days=get_global_setting("epg.pastdaystodisplay", int)), datetime.min.time()
             )
         )
 
-        days_to_display = int(get_global_setting("epg.futuredaystodisplay")) + int(
-            get_global_setting("epg.pastdaystodisplay")
+        days_to_display = get_global_setting("epg.futuredaystodisplay", int) + get_global_setting(
+            "epg.pastdaystodisplay", int
         )
 
         programs = self._get_programs(start_day, days_to_display, self.chunks_per_day, self.mco)
@@ -186,35 +187,80 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def _get_stream_info(self, auth_url: str, stream_endpoint: str, stream_id: str) -> dict:
         """Load stream info from Orange."""
-        tv_token, terminal_id, wassup = (
-            self._retrieve_auth_data(
-                auth_url, get_addon_setting("provider.username"), get_addon_setting("provider.password")
-            )
-            if get_addon_setting("provider.use_credentials") == "true"
-            else self._retrieve_auth_data(auth_url)
+        provider_session_data = get_addon_setting("provider.session_data", dict)
+        tv_token, terminal_id, wassup = (provider_session_data.get(k) for k in ("tv_token", "terminal_id", "wassup"))
+        res = None
+
+        if tv_token and terminal_id:
+            try:
+                stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id=terminal_id)
+                headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
+                res = request("GET", stream_endpoint_url, headers=headers)
+                log("Use stored session data", xbmc.LOGINFO)
+            except RequestException as e:
+                if e.response.status_code == 403:
+                    raise StreamNotIncluded() from e
+                else:
+                    log("Stored session data expired", xbmc.LOGWARNING)
+
+        if res is None:
+            set_addon_setting("provider.session_data", {})
+
+            try:
+                if get_addon_setting("provider.use_credentials", bool):
+                    username, password = get_addon_setting("provider.username"), get_addon_setting("provider.password")
+                    tv_token, terminal_id, wassup = self._retrieve_auth_data(auth_url, username, password)
+                else:
+                    tv_token, terminal_id, wassup = self._retrieve_auth_data(auth_url)
+            except RequestException as e:
+                raise AuthenticationRequired("Authentication page load failed") from e
+            except AttributeError as e:
+                raise AuthenticationRequired("Cannot extract tv token or household id") from e
+
+            try:
+                stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id=terminal_id)
+                headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
+                res = request("GET", stream_endpoint_url, headers=headers)
+                log("Initiate new session", xbmc.LOGINFO)
+            except RequestException as e:
+                if e.response.status_code == 403:
+                    raise StreamNotIncluded() from e
+                else:
+                    raise AuthenticationRequired("Cannot initiate new session") from e
+
+        try:
+            stream = res.json()
+        except JSONDecodeError as e:
+            raise StreamDataDecodeError() from e
+
+        provider_session_data = {
+            "tv_token": tv_token,
+            "terminal_id": terminal_id,
+            "wassup": wassup,
+        }
+
+        set_addon_setting("provider.session_data", provider_session_data)
+        return self._compute_stream_info(stream, tv_token, wassup)
+
+    def _compute_stream_info(self, stream: dict, tv_token: str, wassup: str) -> dict:
+        """Compute stream info."""
+        protectionData = (
+            stream.get("protectionData") if stream.get("protectionData") is not None else stream.get("protectionDatas")
         )
 
-        if tv_token is None or terminal_id is None:
-            log("Authentication failed", xbmc.LOGERROR)
-            return None
+        license_server_url = None
 
-        url = stream_endpoint.format(stream_id=stream_id, terminal_id=terminal_id)
+        for system in protectionData:
+            if system.get("keySystem") == get_drm():
+                license_server_url = system.get("laUrl")
 
-        log(f"url: {url}")
-        stream = request_json(f"{url}", headers={"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"})
-
-        if stream is None:
-            log("Empty stream data", xbmc.LOGERROR)
-            return None
-
-        drm = get_drm()
         stream_info = {
             "path": stream.get("url"),
             "protocol": "mpd",
             "mime_type": "application/xml+dash",
             "drm_config": {  # Keeping items in order
-                "drm": drm.value,
-                "license_server_url": self._extract_license_server_url(stream, drm),
+                "drm": get_drm(),
+                "license_server_url": license_server_url,
                 "headers": urlencode(
                     {
                         "tv_token": f"Bearer {tv_token}",
@@ -228,82 +274,66 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         log(stream_info, xbmc.LOGDEBUG)
         return stream_info
 
-    def _extract_license_server_url(self, stream: dict, drm: DRM) -> str:
-        """Extract license server url from stream info."""
-        protectionData = (
-            stream.get("protectionData") if stream.get("protectionData") is not None else stream.get("protectionDatas")
-        )
-
-        license_server_url = None
-
-        for system in protectionData:
-            if system.get("keySystem") == drm.value:
-                license_server_url = system.get("laUrl")
-
-        return license_server_url
-
     def _retrieve_auth_data(self, auth_url: str, login: str = None, password: str = None) -> (str, str, str):
         """Retreive auth data from Orange (tv token and terminal id, plus wassup cookie when using credentials)."""
         cookies = {}
 
-        if login is not None or password is not None:
-            s = Session()
+        if login or password:
+            cookies = self._login(login, password)
 
-            try:
-                res = request("GET", "https://login.orange.fr", s=s)
-                cookies = res.cookies.get_dict()
-            except RequestException:
-                log("Error while authenticating (init)", xbmc.LOGWARNING)
-                return None, None, None
+        res = request("GET", auth_url, headers={"Cookie": to_cookie_string(cookies, ["trust", "wassup"])})
 
-            try:
-                res = request(
-                    "POST",
-                    "https://login.orange.fr/api/login",
-                    headers={
-                        "Content-Type": "application/json",
-                        "Cookie": to_cookie_string(cookies, ["xauth"]),
-                    },
-                    data=json.dumps({"login": login, "params": {}, "isSosh": False}),
-                    s=s,
-                )
-                cookies = res.cookies.get_dict()
-            except RequestException:
-                log("Error while authenticating (login)", xbmc.LOGWARNING)
-                return None, None, None
+        tv_token = re.search('instanceInfo:{token:"([a-zA-Z0-9-_.]+)"', res.text).group(1)
+        household_id = re.search('householdId:"([A-Z0-9]+)"', res.text).group(1)
 
-            try:
-                res = request(
-                    "POST",
-                    "https://login.orange.fr/api/password",
-                    headers={
-                        "Content-Type": "application/json",
-                        "Cookie": to_cookie_string(cookies, ["xauth"]),
-                    },
-                    data=json.dumps({"password": password, "params": {}}),
-                    s=s,
-                )
-                cookies = res.cookies.get_dict()
-            except RequestException:
-                log("Error while authenticating (password)", xbmc.LOGWARNING)
-                return None, None, None
+        log(f"tv_token: {tv_token}, household_id: {household_id}, wassup: {cookies.get('wassup')}", xbmc.LOGDEBUG)
+        return tv_token, household_id, cookies.get("wassup")
+
+    def _login(self, login: str, password: str) -> dict:
+        """Login to Orange and return session cookie."""
+        cookies = {}
+        s = Session()
 
         try:
-            res = request("GET", auth_url, headers={"Cookie": to_cookie_string(cookies, ["trust", "wassup"])})
+            res = request("GET", "https://login.orange.fr", s=s)
+            cookies = res.cookies.get_dict()
         except RequestException:
-            log("Authentication page load failed", xbmc.LOGERROR)
-            return None, None, None
-
-        html = res.text
+            log("Error while authenticating (init)", xbmc.LOGWARNING)
+            return {}
 
         try:
-            tv_token = re.search('instanceInfo:{token:"([a-zA-Z0-9-_.]+)"', html).group(1)
-            household_id = re.search('householdId:"([A-Z0-9]+)"', html).group(1)
-            log(f"tv_token: {tv_token}, household_id: {household_id}, wassup: {cookies.get('wassup')}", xbmc.LOGDEBUG)
-            return tv_token, household_id, cookies.get("wassup")
-        except AttributeError:
-            log("Cannot extract tv token or household id", xbmc.LOGERROR)
-            return None, None, None
+            res = request(
+                "POST",
+                "https://login.orange.fr/api/login",
+                headers={
+                    "Content-Type": "application/json",
+                    "Cookie": to_cookie_string(cookies, ["xauth"]),
+                },
+                data=json.dumps({"login": login, "params": {}, "isSosh": False}),
+                s=s,
+            )
+            cookies = res.cookies.get_dict()
+        except RequestException:
+            log("Error while authenticating (login)", xbmc.LOGWARNING)
+            return {}
+
+        try:
+            res = request(
+                "POST",
+                "https://login.orange.fr/api/password",
+                headers={
+                    "Content-Type": "application/json",
+                    "Cookie": to_cookie_string(cookies, ["xauth"]),
+                },
+                data=json.dumps({"password": password, "params": {}}),
+                s=s,
+            )
+            cookies = res.cookies.get_dict()
+        except RequestException:
+            log("Error while authenticating (password)", xbmc.LOGWARNING)
+            return {}
+
+        return cookies
 
     def _extract_logo(self, logos: list, definition_type: str = "mobileAppliDark") -> str:
         for logo in logos:

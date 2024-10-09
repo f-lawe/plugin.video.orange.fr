@@ -13,8 +13,8 @@ _PROVIDERS = {
     "France.Orange Réunion": OrangeReunionProvider,
 }
 
-_PROVIDER_NAME: str = get_addon_setting("provider.name")
-_PROVIDER_COUNTRY: str = get_addon_setting("provider.country")
+_PROVIDER_NAME = get_addon_setting("provider.name")
+_PROVIDER_COUNTRY = get_addon_setting("provider.country")
 _PROVIDER_KEY = f"{_PROVIDER_COUNTRY}.{_PROVIDER_NAME}"
 
 _PROVIDER = _PROVIDERS[_PROVIDER_KEY]() if _PROVIDERS.get(_PROVIDER_KEY) is not None else None

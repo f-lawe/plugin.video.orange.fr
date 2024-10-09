@@ -1,9 +1,12 @@
 """Video stream manager."""
 
+from typing import Callable
+
 import inputstreamhelper
 import xbmc
 import xbmcplugin
 
+from lib.exceptions import AuthenticationRequired, StreamDataDecodeError, StreamNotIncluded
 from lib.providers import get_provider
 from lib.router import router
 from lib.utils.gui import create_play_item
@@ -11,7 +14,7 @@ from lib.utils.kodi import localize, log, ok_dialog
 
 
 class StreamManager:
-    """Load streams based using active provider."""
+    """Load video streams using active provider."""
 
     def __init__(self):
         """Initialize Stream Manager object."""
@@ -19,19 +22,29 @@ class StreamManager:
 
     def load_live_stream(self, stream_id: str) -> None:
         """Load live TV stream."""
-        stream_info = self.provider.get_live_stream_info(stream_id)
-        self._load_stream(stream_info)
+        self._load_stream(self.provider.get_live_stream_info, stream_id=stream_id)
 
     def load_chatchup_stream(self, stream_id: str) -> None:
         """Load catchup TV stream."""
-        stream_info = self.provider.get_catchup_stream_info(stream_id)
-        self._load_stream(stream_info)
+        self._load_stream(self.provider.get_catchup_stream_info, stream_id=stream_id)
 
-    def _load_stream(self, stream_info: dict = None) -> None:
+    def _load_stream(self, stream_getter: Callable[[str], dict], stream_id: str) -> None:
         """Load stream."""
-        if stream_info is None:
+        try:
+            stream_info = stream_getter(stream_id)
+        except StreamNotIncluded:
             log("Stream not included in subscription", xbmc.LOGERROR)
             ok_dialog(localize(30900))
+            xbmcplugin.setResolvedUrl(router.handle, False, create_play_item())
+            return
+        except StreamDataDecodeError:
+            log("Cannot decode stream data", xbmc.LOGERROR)
+            ok_dialog(localize(30900))
+            xbmcplugin.setResolvedUrl(router.handle, False, create_play_item())
+            return
+        except AuthenticationRequired as e:
+            log(e, xbmc.LOGERROR)
+            ok_dialog(localize(30902))
             xbmcplugin.setResolvedUrl(router.handle, False, create_play_item())
             return
 

@@ -1,8 +1,7 @@
 """Request utils."""
 
-from http.client import HTTPConnection, HTTPSConnection
 from random import randint
-from typing import Mapping, TypeVar, Union
+from typing import Mapping, Union
 
 import xbmc
 from requests import Response, Session
@@ -32,9 +31,6 @@ _USER_AGENTS = [
 ]
 
 
-C = TypeVar("C", HTTPConnection, HTTPSConnection)
-
-
 def get_random_ua() -> str:
     """Get a randomised user agent."""
     return _USER_AGENTS[randint(0, len(_USER_AGENTS) - 1)]
@@ -57,22 +53,25 @@ def request(method: str, url: str, headers: Mapping[str, str] = None, data=None,
     s = s if s is not None else Session()
 
     log(f"Fetching {url}", xbmc.LOGDEBUG)
-    return s.request(method, url, headers=headers, data=data)
+    res = s.request(method, url, headers=headers, data=data)
+    res.raise_for_status()
+    log(f" -> {res.status_code}", xbmc.LOGDEBUG)
+    return res
 
 
-def request_json(url: str, headers: Mapping[str, str] = None, default=None) -> Union[dict, list]:
+def request_json(url: str, headers: Mapping[str, str] = None, default: Union[dict, list] = None) -> Union[dict, list]:
     """Send HTTP request and load json response."""
     try:
         res = request("GET", url, headers=headers)
         res.raise_for_status()
     except RequestException as e:
-        log(e, xbmc.LOGERROR)
+        log(e, xbmc.LOGWARNING)
         return default
 
     try:
         content = res.json()
     except JSONDecodeError:
-        log("Cannot load json content", xbmc.LOGERROR)
+        log("Cannot load json content", xbmc.LOGWARNING)
         log(res.text, xbmc.LOGDEBUG)
         return default
 
@@ -84,14 +83,14 @@ def to_cookie_string(cookies: dict, pick: list = None) -> str:
     if pick is None:
         pick = cookies.keys()
 
-    cookies = {k: v for k, v in cookies.items() if k in pick}
+    cookies = {key: value for key, value in cookies.items() if key in pick}
 
-    return "; ".join([f"{k}={v}" for k, v in cookies.items()])
+    return "; ".join([f"{key}={value}" for key, value in cookies.items()])
 
 
 def install_proxy() -> None:
     """Install proxy server for the next requests."""
-    if get_addon_setting("proxy.enabled") != "true":
+    if get_addon_setting("proxy.enabled", bool):
         return
 
     ip = get_addon_setting("proxy.ip")
