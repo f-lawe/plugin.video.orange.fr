@@ -129,9 +129,13 @@ msgstr ""
 # Dialogs (from 30900 to 30999)
 
 msgctxt "#30900"
-msgid "This channel is not part of your current registration."
+msgid "This channel is not included of your current subscription."
 msgstr "Cette chaîne ne fait pas partie de votre abonnement."
 
 msgctxt "#30901"
 msgid "InputStream cannot be loaded."
 msgstr "InputStream n'a pas pu être chargé."
+
+msgctxt "#30902"
+msgid "Cannot authenticate with your provider."
+msgstr "Authentification impossible avec votre fournisseur."

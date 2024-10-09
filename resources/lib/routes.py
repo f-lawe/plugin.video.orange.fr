@@ -10,7 +10,7 @@ from lib.utils.kodi import log
 @router.route("/")
 def index():
     """Display catchup TV channels."""
-    log("Display home", xbmc.LOGINFO)
+    log("Display index", xbmc.LOGINFO)
     CatchupManager().get_channels()
 
 
