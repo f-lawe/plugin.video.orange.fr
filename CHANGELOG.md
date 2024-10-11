@@ -1,5 +1,12 @@
 # 2.x
 
+## [2.3.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.1) - 2024-10-11
+
+### Changed
+- Update to InputstreamAdaptive for Kodi 21 ([#63](https://github.com/f-lawe/plugin.video.orange.fr/issues/63))
+- Avoid reauthentication when stored session data is not expired ([#64](https://github.com/f-lawe/plugin.video.orange.fr/issues/64))
+- Better error management ([#65](https://github.com/f-lawe/plugin.video.orange.fr/issues/65))
+
 ## [2.2.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.2.1) - 2024-10-07
 
 ### Changed
