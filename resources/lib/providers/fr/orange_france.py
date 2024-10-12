@@ -1,4 +1,3 @@
-# ruff: noqa: D102
 """Orange France."""
 
 from lib.providers.abstract_orange_provider import AbstractOrangeProvider

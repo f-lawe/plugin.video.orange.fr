@@ -1,6 +1,7 @@
 """Abstract TV Provider."""
 
 from abc import ABC, abstractmethod
+from typing import List
 
 
 class AbstractProvider(ABC):
@@ -27,21 +28,6 @@ class AbstractProvider(ABC):
         pass
 
     @abstractmethod
-    def get_catchup_channels(self) -> list:
-        """Return a list of available catchup channels."""
-        pass
-
-    @abstractmethod
-    def get_catchup_categories(self, catchup_channel_id: str) -> list:
-        """Return a list of catchup categories for the specified channel id."""
-        pass
-
-    @abstractmethod
-    def get_catchup_articles(self, catchup_channel_id: str, category_id: str) -> list:
-        """Return a list of catchup articles for the specified channel id and category id."""
-        pass
-
-    @abstractmethod
-    def get_catchup_videos(self, catchup_channel_id: str, article_id: str) -> list:
-        """Return a list of catchup videos for the specified channel id and article id."""
+    def get_catchup_items(self, levels: List[str]) -> list:
+        """Return a list of directory items for the specified levels."""
         pass
