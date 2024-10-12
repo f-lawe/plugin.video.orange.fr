@@ -5,6 +5,7 @@ import json
 import re
 from abc import ABC
 from datetime import date, datetime, timedelta
+from typing import List
 from urllib.parse import urlencode
 
 import xbmc
@@ -18,7 +19,7 @@ from lib.utils.request import request, request_json, to_cookie_string
 
 _PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
 _CATCHUP_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels"
-_CATCHUP_ARTICLES_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels/{catchup_channel_id}/categories/{category_id}"
+_CATCHUP_ARTICLES_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels/{channel_id}/categories/{category_id}"
 _CATCHUP_VIDEOS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/groups/{group_id}"
 _CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/pds/v1/live/ew?everywherePopulation=OTT_Metro"
 
@@ -43,6 +44,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         return self._get_stream_info(auth_url, _LIVE_STREAM_ENDPOINT, stream_id)
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
+        """Get catchup stream info."""
         auth_url = _CATCHUP_VIDEO_URL.format(stream_id=stream_id)
         return self._get_stream_info(auth_url, _CATCHUP_STREAM_ENDPOINT, stream_id)
 
@@ -59,7 +61,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 "name": channel["name"],
                 "preset": str(channel["displayOrder"]),
                 "logo": self._extract_logo(channel["logos"]),
-                "stream": build_addon_url(f"/live-streams/{channel['idEPG']}"),
+                "stream": build_addon_url(f"/stream/live/{channel['idEPG']}"),
                 "group": [group_name for group_name in self.groups if int(channel["idEPG"]) in self.groups[group_name]],
             }
             for channel in channels
@@ -124,55 +126,72 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         return epg
 
-    def get_catchup_channels(self) -> list:
+    def get_catchup_items(self, levels: List[str]) -> list:
+        """Return a list of directory items for the specified levels."""
+        depth = len(levels)
+
+        if depth == 0:
+            return self._get_catchup_channels()
+        elif depth == 1:
+            return self._get_catchup_categories(levels[0])
+        elif depth == 2:
+            return self._get_catchup_articles(levels[0], levels[1])
+        elif depth == 3:
+            return self._get_catchup_videos(levels[0], levels[1], levels[2])
+
+    def _get_catchup_channels(self) -> list:
         """Load available catchup channels."""
         channels = request_json(_CATCHUP_CHANNELS_ENDPOINT, default=[])
 
         return [
             {
+                "is_folder": True,
                 "label": str(channel["name"]).upper(),
-                "path": build_addon_url(f"/channels/{channel['id']}/categories"),
+                "path": build_addon_url(f"/catchup/{channel['id']}"),
                 "art": {"thumb": channel["logos"]["ref_millenials_partner_white_logo"]},
             }
             for channel in channels
         ]
 
-    def get_catchup_categories(self, catchup_channel_id: str) -> list:
+    def _get_catchup_categories(self, channel_id: str) -> list:
         """Return a list of catchup categories for the specified channel id."""
-        url = _CATCHUP_CHANNELS_ENDPOINT + "/" + catchup_channel_id
+        url = _CATCHUP_CHANNELS_ENDPOINT + "/" + channel_id
         categories = request_json(url, default={"categories": {}})["categories"]
 
         return [
             {
+                "is_folder": True,
                 "label": category["name"][0].upper() + category["name"][1:],
-                "path": build_addon_url(f"/channels/{catchup_channel_id}/categories/{category['id']}/articles"),
+                "path": build_addon_url(f"/catchup/{channel_id}/{category['id']}"),
             }
             for category in categories
         ]
 
-    def get_catchup_articles(self, catchup_channel_id: str, category_id: str) -> list:
+    def _get_catchup_articles(self, channel_id: str, category_id: str) -> list:
         """Return a list of catchup groups for the specified channel id and category id."""
-        url = _CATCHUP_ARTICLES_ENDPOINT.format(catchup_channel_id=catchup_channel_id, category_id=category_id)
+        url = _CATCHUP_ARTICLES_ENDPOINT.format(channel_id=channel_id, category_id=category_id)
         articles = request_json(url, default={"articles": {}})["articles"]
 
         return [
             {
+                "is_folder": True,
                 "label": article["title"],
-                "path": build_addon_url(f"/channels/{catchup_channel_id}/articles/{article['id']}/videos"),
+                "path": build_addon_url(f"/catchup/{channel_id}/{category_id}/{article['id']}"),
                 "art": {"poster": article["covers"]["ref_16_9"]},
             }
             for article in articles
         ]
 
-    def get_catchup_videos(self, catchup_channel_id: str, article_id: str) -> list:
+    def _get_catchup_videos(self, channel_id: str, category_id: str, article_id: str) -> list:
         """Return a list of catchup videos for the specified channel id and article id."""
         url = _CATCHUP_VIDEOS_ENDPOINT.format(group_id=article_id)
         videos = request_json(url, default={"videos": {}})["videos"]
 
         return [
             {
+                "is_folder": False,
                 "label": video["title"],
-                "path": build_addon_url(f"/catchup-streams/{video['id']}"),
+                "path": build_addon_url(f"/stream/catchup/{video['id']}"),
                 "art": {"poster": video["covers"]["ref_16_9"]},
                 "info": {
                     "duration": int(video["duration"]) * 60,

@@ -9,41 +9,27 @@ from lib.utils.kodi import log
 
 @router.route("/")
 def index():
-    """Display catchup TV channels."""
-    log("Display index", xbmc.LOGINFO)
-    CatchupManager().get_channels()
+    """Display catchup service index."""
+    log("Display catchup index", xbmc.LOGINFO)
+    CatchupManager().build_directory()
 
 
-@router.route("/channels/<catchup_channel_id>/categories")
-def channel_categories(catchup_channel_id: str):
-    """Return catchup category listitems for the required channel id."""
-    log(f"Loading catchup categories for channel {catchup_channel_id}", xbmc.LOGINFO)
-    CatchupManager().get_categories(catchup_channel_id)
+@router.route("/catchup/<path:levels>")
+def catchup_(levels: str):
+    """Display catchup service directory."""
+    log(f"Display catchup directory {levels}", xbmc.LOGINFO)
+    CatchupManager().build_directory(levels)
 
 
-@router.route("/channels/<catchup_channel_id>/categories/<category_id>/articles")
-def channel_category_articles(catchup_channel_id: str, category_id: str):
-    """Return catchup category article listitems."""
-    log(f"Loading catchup articles for category {category_id}", xbmc.LOGINFO)
-    CatchupManager().get_articles(catchup_channel_id, category_id)
-
-
-@router.route("/channels/<catchup_channel_id>/articles/<article_id>/videos")
-def channel_article_videos(catchup_channel_id: str, article_id: str):
-    """Return catchup article video listitems."""
-    log(f"Loading catchup videos for article {article_id}", xbmc.LOGINFO)
-    CatchupManager().get_videos(catchup_channel_id, article_id)
-
-
-@router.route("/live-streams/<stream_id>")
-def live_stream(stream_id: str):
+@router.route("/stream/live/<stream_id>")
+def stream_live(stream_id: str):
     """Load live stream for the required channel id."""
     log(f"Loading live stream {stream_id}", xbmc.LOGINFO)
     StreamManager().load_live_stream(stream_id)
 
 
-@router.route("/catchup-streams/<stream_id>")
-def catchup_stream(stream_id: str):
+@router.route("/stream/catchup/<stream_id>")
+def stream_catchup(stream_id: str):
     """Load live stream for the required video id."""
     log(f"Loading catchup stream {stream_id}", xbmc.LOGINFO)
     StreamManager().load_chatchup_stream(stream_id)
