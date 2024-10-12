@@ -1,6 +1,11 @@
 # 2.x
 
-## [2.3.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.1) - 2024-10-11
+## [2.3.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.1) - 2024-10-12
+
+### Changed
+- Routing and provider interface now allow various depths in catchup menus ([#67](https://github.com/f-lawe/plugin.video.orange.fr/issues/67))
+
+## [2.3.0](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.0) - 2024-10-11
 
 ### Changed
 - Update to InputstreamAdaptive for Kodi 21 ([#63](https://github.com/f-lawe/plugin.video.orange.fr/issues/63))
