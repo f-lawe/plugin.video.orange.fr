@@ -277,15 +277,21 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             "path": stream.get("url"),
             "protocol": "mpd",
             "mime_type": "application/xml+dash",
-            "drm_config": {  # Keeping items in order
-                "drm": get_drm(),
-                "license_server_url": license_server_url,
-                "headers": urlencode(
+            "drm_config": {
+                "license_type": get_drm(),
+                "license_key": "|".join(
                     {
-                        "tv_token": f"Bearer {tv_token}",
-                        "Content-Type": "",
-                        "Cookie": f"wassup={wassup}",
-                    }
+                        "licence_server_url": license_server_url,
+                        "headers": urlencode(
+                            {
+                                "tv_token": f"Bearer {tv_token}",
+                                "Content-Type": "",
+                                "Cookie": f"wassup={wassup}",
+                            }
+                        ),
+                        "post_data": "R{SSM}",
+                        "response_data": "",
+                    }.values()
                 ),
             },
         }

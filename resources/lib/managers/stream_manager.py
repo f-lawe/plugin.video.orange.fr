@@ -48,12 +48,15 @@ class StreamManager:
             xbmcplugin.setResolvedUrl(router.handle, False, create_play_item())
             return
 
-        is_helper = inputstreamhelper.Helper(stream_info["protocol"], drm=stream_info["drm_config"]["drm"])
+        drm = stream_info.get("drm_config", {}).get("license_type")
 
-        if is_helper.check_inputstream():
-            play_item = create_play_item(stream_info, is_helper.inputstream_addon)
-            xbmcplugin.setResolvedUrl(router.handle, True, play_item)
-            return
+        if drm:
+            is_helper = inputstreamhelper.Helper(stream_info["protocol"], drm=stream_info["drm_config"]["license_type"])
+
+            if is_helper.check_inputstream():
+                play_item = create_play_item(stream_info, is_helper.inputstream_addon)
+                xbmcplugin.setResolvedUrl(router.handle, True, play_item)
+                return
 
         log("Cannot load InputStream", xbmc.LOGERROR)
         ok_dialog(localize(30901))
