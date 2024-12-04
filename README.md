@@ -27,6 +27,7 @@ If you need the latest update, you can download the latest ZIP archive from the 
 ## Available providers
 | Country   | Provider          |  |
 |:---------:|:------------------|:-|
+| 🇫🇷        | OQEE by Free      | Not working, under developpement |
 | 🇫🇷        | Orange            |  |
 | 🇫🇷        | Orange Caraïbe    |  |
 | 🇫🇷        | Orange Réunion    | thanks to [@starmate](https://github.com/starmate) and [@sae-gfc](https://github.com/sae-gfc) |

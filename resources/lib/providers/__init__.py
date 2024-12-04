@@ -5,9 +5,10 @@ import xbmc
 from lib.utils.kodi import get_addon_setting, log
 
 from .abstract_provider import AbstractProvider
-from .fr import OrangeCaraibeProvider, OrangeFranceProvider, OrangeReunionProvider
+from .fr import FreeOqeeProvider, OrangeCaraibeProvider, OrangeFranceProvider, OrangeReunionProvider
 
 _PROVIDERS = {
+    "France.OQEE by Free": FreeOqeeProvider,
     "France.Orange": OrangeFranceProvider,
     "France.Orange Caraïbe": OrangeCaraibeProvider,
     "France.Orange Réunion": OrangeReunionProvider,

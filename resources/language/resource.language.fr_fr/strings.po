@@ -15,8 +15,8 @@ msgstr ""
 # Integration settings (from 30100 to 30199)
 
 msgctxt "#30100"
-msgid "TV Integration"
-msgstr "Intégration TV"
+msgid "IPTV Integration"
+msgstr "Intégration IPTV"
 
 msgctxt "#30101"
 msgid "Install IPTV Manager…"

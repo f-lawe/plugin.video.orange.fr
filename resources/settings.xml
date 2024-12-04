@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <!-- TV Integration -->
+    <!-- IPTV Integration -->
     <category label="30100">
         <setting id="iptv.channels_uri">
             <level>4</level>
@@ -22,7 +22,7 @@
 		<setting id="provider.country" label="30201" help="30202" type="select" values="France">
             <default>France</default>
         </setting>
-        <setting id="provider.name" visible="eq(-1,France)" label="30203" help="30204" type="labelenum" values="Orange|Orange Caraïbe|Orange Réunion">
+        <setting id="provider.name" visible="eq(-1,France)" label="30203" help="30204" type="labelenum" values="OQEE by Free|Orange|Orange Caraïbe|Orange Réunion">
             <default>Orange</default>
         </setting>
         <setting type="lsep"/>

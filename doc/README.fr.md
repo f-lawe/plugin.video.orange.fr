@@ -25,6 +25,7 @@ Si vous avez besoin de la dernière version, vous pouvez toujours télécharger 
 ## Fournisseurs disponibles
 | Pays      | Fournisseur       |  |
 |:---------:|:------------------|:-|
+| 🇫🇷        | OQEE by Free      | ne fonctionne pas, développement en cours |
 | 🇫🇷        | Orange            |  |
 | 🇫🇷        | Orange Caraïbe    |  |
 | 🇫🇷        | Orange Réunion    | merci à [@starmate](https://github.com/starmate) et [@sae-gfc](https://github.com/sae-gfc)

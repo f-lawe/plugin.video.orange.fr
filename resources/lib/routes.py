@@ -15,7 +15,7 @@ def index():
 
 
 @router.route("/catchup/<path:levels>")
-def catchup_(levels: str):
+def catchup_directory(levels: str):
     """Display catchup service directory."""
     log(f"Display catchup directory {levels}", xbmc.LOGINFO)
     CatchupManager().build_directory(levels)

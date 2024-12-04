@@ -44,6 +44,12 @@ def create_play_item(stream_info: dict = None, inputstream_addon: str = "") -> L
     play_item.setMimeType(stream_info.get("mime_type"))
 
     play_item.setProperty("inputstream", inputstream_addon)
-    play_item.setProperty("inputstream.adaptive.drm_legacy", "|".join(stream_info.get("drm_config", {}).values()))
+
+    drm_config = stream_info.get("drm_config", {})
+    keys = ["license_type", "license_key", "license_data", "server_certificate", "license_flags", "pre_init_data"]
+
+    for key in keys:
+        if drm_config.get(key) is not None:
+            play_item.setProperty(f"inputstream.adaptive.{key}", drm_config.get(key))
 
     return play_item
