@@ -1,5 +1,11 @@
 # 2.x
 
+## [2.3.2](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.2) - 2024-12-05
+
+### Changed
+- Revert to legacy Inputstream Adaptive API
+- WIP on OQEE by Free
+
 ## [2.3.1](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.1) - 2024-10-12
 
 ### Changed
