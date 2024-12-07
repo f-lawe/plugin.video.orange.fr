@@ -16,7 +16,7 @@ from requests.exceptions import JSONDecodeError, RequestException
 from lib.exceptions import AuthenticationRequired, StreamDataDecodeError, StreamNotIncluded
 from lib.providers.abstract_provider import AbstractProvider
 from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log, set_addon_setting
-from lib.utils.request import request, request_json, to_cookie_string
+from lib.utils.request import request, request_json, to_cookie_string, get_random_ua
 
 _PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
 _CATCHUP_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels"
@@ -30,6 +30,7 @@ _CATCHUP_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/catchup/v4
 _STREAM_LOGO_URL = "https://proxymedia.woopic.com/api/v1/images/2090{path}"
 _LIVE_HOMEPAGE_URL = "https://chaines-tv.orange.fr/"
 _CATCHUP_VIDEO_URL = "https://replay.orange.fr/videos/{stream_id}"
+_LOGIN_URL = 'https://login.orange.fr'
 
 
 class AbstractOrangeProvider(AbstractProvider, ABC):
@@ -269,30 +270,25 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         tv_token, tv_token_expires, wassup = (provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup"))
 
         if not tv_token_expires or datetime.utcnow().timestamp() > tv_token_expires:
-            URL_ROOT = 'https://chaines-tv.orange.fr'
-            USER_AGENT_FIREFOX = "Mozilla/5.0 (Windows NT 10.0; rv:114.0) Gecko/20100101 Firefox/114.0"
             session = Session()
-            session.headers = {
-                'User-Agent': USER_AGENT_FIREFOX,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                'Accept-Language': 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
-                'Accept-Encoding': 'gzip, deflate, br'
-            }
 
             if not self._expired_wassup(wassup):
                 log("Cookie reuse", xbmc.LOGINFO)
-                response = session.get(URL_ROOT + '/token', cookies={'wassup': wassup})
-            else:
-                response = session.get(URL_ROOT + '/token')
-                if response.status_code != 200:
-                    log('Login required', xbmc.LOGINFO)
-                    self._login(session)
-                    response = session.get(URL_ROOT + '/token')
+                session.headers['Cookie'] = f'wassup={wassup}'
+            
+            try:
+                response = request("GET", f'{_LIVE_HOMEPAGE_URL}token', s=session)
+            except:
+                log('Login required', xbmc.LOGINFO)
+                self._login(session)
+                response = request("GET", f'{_LIVE_HOMEPAGE_URL}token', s=session)
 
             tv_token = response.json()
             tv_token_expires = datetime.utcnow().timestamp() + 30 * 60
+
             if 'wassup' in session.cookies:
                 wassup = session.cookies.get('wassup')
+
             provider_session_data = {
                 "tv_token": tv_token,
                 "tv_token_expires": tv_token_expires,
@@ -313,13 +309,48 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         except:
             return True
 
-    def _login(self, session) -> dict:
-        """Login to Orange and return session cookie."""
-        URL_LOGIN = 'https://login.orange.fr'
+    def _login(self, session):
+        """Login to Orange"""
         login, password = get_addon_setting("provider.username"), get_addon_setting("provider.password")
-        session.get(URL_LOGIN)
-        session.post(URL_LOGIN + '/api/login', data={'login': login, 'params': {}})
-        session.post(URL_LOGIN + '/api/password', json={'password': password, 'remember': True})
+        session.headers = {
+            'User-Agent': get_random_ua(),
+            'Accept': 'application/xhtml+xml,application/xml',
+            "Accept-Encoding": "gzip, deflate, br",
+        }
+
+        session.get(_LOGIN_URL)
+        session.post(f'{_LOGIN_URL}/api/login', data={'login': login, 'params': {}})
+        session.post(f'{_LOGIN_URL}/api/password', json={'password': password, 'remember': True})
+
+        # try:
+        #     res = request("GET", _LOGIN_URL, headers=session.headers, s=session)
+        # except RequestException:
+        #     log("Error while authenticating (init)", xbmc.LOGWARNING)
+        #     return
+
+        # try:
+        #     res = request(
+        #         "POST",
+        #         f"{_LOGIN_URL}/api/login",
+        #         headers = session.headers,
+        #         data=json.dumps({'login': login, 'params': {}}),
+        #         s=session,
+        #     )
+        # except RequestException:
+        #     log("Error while authenticating (login)", xbmc.LOGWARNING)
+        #     return
+
+        # session.headers["Content-Type"] = "application/json"
+        # try:
+        #     res = request(
+        #         "POST",
+        #         f"{_LOGIN_URL}/api/password",
+        #         headers = session.headers,
+        #         data=json.dumps({'password': password, 'remember': True}),
+        #         s=session,
+        #     )
+        # except RequestException:
+        #     log("Error while authenticating (password)", xbmc.LOGWARNING)
 
     def _extract_logo(self, logos: list, definition_type: str = "mobileAppliDark") -> str:
         for logo in logos:
