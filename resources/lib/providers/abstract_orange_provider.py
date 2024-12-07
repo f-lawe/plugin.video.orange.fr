@@ -23,12 +23,13 @@ _CATCHUP_ARTICLES_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catc
 _CATCHUP_VIDEOS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/groups/{group_id}"
 _CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/pds/v1/live/ew?everywherePopulation=OTT_Metro"
 
-_LIVE_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/live/v3/auth/accountToken/applications/PC/channels/{stream_id}/stream?terminalModel=WEB_PC&terminalId={terminal_id}"
-_CATCHUP_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/catchup/v4/auth/accountToken/applications/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId={terminal_id}"
+_LIVE_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/live/v3/auth/accountToken/applications/PC/channels/{stream_id}/stream?terminalModel=WEB_PC&terminalId="
+_CATCHUP_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/catchup/v4/auth/accountToken/applications/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId="
 
 _STREAM_LOGO_URL = "https://proxymedia.woopic.com/api/v1/images/2090{path}"
 _LIVE_HOMEPAGE_URL = "https://chaines-tv.orange.fr/"
 _CATCHUP_VIDEO_URL = "https://replay.orange.fr/videos/{stream_id}"
+_LOGIN_URL = "https://login.orange.fr"
 _LOGIN_URL = "https://login.orange.fr"
 
 
@@ -70,18 +71,13 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_epg(self) -> dict:
         """Load EPG data from Orange and convert it to JSON-EPG format."""
-        start_day = datetime.timestamp(
-            datetime.combine(
-                date.today() - timedelta(days=get_global_setting("epg.pastdaystodisplay", int)), datetime.min.time()
-            )
-        )
+        past_days_to_display = get_global_setting("epg.pastdaystodisplay", int)
+        future_days_to_display = get_global_setting("epg.futuredaystodisplay", int)
 
-        days_to_display = get_global_setting("epg.futuredaystodisplay", int) + get_global_setting(
-            "epg.pastdaystodisplay", int
-        )
+        start_day = datetime.combine(date.today() - timedelta(days=past_days_to_display), datetime.min.time())
+        days_to_display = past_days_to_display + future_days_to_display
 
         programs = self._get_programs(start_day, days_to_display, self.chunks_per_day, self.mco)
-
         log(f"{len(programs)} EPG entries found", xbmc.LOGINFO)
 
         epg = {}
@@ -107,15 +103,13 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                     if cover["format"] == "RATIO_16_9":
                         image = program["covers"][0]["url"]
 
+            start = datetime.fromtimestamp(program["diffusionDate"]).astimezone().replace(microsecond=0).isoformat()
+            stop = datetime.fromtimestamp(program["diffusionDate"] + program["duration"]).astimezone().isoformat()
+
             epg[program["channelId"]].append(
                 {
-                    "start": datetime.fromtimestamp(program["diffusionDate"])
-                    .astimezone()
-                    .replace(microsecond=0)
-                    .isoformat(),
-                    "stop": (
-                        datetime.fromtimestamp(program["diffusionDate"] + program["duration"]).astimezone()
-                    ).isoformat(),
+                    "start": start,
+                    "stop": stop,
                     "title": title,
                     "subtitle": subtitle,
                     "episode": episode,
@@ -130,15 +124,14 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def get_catchup_items(self, levels: List[str]) -> list:
         """Return a list of directory items for the specified levels."""
         depth = len(levels)
+        item_getters = [
+            self._get_catchup_channels,
+            self._get_catchup_categories,
+            self._get_catchup_articles,
+            self._get_catchup_videos,
+        ]
 
-        if depth == 0:
-            return self._get_catchup_channels()
-        elif depth == 1:
-            return self._get_catchup_categories(levels[0])
-        elif depth == 2:
-            return self._get_catchup_articles(levels[0], levels[1])
-        elif depth == 3:
-            return self._get_catchup_videos(levels[0], levels[1], levels[2])
+        return item_getters[depth](*levels)
 
     def _get_catchup_channels(self) -> list:
         """Load available catchup channels."""
@@ -156,7 +149,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def _get_catchup_categories(self, channel_id: str) -> list:
         """Return a list of catchup categories for the specified channel id."""
-        url = _CATCHUP_CHANNELS_ENDPOINT + "/" + channel_id
+        url = f"{_CATCHUP_CHANNELS_ENDPOINT}/{channel_id}"
         categories = request_json(url, default={"categories": {}})["categories"]
 
         return [
@@ -210,20 +203,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         tv_token, tv_token_expires, wassup = self._retrieve_auth_data(auth_url)
 
         try:
-            stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id="")
-            headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
-            res = request("GET", stream_endpoint_url, headers=headers)
-            stream = res.json()
-            log("Initiate new session", xbmc.LOGINFO)
-        except RequestException as e:
-            if e.response.status_code == 403:
-                raise StreamNotIncluded() from e
-            else:
-                raise AuthenticationRequired("Cannot initiate new session") from e
-        tv_token, tv_token_expires, wassup = self._retrieve_auth_data(auth_url)
-
-        try:
-            stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id="")
+            stream_endpoint_url = stream_endpoint.format(stream_id=stream_id)
             headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
             res = request("GET", stream_endpoint_url, headers=headers)
             stream = res.json()
@@ -240,10 +220,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def _compute_stream_info(self, stream: dict, tv_token: str, wassup: str) -> dict:
         """Compute stream info."""
-        protectionData = (
-            stream.get("protectionData") if stream.get("protectionData") is not None else stream.get("protectionDatas")
-        )
-
+        protectionData = stream.get("protectionData") or stream.get("protectionDatas")
         license_server_url = None
 
         for system in protectionData:
@@ -282,6 +259,9 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         tv_token, tv_token_expires, wassup = (
             provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup")
         )
+        tv_token, tv_token_expires, wassup = (
+            provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup")
+        )
 
         if not tv_token_expires or datetime.utcnow().timestamp() > tv_token_expires:
             URL_ROOT = "https://chaines-tv.orange.fr"
@@ -294,20 +274,23 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 "Accept-Encoding": "gzip, deflate, br",
             }
 
-            if not self._expired_wassup(wassup):
+            if not self._is_wassup_expired(wassup):
                 log("Cookie reuse", xbmc.LOGINFO)
-                response = session.get(URL_ROOT + "/token", cookies={"wassup": wassup})
-            else:
-                response = session.get(URL_ROOT + "/token")
-                if response.status_code != 200:
-                    log("Login required", xbmc.LOGINFO)
-                    self._login(session)
-                    response = session.get(URL_ROOT + "/token")
+                session.headers["Cookie"] = f"wassup={wassup}"
+
+            try:
+                response = request("GET", f"{_LIVE_HOMEPAGE_URL}token", s=session)
+            except RequestException:
+                log("Login required", xbmc.LOGINFO)
+                self._login(session)
+                response = request("GET", f"{_LIVE_HOMEPAGE_URL}token", s=session)
 
             tv_token = response.json()
             tv_token_expires = datetime.utcnow().timestamp() + 30 * 60
+
             if "wassup" in session.cookies:
                 wassup = session.cookies.get("wassup")
+
             provider_session_data = {
                 "tv_token": tv_token,
                 "tv_token_expires": tv_token_expires,
@@ -318,23 +301,50 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         log(f"tv_token: {tv_token}, tv_token_expires: {tv_token_expires}, wassup: {wassup}", xbmc.LOGDEBUG)
         return tv_token, tv_token_expires, wassup
 
-    def _expired_wassup(self, wassup):
+    def _is_wassup_expired(self, wassup: str) -> bool:
         try:
             wassup = bytes.fromhex(wassup).decode()
             xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", wassup).group(1)
-            # expiration = datetime.strptime(xwvd, '%Y%m%d%H%M%S').timestamp()
             wassup_expires = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6])).timestamp()
             return datetime.utcnow().timestamp() > wassup_expires
-        except:
+        except (TypeError, AttributeError):
             return True
 
-    def _login(self, session) -> dict:
-        """Login to Orange and return session cookie."""
-        URL_LOGIN = "https://login.orange.fr"
+    def _login(self, session):
+        """Login to Orange."""
         login, password = get_addon_setting("provider.username"), get_addon_setting("provider.password")
-        session.get(URL_LOGIN)
-        session.post(URL_LOGIN + "/api/login", data={"login": login, "params": {}})
-        session.post(URL_LOGIN + "/api/password", json={"password": password, "remember": True})
+        session.headers = {
+            "Accept": "application/xhtml+xml,application/xml",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            request("GET", _LOGIN_URL, headers=session.headers, s=session)
+        except RequestException:
+            log("Error while authenticating (init)", xbmc.LOGWARNING)
+            return
+
+        try:
+            request(
+                "POST",
+                f"{_LOGIN_URL}/api/login",
+                data=json.dumps({"login": login, "params": {}}),
+                s=session,
+            )
+        except RequestException:
+            log("Error while authenticating (login)", xbmc.LOGWARNING)
+            return
+
+        try:
+            request(
+                "POST",
+                f"{_LOGIN_URL}/api/password",
+                data=json.dumps({"password": password, "remember": True}),
+                s=session,
+            )
+        except RequestException:
+            log("Error while authenticating (password)", xbmc.LOGWARNING)
 
     def _extract_logo(self, logos: list, definition_type: str = "mobileAppliDark") -> str:
         for logo in logos:
@@ -343,14 +353,15 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         return None
 
-    def _get_programs(self, start_day: int, days_to_display: int, chunks_per_day: int = 2, mco: str = "OFR") -> list:
+    def _get_programs(self, start_day: datetime, days_to_display: int, chunks_per_day: int, mco: str = "OFR") -> list:
         """Return the programs for today (default) or the specified period."""
         programs = []
+        start_day_timestamp = start_day.timestamp()
         chunk_duration = 24 * 60 * 60 / chunks_per_day
 
         for chunk in range(0, days_to_display * chunks_per_day):
-            period_start = (start_day + chunk_duration * chunk) * 1000
-            period_end = (start_day + chunk_duration * (chunk + 1)) * 1000
+            period_start = (start_day_timestamp + chunk_duration * chunk) * 1000
+            period_end = (start_day_timestamp + chunk_duration * (chunk + 1)) * 1000
 
             try:
                 period = f"{int(period_start)},{int(period_end)}"

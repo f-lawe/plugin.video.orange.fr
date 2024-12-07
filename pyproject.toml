@@ -17,11 +17,11 @@ skip-magic-trailing-comma = false
 fixable = ["ALL"]
 ignore = ["D203", "D213"]
 select = [
-    "E",    # pycodestyle
-    "F",    # Pyflakes
-    "UP",   # pyupgrade
-    "B",    # flake8-bugbear
-    "SIM",  # flake8-simplify
-    "I",    # isort
-    "D",    # pydocstyle
+  "E",    # pycodestyle
+  "F",    # Pyflakes
+  "UP",   # pyupgrade
+  "B",    # flake8-bugbear
+  "SIM",  # flake8-simplify
+  "I",    # isort
+  "D",    # pydocstyle
 ]
