@@ -16,7 +16,7 @@ from requests.exceptions import JSONDecodeError, RequestException
 from lib.exceptions import AuthenticationRequired, StreamDataDecodeError, StreamNotIncluded
 from lib.providers.abstract_provider import AbstractProvider
 from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log, set_addon_setting
-from lib.utils.request import request, request_json, to_cookie_string, get_random_ua
+from lib.utils.request import request, request_json
 
 _PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
 _CATCHUP_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels"
@@ -278,7 +278,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             
             try:
                 response = request("GET", f'{_LIVE_HOMEPAGE_URL}token', s=session)
-            except:
+            except RequestException:
                 log('Login required', xbmc.LOGINFO)
                 self._login(session)
                 response = request("GET", f'{_LIVE_HOMEPAGE_URL}token', s=session)
@@ -303,54 +303,47 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         try:
             wassup = bytes.fromhex(wassup).decode()
             xwvd = re.search('\|X_WASSUP_VALID_DATE=(.*?)\|', wassup).group(1)
-            # expiration = datetime.strptime(xwvd, '%Y%m%d%H%M%S').timestamp()
+            # wassup_expires = datetime.strptime(xwvd, '%Y%m%d%H%M%S').timestamp()
             wassup_expires = datetime(*(strptime(xwvd, '%Y%m%d%H%M%S')[0:6])).timestamp()
             return datetime.utcnow().timestamp() > wassup_expires
-        except:
+        except (TypeError, AttributeError):
             return True
 
     def _login(self, session):
-        """Login to Orange"""
+        """Login to Orange."""
         login, password = get_addon_setting("provider.username"), get_addon_setting("provider.password")
         session.headers = {
-            'User-Agent': get_random_ua(),
             'Accept': 'application/xhtml+xml,application/xml',
-            "Accept-Encoding": "gzip, deflate, br",
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Content-Type': 'application/json'
         }
 
-        session.get(_LOGIN_URL)
-        session.post(f'{_LOGIN_URL}/api/login', data={'login': login, 'params': {}})
-        session.post(f'{_LOGIN_URL}/api/password', json={'password': password, 'remember': True})
+        try:
+            request("GET", _LOGIN_URL, headers=session.headers, s=session)
+        except RequestException:
+            log("Error while authenticating (init)", xbmc.LOGWARNING)
+            return
 
-        # try:
-        #     res = request("GET", _LOGIN_URL, headers=session.headers, s=session)
-        # except RequestException:
-        #     log("Error while authenticating (init)", xbmc.LOGWARNING)
-        #     return
+        try:
+            request(
+                "POST",
+                f"{_LOGIN_URL}/api/login",
+                data=json.dumps({'login': login, 'params': {}}),
+                s=session,
+            )
+        except RequestException:
+            log("Error while authenticating (login)", xbmc.LOGWARNING)
+            return
 
-        # try:
-        #     res = request(
-        #         "POST",
-        #         f"{_LOGIN_URL}/api/login",
-        #         headers = session.headers,
-        #         data=json.dumps({'login': login, 'params': {}}),
-        #         s=session,
-        #     )
-        # except RequestException:
-        #     log("Error while authenticating (login)", xbmc.LOGWARNING)
-        #     return
-
-        # session.headers["Content-Type"] = "application/json"
-        # try:
-        #     res = request(
-        #         "POST",
-        #         f"{_LOGIN_URL}/api/password",
-        #         headers = session.headers,
-        #         data=json.dumps({'password': password, 'remember': True}),
-        #         s=session,
-        #     )
-        # except RequestException:
-        #     log("Error while authenticating (password)", xbmc.LOGWARNING)
+        try:
+            request(
+                "POST",
+                f"{_LOGIN_URL}/api/password",
+                data=json.dumps({'password': password, 'remember': True}),
+                s=session,
+            )
+        except RequestException:
+            log("Error while authenticating (password)", xbmc.LOGWARNING)
 
     def _extract_logo(self, logos: list, definition_type: str = "mobileAppliDark") -> str:
         for logo in logos:
