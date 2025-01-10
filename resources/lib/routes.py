@@ -30,7 +30,7 @@ def stream_live(stream_id: str):
 
 @router.route("/stream/catchup/<stream_id>")
 def stream_catchup(stream_id: str):
-    """Load live stream for the required video id."""
+    """Load catchup stream for the required video id."""
     log(f"Loading catchup stream {stream_id}", xbmc.LOGINFO)
     StreamManager().load_chatchup_stream(stream_id)
 

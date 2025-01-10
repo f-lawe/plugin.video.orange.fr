@@ -1,7 +1,6 @@
 # ruff: noqa: D102
 """Orange provider template."""
 
-import json
 import re
 from abc import ABC
 from datetime import date, datetime, timedelta
@@ -30,7 +29,7 @@ _CATCHUP_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/catchup/v4
 _STREAM_LOGO_URL = "https://proxymedia.woopic.com/api/v1/images/2090{path}"
 _LIVE_HOMEPAGE_URL = "https://chaines-tv.orange.fr/"
 _CATCHUP_VIDEO_URL = "https://replay.orange.fr/videos/{stream_id}"
-_LOGIN_URL = 'https://login.orange.fr'
+_LOGIN_URL = "https://login.orange.fr"
 
 
 class AbstractOrangeProvider(AbstractProvider, ABC):
@@ -211,7 +210,20 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         tv_token, tv_token_expires, wassup = self._retrieve_auth_data(auth_url)
 
         try:
-            stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id='')
+            stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id="")
+            headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
+            res = request("GET", stream_endpoint_url, headers=headers)
+            stream = res.json()
+            log("Initiate new session", xbmc.LOGINFO)
+        except RequestException as e:
+            if e.response.status_code == 403:
+                raise StreamNotIncluded() from e
+            else:
+                raise AuthenticationRequired("Cannot initiate new session") from e
+        tv_token, tv_token_expires, wassup = self._retrieve_auth_data(auth_url)
+
+        try:
+            stream_endpoint_url = stream_endpoint.format(stream_id=stream_id, terminal_id="")
             headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
             res = request("GET", stream_endpoint_url, headers=headers)
             stream = res.json()
@@ -267,28 +279,35 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _retrieve_auth_data(self, auth_url: str, login: str = None, password: str = None) -> (str, str, str):
         """Retreive auth data from Orange (tv token and wassup cookie)."""
         provider_session_data = get_addon_setting("provider.session_data", dict)
-        tv_token, tv_token_expires, wassup = (provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup"))
+        tv_token, tv_token_expires, wassup = (
+            provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup")
+        )
 
         if not tv_token_expires or datetime.utcnow().timestamp() > tv_token_expires:
+            URL_ROOT = "https://chaines-tv.orange.fr"
+            USER_AGENT_FIREFOX = "Mozilla/5.0 (Windows NT 10.0; rv:114.0) Gecko/20100101 Firefox/114.0"
             session = Session()
+            session.headers = {
+                "User-Agent": USER_AGENT_FIREFOX,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3",
+                "Accept-Encoding": "gzip, deflate, br",
+            }
 
             if not self._expired_wassup(wassup):
                 log("Cookie reuse", xbmc.LOGINFO)
-                session.headers['Cookie'] = f'wassup={wassup}'
-            
-            try:
-                response = request("GET", f'{_LIVE_HOMEPAGE_URL}token', s=session)
-            except RequestException:
-                log('Login required', xbmc.LOGINFO)
-                self._login(session)
-                response = request("GET", f'{_LIVE_HOMEPAGE_URL}token', s=session)
+                response = session.get(URL_ROOT + "/token", cookies={"wassup": wassup})
+            else:
+                response = session.get(URL_ROOT + "/token")
+                if response.status_code != 200:
+                    log("Login required", xbmc.LOGINFO)
+                    self._login(session)
+                    response = session.get(URL_ROOT + "/token")
 
             tv_token = response.json()
             tv_token_expires = datetime.utcnow().timestamp() + 30 * 60
-
-            if 'wassup' in session.cookies:
-                wassup = session.cookies.get('wassup')
-
+            if "wassup" in session.cookies:
+                wassup = session.cookies.get("wassup")
             provider_session_data = {
                 "tv_token": tv_token,
                 "tv_token_expires": tv_token_expires,
@@ -302,48 +321,20 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _expired_wassup(self, wassup):
         try:
             wassup = bytes.fromhex(wassup).decode()
-            xwvd = re.search('\|X_WASSUP_VALID_DATE=(.*?)\|', wassup).group(1)
-            # wassup_expires = datetime.strptime(xwvd, '%Y%m%d%H%M%S').timestamp()
-            wassup_expires = datetime(*(strptime(xwvd, '%Y%m%d%H%M%S')[0:6])).timestamp()
+            xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", wassup).group(1)
+            # expiration = datetime.strptime(xwvd, '%Y%m%d%H%M%S').timestamp()
+            wassup_expires = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6])).timestamp()
             return datetime.utcnow().timestamp() > wassup_expires
-        except (TypeError, AttributeError):
+        except:
             return True
 
-    def _login(self, session):
-        """Login to Orange."""
+    def _login(self, session) -> dict:
+        """Login to Orange and return session cookie."""
+        URL_LOGIN = "https://login.orange.fr"
         login, password = get_addon_setting("provider.username"), get_addon_setting("provider.password")
-        session.headers = {
-            'Accept': 'application/xhtml+xml,application/xml',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': 'application/json'
-        }
-
-        try:
-            request("GET", _LOGIN_URL, headers=session.headers, s=session)
-        except RequestException:
-            log("Error while authenticating (init)", xbmc.LOGWARNING)
-            return
-
-        try:
-            request(
-                "POST",
-                f"{_LOGIN_URL}/api/login",
-                data=json.dumps({'login': login, 'params': {}}),
-                s=session,
-            )
-        except RequestException:
-            log("Error while authenticating (login)", xbmc.LOGWARNING)
-            return
-
-        try:
-            request(
-                "POST",
-                f"{_LOGIN_URL}/api/password",
-                data=json.dumps({'password': password, 'remember': True}),
-                s=session,
-            )
-        except RequestException:
-            log("Error while authenticating (password)", xbmc.LOGWARNING)
+        session.get(URL_LOGIN)
+        session.post(URL_LOGIN + "/api/login", data={"login": login, "params": {}})
+        session.post(URL_LOGIN + "/api/password", json={"password": password, "remember": True})
 
     def _extract_logo(self, logos: list, definition_type: str = "mobileAppliDark") -> str:
         for logo in logos:
