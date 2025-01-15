@@ -1,5 +1,14 @@
 # 2.x
 
+## [2.3.3](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.3) - 2025-01-15
+
+### Changed
+- Miscellaneous code improvements and cleaning
+
+### Fixed
+- Detection by IPTV Manager ([#73](https://github.com/f-lawe/plugin.video.orange.fr/issues/73))
+- Authentication to Orange servers ([#74](https://github.com/f-lawe/plugin.video.orange.fr/issues/74))
+
 ## [2.3.2](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.2) - 2024-12-05
 
 ### Changed
