@@ -1,6 +1,7 @@
 # ruff: noqa: D102
 """Orange provider template."""
 
+import json
 import re
 from abc import ABC
 from datetime import date, datetime, timedelta
@@ -29,7 +30,6 @@ _CATCHUP_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/catchup/v4
 _STREAM_LOGO_URL = "https://proxymedia.woopic.com/api/v1/images/2090{path}"
 _LIVE_HOMEPAGE_URL = "https://chaines-tv.orange.fr/"
 _CATCHUP_VIDEO_URL = "https://replay.orange.fr/videos/{stream_id}"
-_LOGIN_URL = "https://login.orange.fr"
 _LOGIN_URL = "https://login.orange.fr"
 
 
@@ -259,20 +259,9 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         tv_token, tv_token_expires, wassup = (
             provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup")
         )
-        tv_token, tv_token_expires, wassup = (
-            provider_session_data.get(k) for k in ("tv_token", "tv_token_expires", "wassup")
-        )
 
         if not tv_token_expires or datetime.utcnow().timestamp() > tv_token_expires:
-            URL_ROOT = "https://chaines-tv.orange.fr"
-            USER_AGENT_FIREFOX = "Mozilla/5.0 (Windows NT 10.0; rv:114.0) Gecko/20100101 Firefox/114.0"
             session = Session()
-            session.headers = {
-                "User-Agent": USER_AGENT_FIREFOX,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-                "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3",
-                "Accept-Encoding": "gzip, deflate, br",
-            }
 
             if not self._is_wassup_expired(wassup):
                 log("Cookie reuse", xbmc.LOGINFO)
