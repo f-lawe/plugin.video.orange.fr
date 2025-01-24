@@ -81,11 +81,11 @@ def request_json(url: str, headers: Mapping[str, str] = None, default: Union[dic
 def to_cookie_string(cookies: dict, pick: list = None) -> str:
     """Convert cookies to cookie string."""
     if pick is None:
-        pick = cookies.keys()
+        pick = list(cookies.keys())
 
-    cookies = {key: value for key, value in cookies.items() if key in pick}
+    cookies = {key: value for key, value in list(cookies.items()) if key in pick}
 
-    return "; ".join([f"{key}={value}" for key, value in cookies.items()])
+    return "; ".join([f"{key}={value}" for key, value in list(cookies.items())])
 
 
 def install_proxy() -> None:

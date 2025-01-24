@@ -41,45 +41,43 @@ class FreeOqeeProvider(AbstractProvider):
 
         # log(token)
 
+        license_key = {
+            "licence_server_url": "https://license.oqee.net/api/v1/live/license/widevine",
+            "headers": urlencode(
+                {
+                    "Host": "license.oqee.net",
+                    "User-Agent": get_random_ua(),
+                    "Accept": "*/*",
+                    "Accept-Language": "fr-FR,fr;q=0.8,en-GB;q=0.5,en;q=0.3",
+                    "Accept-Encoding": "gzip, deflate, br, zstd",
+                    "Referer": "https://oqee.tv/",
+                    "content-type": "application/json",
+                    "x-oqee-account-provider": "free",
+                    "x-oqee-customization": "1",
+                    "x-oqee-platform": "web",
+                    "x-oqee-profile": "qYyeeAzNbuWNxByv",
+                    "Content-Length": "25",
+                    "Origin": "https://oqee.tv",
+                    "DNT": "1",
+                    "Connection": "keep-alive",
+                    "Sec-Fetch-Dest": "empty",
+                    "Sec-Fetch-Mode": "cors",
+                    "Sec-Fetch-Site": "cross-site",
+                    "Priority": "u=4",
+                    "Pragma": "no-cache",
+                    "Cache-Control": "no-cache",
+                    "TE": "trailers",
+                }
+            ),
+        }
+
         stream_info = {
             "path": "https://api-proxad.dc2.oqee.net/playlist/v1/live/612/1/live.mpd",
             "protocol": "mpd",
             "mime_type": "application/xml+dash",
             "drm_config": {
                 "license_type": get_drm(),
-                "license_key": "|".join(
-                    {
-                        "license_server_url": "https://license.oqee.net/api/v1/live/license/widevine",
-                        "headers": urlencode(
-                            {
-                                "Host": "license.oqee.net",
-                                "User-Agent": get_random_ua(),
-                                "Accept": "*/*",
-                                "Accept-Language": "fr-FR,fr;q=0.8,en-GB;q=0.5,en;q=0.3",
-                                "Accept-Encoding": "gzip, deflate, br, zstd",
-                                "Referer": "https://oqee.tv/",
-                                "content-type": "application/json",
-                                "x-oqee-account-provider": "free",
-                                "x-oqee-customization": "1",
-                                "x-oqee-platform": "web",
-                                "x-oqee-profile": "qYyeeAzNbuWNxByv",
-                                "Content-Length": "25",
-                                "Origin": "https://oqee.tv",
-                                "DNT": "1",
-                                "Connection": "keep-alive",
-                                "Sec-Fetch-Dest": "empty",
-                                "Sec-Fetch-Mode": "cors",
-                                "Sec-Fetch-Site": "cross-site",
-                                "Priority": "u=4",
-                                "Pragma": "no-cache",
-                                "Cache-Control": "no-cache",
-                                "TE": "trailers",
-                            }
-                        ),
-                        "post_data": "R{SSM}",
-                        "response_data": "J[result.license]",
-                    }.values()
-                ),
+                "license_key": "|".join(list(license_key.values())),
             },
         }
 
@@ -116,7 +114,7 @@ class FreeOqeeProvider(AbstractProvider):
 
     def _extract_channel_info(self, channel_id: dict, channels: dict, icon_type: str = "icon_dark") -> dict:
         """."""
-        for channel in channels.values():
+        for channel in list(channels.values()):
             if channel["id"] == channel_id and channel.get("freebox_id") is not None:
                 return {
                     "id": str(channel["freebox_id"]),
