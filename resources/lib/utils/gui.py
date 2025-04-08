@@ -52,13 +52,13 @@ def create_play_item(stream_info: dict = None, inputstream_addon: str = "") -> L
     play_item.setMimeType(stream_info.get("mime_type"))
 
     play_item.setProperty("inputstream", inputstream_addon)
-    play_item.setProperty("inputstream.adaptive.manifest_type", stream_info["protocol"])
+    play_item.setProperty("inputstream.adaptive.manifest_type", stream_info.get("protocol"))
     play_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
 
     drm_config = stream_info.get("drm_config", {})
-    keys = ["license_type", "license_key", "license_data", "server_certificate", "license_flags", "pre_init_data"]
+    drm_keys = ["license_type", "license_key", "license_data", "server_certificate", "license_flags", "pre_init_data"]
 
-    for key in keys:
+    for key in drm_keys:
         if drm_config.get(key) is not None:
             play_item.setProperty(f"inputstream.adaptive.{key}", drm_config.get(key))
 

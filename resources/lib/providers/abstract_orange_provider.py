@@ -1,6 +1,5 @@
 """Orange provider template."""
 
-import json
 import re
 from abc import ABC
 from datetime import date, datetime, timedelta
@@ -201,32 +200,24 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         res, tv_token, wassup = None, None, None
         session_data = get_addon_setting("provider.session_data", dict)
 
-        if self._is_session_data_valid(session_data):
-            tv_token, wassup = session_data.get("tv_token"), session_data.get("wassup")
-
-            try:
-                log("Use stored session data", xbmc.LOGINFO)
-                res = request(
-                    "GET",
-                    stream_endpoint.format(stream_id=stream_id),
-                    headers={"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"},
-                )
-            except RequestException as e:
-                if e.response.status_code == 403:
-                    raise StreamNotIncluded() from e
-                else:
-                    log("Stored session data expired", xbmc.LOGWARNING)
+        # if self._is_session_data_valid(session_data):
+        #     try:
+        #         log("Use stored session data", xbmc.LOGINFO)
+        #         tv_token, wassup = session_data.get("tv_token"), session_data.get("wassup")
+        #         headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
+        #         res = request("GET", stream_endpoint.format(stream_id=stream_id), headers=headers)
+        #     except RequestException as e:
+        #         if e.response.status_code == 403:
+        #             raise StreamNotIncluded() from e
+        #         else:
+        #             log("Stored session data expired", xbmc.LOGWARNING)
 
         if res is None:
-            tv_token, wassup = self._retrieve_auth_data()
-
             try:
                 log("Initiate new session", xbmc.LOGINFO)
-                res = request(
-                    "GET",
-                    stream_endpoint.format(stream_id=stream_id),
-                    headers={"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"},
-                )
+                tv_token, wassup = self._refresh_session_data()
+                headers = {"tv_token": f"Bearer {tv_token}", "Cookie": f"wassup={wassup}"}
+                res = request("GET", stream_endpoint.format(stream_id=stream_id), headers=headers)
             except RequestException as e:
                 if e.response.status_code == 403:
                     raise StreamNotIncluded() from e
@@ -293,18 +284,26 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         except (TypeError, AttributeError):
             return False
 
-    def _retrieve_auth_data(self, login: str = None, password: str = None) -> Tuple[str, str]:
-        """Retreive auth data from Orange (tv token and wassup cookie)."""
+    def _refresh_session_data(self, login: str = None, password: str = None) -> Tuple[str, str]:
+        """Retreive session data from Orange (tv token and wassup cookie)."""
         set_addon_setting("provider.session_data", {})
         session = Session()
 
         try:
+            log("1")
             res = request("GET", _TV_TOKEN_ENDPOINT, s=session)
-        except RequestException:
-            log("Required login", xbmc.LOGINFO)
-            self._login(session)
+        except RequestException as e:
+            log("2")
+            if not get_addon_setting("provider.use_credentials", bool):
+                log("3")
+                raise AuthenticationRequired("Provider credentials not set") from e
+
+            log("4")
+            self._login(session, get_addon_setting("provider.username"), get_addon_setting("provider.password"))
+            log("5")
             res = request("GET", _TV_TOKEN_ENDPOINT, s=session)
 
+        log("6")
         tv_token = res.json()
         tv_token_expires_at = datetime.now() + self.tv_token_duration
 
@@ -316,14 +315,13 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             "expires_at": int(tv_token_expires_at.timestamp()),
             "wassup": wassup,
         }
-        set_addon_setting("provider.session_data", session_data)
 
+        set_addon_setting("provider.session_data", session_data)
         log(session_data, xbmc.LOGDEBUG)
         return tv_token, wassup
 
-    def _login(self, session):
+    def _login(self, session: Session, login: str, password: str):
         """Login to Orange."""
-        login, password = get_addon_setting("provider.username"), get_addon_setting("provider.password")
         session.headers = {
             "Accept": "application/xhtml+xml,application/xml",
             "Accept-Encoding": "gzip, deflate, br",
@@ -337,23 +335,13 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             return
 
         try:
-            request(
-                "POST",
-                f"{_LOGIN_URL}/api/login",
-                data=json.dumps({"login": login, "params": {}}),
-                s=session,
-            )
+            request("POST", f"{_LOGIN_URL}/api/login", data={"login": login, "params": {}}, s=session)
         except RequestException:
             log("Error while authenticating (login)", xbmc.LOGWARNING)
             return
 
         try:
-            request(
-                "POST",
-                f"{_LOGIN_URL}/api/password",
-                data=json.dumps({"password": password, "remember": True}),
-                s=session,
-            )
+            request("POST", f"{_LOGIN_URL}/api/password", data={"password": password, "remember": True}, s=session)
         except RequestException:
             log("Error while authenticating (password)", xbmc.LOGWARNING)
 

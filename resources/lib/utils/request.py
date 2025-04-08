@@ -1,5 +1,6 @@
 """Request utils."""
 
+import json
 from random import randint
 from typing import Mapping, Union
 
@@ -51,6 +52,9 @@ def request(method: str, url: str, headers: Mapping[str, str] = None, data=None,
     }
 
     s = s if s is not None else Session()
+
+    if data is not str:
+        data = json.dumps(data)
 
     log(f"Fetching {url}", xbmc.LOGDEBUG)
     res = s.request(method, url, headers=headers, data=data)
