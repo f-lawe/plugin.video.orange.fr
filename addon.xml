@@ -22,7 +22,7 @@
     <source>https://github.com/f-lawe/plugin.video.orange.fr</source>
     <email>francois@lavaud.family</email>
     <assets>
-      <icon>resources/media/icon.png</icon>
+      <icon>resources/media/orange_tv.png</icon>
       <fanart>resources/media/fanart.jpg</fanart>
       <screenshot>resources/media/screenshot_1.jpg</screenshot>
       <screenshot>resources/media/screenshot_2.jpg</screenshot>
