@@ -1,5 +1,10 @@
 # 2.x
 
+## [2.3.5](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.5) - 2025-04-18
+
+### Fixed
+- Auth and live stream update following new Orange TV website changes
+
 ## [2.3.4](https://github.com/f-lawe/plugin.video.orange.fr/releases/tag/v2.3.4) - 2025-04-08
 
 ### Changed
