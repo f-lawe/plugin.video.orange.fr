@@ -212,11 +212,9 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         }
 
         if self._is_session_data_valid(session_data, now):
-            log(" -> reuse session data")
             try:
                 stream_info = self._request_stream_info(stream_endpoint_url, session_data)
             except StreamRequestException:
-                log(" -> login and retry")
                 if get_addon_setting("provider.use_credentials", bool):
                     self._login(session)
 
@@ -224,7 +222,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 stream_info = self._request_stream_info(stream_endpoint_url, session_data)
             return stream_info
 
-        log(" -> initiate new session")
         if get_addon_setting("provider.use_credentials", bool):
             self._login(session)
 
