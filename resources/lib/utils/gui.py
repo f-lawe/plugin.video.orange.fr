@@ -55,6 +55,10 @@ def create_play_item(stream_info: dict = None, inputstream_addon: str = "") -> L
     play_item.setProperty("inputstream.adaptive.manifest_type", stream_info.get("protocol"))
     play_item.setProperty("inputstream.adaptive.play_timeshift_buffer", "true")
 
+    if '/bpk-tv/' in stream_info['path']:
+        InfoTagVideo = play_item.getVideoInfoTag()
+        InfoTagVideo.setResumePoint(43200, 1)
+
     drm_config = stream_info.get("drm_config", {})
     keys = ["license_type", "license_key", "license_data", "server_certificate", "license_flags", "pre_init_data"]
 

@@ -4,7 +4,7 @@
 import json
 import re
 from abc import ABC
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 from time import strptime
 from typing import List
 from urllib.parse import urlencode
@@ -18,21 +18,27 @@ from lib.providers.abstract_provider import AbstractProvider
 from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log, set_addon_setting
 from lib.utils.request import get_random_ua, request, request_json
 
-_PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
-_CATCHUP_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels"
-_CATCHUP_ARTICLES_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/channels/{channel_id}/categories/{category_id}"
-_CATCHUP_VIDEOS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/catchup/v4/applications/PC/groups/{group_id}"
-_CHANNELS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/pds/v1/live/ew?everywherePopulation=OTT_Metro"
 
-_LIVE_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/stream/v2/auth/accountToken/live/{stream_id}?deviceModel=WEB_PC&customerOrangePopulation=OTT_Metro"
-_CATCHUP_STREAM_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/catchup/v4/auth/accountToken/applications/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId="
+HOMEPAGE_URL = "https://tv.orange.fr"
+LOGIN_URL = "https://login.orange.fr"
 
-_STREAM_LOGO_URL = "https://proxymedia.woopic.com/api/v1/images/2090{path}"
-_HOMEPAGE_URL = "https://tv.orange.fr/"
-_LOGIN_URL = "https://login.orange.fr"
+PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
+# LIVE_PROGRAM_URL = "https://rp-ott-mediation-tv.orange.fr/api-gw/bff-epg-player/v1/programs"
+# BFF_EPG_GRID_URL = "/bff-guidetv-epggrid/v1/auth/accountToken/guidetv/epggrid/epggrid-tv-grid"
 
-_LICENSE_ENDPOINT = "https://mediation-tv.orange.fr/all/api-gw/license/v1/auth/accountToken"
+TV_GW_BASE_URL = "https://mediation-tv.orange.fr/all/api-gw"
+PARAMS = 'appVersion=1.0.6&deviceModel=WEB_PC&deviceCategory=W_PC&customerOrangePopulation=OTT_Metro&customerCanalPopulation=&consentPersoStatus=0'
 
+LIVE_SERVICE_PLAN_URL = "/bff-live-player-rights/v1/auth/accountToken/livePlayerRights"
+LIVE_STREAM_STARTOVER_URL = "stream/v1/auth/accountToken/livecontrol"
+
+BFF_REPLAY_LISTING_CHANNELS_URL = "bff-replay-listing-channels/v1/auth/accountToken/replay/listing/listing-channels"
+BFF_REPLAY_LANDING_CHANNEL_URL = "bff-replay-landing-channelcorner/v1/auth/accountToken/replay/landing/landing-channel"
+BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL = "bff-replay-listing-channelcorner-category/v1/auth/accountToken/replay/listing/listing-channel-cat"
+BFF_REPLAY_FIP_URL = "bff-replay-infocard/v1/auth/accountToken/replay"
+REPLAY_AUTH_URL = "/catchup/v4/auth/accountToken/applications"
+
+STREAM_LICENSE_AUTH_URL = "/license/v1/auth/accountToken"
 
 class AbstractOrangeProvider(AbstractProvider, ABC):
     """Abstract Orange Provider."""
@@ -43,30 +49,31 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_live_stream_info(self, stream_id: str) -> dict:
         """Get live stream info."""
-        return self._get_stream_info(_LIVE_STREAM_ENDPOINT, stream_id)
+        url = f'{TV_GW_BASE_URL}/{LIVE_STREAM_STARTOVER_URL}/{stream_id}?{PARAMS}'
+        return self._get_stream_info(url)
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
         """Get catchup stream info."""
-        return self._get_stream_info(_CATCHUP_STREAM_ENDPOINT, stream_id)
+        url = f'{TV_GW_BASE_URL}{REPLAY_AUTH_URL}/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId='
+        return self._get_stream_info(url)
 
     def get_streams(self) -> list:
         """Load stream data from Orange and convert it to JSON-STREAMS format."""
-        # @todo: use new API to check if channel is part of subscription
-        channels = request_json(_CHANNELS_ENDPOINT, default={"channels": {}})["channels"]
-        channels.sort(key=lambda channel: channel["displayOrder"])
-
+        headers = self._get_auth_headers()
+        url = f'{TV_GW_BASE_URL}{LIVE_SERVICE_PLAN_URL}?{PARAMS}'
+        channels = request_json(url, headers=headers)["channels"]
         log(f"{len(channels)} channels found", xbmc.LOGINFO)
 
         return [
             {
-                "id": str(channel["idEPG"]),
+                "id": str(channel["epgId"]),
                 "name": channel["name"],
-                "preset": str(channel["displayOrder"]),
-                "logo": self._extract_logo(channel["logos"]),
-                "stream": build_addon_url(f"/stream/live/{self._get_channel_live_id(channel)}"),
-                "group": [group_name for group_name in self.groups if int(channel["idEPG"]) in self.groups[group_name]],
+                "preset": channel["lcn"],
+                "logo": channel["logos"][0]['logoImageUrl'] + '|verifypeer=false',
+                "stream": build_addon_url(f'/stream/live/{channel["externalId"]}'),
+                "group": [group_name for group_name in self.groups if channel["epgId"] in self.groups[group_name]],
             }
-            for channel in channels
+            for channel in channels if channel['subscribed']
         ]
 
     def get_epg(self) -> dict:
@@ -129,152 +136,124 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             self._get_catchup_categories,
             self._get_catchup_articles,
             self._get_catchup_videos,
+            self._get_catchup_video,
         ]
 
         return item_getters[depth](*levels)
 
     def _get_catchup_channels(self) -> list:
         """Load available catchup channels."""
-        channels = request_json(_CATCHUP_CHANNELS_ENDPOINT, default=[])
+        headers = self._get_auth_headers()
+        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_LISTING_CHANNELS_URL}?{PARAMS}'
+        channels = request_json(url, headers=headers)['page']['sections'][1]['items']
+        # log(f"channels : {channels}", xbmc.LOGINFO)
 
         return [
             {
                 "is_folder": True,
-                "label": str(channel["name"]).upper(),
-                "path": build_addon_url(f"/catchup/{channel['id']}"),
-                "art": {"thumb": channel["logos"]["ref_millenials_partner_white_logo"]},
+                "label": channel["titleText"],
+                "path": build_addon_url(f"/catchup/{channel['events']['onClick']['track']['trackParams'][-2]['value']}"),
+                "art": {"thumb": channel["titleLogoImageUrl"] + '|verifypeer=false'},
             }
-            for channel in channels
+            for channel in channels if 'rightTag' not in channel
         ]
 
     def _get_catchup_categories(self, channel_id: str) -> list:
         """Return a list of catchup categories for the specified channel id."""
-        url = f"{_CATCHUP_CHANNELS_ENDPOINT}/{channel_id}"
-        categories = request_json(url, default={"categories": {}})["categories"]
-
+        headers = self._get_auth_headers()
+        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_LANDING_CHANNEL_URL}?{PARAMS}&channelId={channel_id}'
+        categories = request_json(url, headers=headers)['page']['sections'][1:]
+        # log(f"categories : {categories}", xbmc.LOGINFO)
+        
         return [
             {
                 "is_folder": True,
-                "label": category["name"][0].upper() + category["name"][1:],
-                "path": build_addon_url(f"/catchup/{channel_id}/{category['id']}"),
+                "label": category['title']['text'],
+                "path": build_addon_url(f"/catchup/{channel_id}/{category['extraLink']['events']['onClick']['navigate']['route'].split('/')[-1]}"),
             }
             for category in categories
         ]
 
     def _get_catchup_articles(self, channel_id: str, category_id: str) -> list:
         """Return a list of catchup groups for the specified channel id and category id."""
-        url = _CATCHUP_ARTICLES_ENDPOINT.format(channel_id=channel_id, category_id=category_id)
-        articles = request_json(url, default={"articles": {}})["articles"]
+        headers = self._get_auth_headers()
+        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL}?{PARAMS}&channelId={channel_id}&categoryId={category_id}'
+        articles = request_json(url, headers=headers)['page']['sections'][1]['items']
+        # log(f"articles : {articles}", xbmc.LOGINFO)
+
+        table = []
+        for article in articles:
+            route = article['events']['onClick']['navigate']['route'].split('/')
+            if route[-2] == 'videos':
+                path = f"/catchup/{channel_id}/{category_id}/{route[-1]}/{route[-1]}"
+            else:
+                path = f"/catchup/{channel_id}/{category_id}/{route[-1]}"
+            table.append(
+                {
+                    "is_folder": True,
+                    "label": article["titleText"],
+                    "path": build_addon_url(path),
+                    "art": {"poster": article["backgroundImageUrl"] + '|verifypeer=false'},
+                }
+            )
+
+        return table
+
+    def _get_catchup_videos(self, channel_id: str, category_id: str, article_id: str) -> list:
+        """Return a list of catchup videos for the specified channel id, category id and article id."""
+        headers = self._get_auth_headers()
+        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_FIP_URL}/fip-replay-serial?{PARAMS}&groupId={article_id}'
+        videos = request_json(url, headers=headers)['page']['sections'][2]['items']
+        # log(f"videos : {videos}", xbmc.LOGINFO)
+
+        if len(videos) == 1:
+            return self._get_catchup_video(channel_id, category_id, article_id, videos[0]['events']['onClick']['track']['trackParams'][0]['value'])
 
         return [
             {
                 "is_folder": True,
-                "label": article["title"],
-                "path": build_addon_url(f"/catchup/{channel_id}/{category_id}/{article['id']}"),
-                "art": {"poster": article["covers"]["ref_16_9"]},
-            }
-            for article in articles
-        ]
-
-    def _get_catchup_videos(self, channel_id: str, category_id: str, article_id: str) -> list:
-        """Return a list of catchup videos for the specified channel id and article id."""
-        url = _CATCHUP_VIDEOS_ENDPOINT.format(group_id=article_id)
-        videos = request_json(url, default={"videos": {}})["videos"]
-
-        return [
-            {
-                "is_folder": False,
-                "label": video["title"],
-                "path": build_addon_url(f"/stream/catchup/{video['id']}"),
-                "art": {"poster": video["covers"]["ref_16_9"]},
+                "label": video["titleText"],
+                "path": build_addon_url(f"/catchup/{channel_id}/{category_id}/{article_id}/{video['events']['onClick']['track']['trackParams'][0]['value']}"),
+                "art": {"poster": video["backgroundImageUrl"] + '|verifypeer=false'},
                 "info": {
-                    "duration": int(video["duration"]) * 60,
-                    "genres": video["genres"],
-                    "plot": video["longSummary"],
-                    "premiered": datetime.fromtimestamp(int(video["broadcastDate"]) / 1000).strftime("%Y-%m-%d"),
-                    "year": int(video["productionDate"]),
+                    "plot": f'[B]{video["titleText"]}[/B]\n{video["mainText"]["text"]}',
                 },
             }
             for video in videos
         ]
 
-    def _get_stream_info(self, stream_endpoint: str, stream_id: str) -> dict:
+    def _get_catchup_video(self, channel_id: str, category_id: str, article_id: str, video_id: str) -> dict:
+        """Return a catchup video for the article id."""
+        headers = self._get_auth_headers()
+        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_FIP_URL}/fip-replay-unit?{PARAMS}&videoId={video_id}'
+        video = request_json(url, headers=headers)['page']['sections']
+        # log(f"video : {video}", xbmc.LOGINFO)
+
+        return [
+            {
+                "is_folder": False,
+                "label": video[1]['title']['text'],
+                "path": build_addon_url(f"/stream/catchup/{video_id}"),
+                "art": {"poster": video[1]["backgroundImageUrl"] + '|verifypeer=false'},
+                "info": {
+                    # "duration": int(video["duration"]) * 60,
+                    # "genres": video["genres"],
+                    "plot": f'[B]{video[1]["information"]["text"]}[/B]\n[I]{video[1]["footNote"]}[/I]\n{video[2]["items"][0]["paragraphs"][0]["text"]}',
+                    # "premiered": datetime.fromtimestamp(int(video["broadcastDate"]) / 1000).strftime("%Y-%m-%d"),
+                    # "year": int(video["productionDate"]),
+                },
+            }
+        ]
+
+    def _get_stream_info(self, stream_endpoint_url: str) -> dict:
         """Load stream info from Orange."""
-        stream_endpoint_url = stream_endpoint.format(stream_id=stream_id)
-        now = datetime.now(timezone.utc)
-        session_data = get_addon_setting("provider.session_data", dict)
-
-        session = Session()
-        session.headers = {
-            "Accept": "application/xhtml+xml,application/xml",
-            "Content-Type": "application/json",
-            "User-Agent": get_random_ua(),
-        }
-
-        if self._is_session_data_valid(session_data, now):
-            try:
-                stream_info = self._request_stream_info(stream_endpoint_url, session_data)
-            except StreamRequestException:
-                if get_addon_setting("provider.use_credentials", bool):
-                    self._login(session)
-
-                session_data = self._refresh_session_data(session, now)
-                stream_info = self._request_stream_info(stream_endpoint_url, session_data)
-            return stream_info
-
-        if get_addon_setting("provider.use_credentials", bool):
-            self._login(session)
-
-        session_data = self._refresh_session_data(session, now)
-        stream_info = self._request_stream_info(stream_endpoint_url, session_data)
-
+        stream_info = self._request_stream_info(stream_endpoint_url)
         return stream_info
 
-    def _is_session_data_valid(self, session_data: dict, at: datetime = None) -> bool:
-        """Check if session data is valid."""
-        if not session_data.get("tv_token") or not session_data.get("wassup"):
-            return False
-
-        if at is None:
-            at = datetime.now(timezone.utc)
-
-        if not session_data.get("tv_token_expires") or at.timestamp() > session_data.get("tv_token_expires"):
-            return False
-
-        try:
-            decoded_wassup = bytes.fromhex(session_data.get("wassup")).decode()
-            xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", decoded_wassup).group(1)
-            wassup_expires_at = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6])).replace(tzinfo=timezone.utc)
-            return wassup_expires_at > at
-        except (TypeError, AttributeError):
-            return False
-
-    def _refresh_session_data(self, session: Session, now: datetime) -> dict:
-        """Fetch session data from home page."""
-        try:
-            response = request("GET", _HOMEPAGE_URL, session=session)
-            session_data = {
-                "tv_token": json.loads(re.search('"token":(".*?")', response.text).group(1)),
-                "tv_token_expires": now.timestamp() + 30 * 60,
-                "wassup": session.cookies.get("wassup"),
-            }
-        except RequestException as e:
-            raise AuthenticationRequired("Cannot initiate new session (request failed)") from e
-        except AttributeError as e:
-            raise AuthenticationRequired("Cannot initiate new session (tv token not found)") from e
-        except JSONDecodeError as e:
-            raise StreamDataDecodeError("Cannot initiate new session (tv token not loaded") from e
-
-        set_addon_setting("provider.session_data", dict(session_data))
-        return session_data
-
-    def _request_stream_info(self, stream_endpoint_url: str, session_data: dict) -> dict:
+    def _request_stream_info(self, stream_endpoint_url: str) -> dict:
         """Load stream data from Orange."""
         try:
-            headers = {
-                "tv_token": f"Bearer {session_data.get('tv_token')}",
-                "Cookie": f"wassup={session_data.get('wassup')}",
-            }
+            headers = self._get_auth_headers()
             res = request("GET", stream_endpoint_url, headers=headers)
             stream = res.json()
         except RequestException as e:
@@ -285,14 +264,15 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         except JSONDecodeError as e:
             raise StreamDataDecodeError() from e
 
-        return self._format_stream_info(stream, session_data)
+        return self._format_stream_info(stream)
 
-    def _format_stream_info(self, stream: dict, session_data: dict) -> dict:
+    def _format_stream_info(self, stream: dict) -> dict:
         """Compute stream info."""
+        headers = self._get_auth_headers()
         protectionData = stream.get("protectionData") or stream.get("protectionDatas")
         path = stream.get("streamURL") or stream.get("url")
 
-        license_server_url = _LICENSE_ENDPOINT if stream.get("url") is None else ""
+        license_server_url = f"{TV_GW_BASE_URL}{STREAM_LICENSE_AUTH_URL}" if stream.get("url") is None else ""
 
         for system in protectionData:
             if system.get("keySystem") == get_drm():
@@ -307,13 +287,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 "license_key": "|".join(
                     {
                         "licence_server_url": license_server_url,
-                        "headers": urlencode(
-                            {
-                                "tv_token": f"Bearer {session_data.get('tv_token')}",
-                                "Content-Type": "",
-                                "Cookie": f"wassup={session_data.get('wassup')}",
-                            }
-                        ),
+                        "headers": urlencode({"Content-Type": "", **headers}),
                         "post_data": "R{SSM}",
                         "response_data": "",
                     }.values()
@@ -324,41 +298,109 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         log(stream_info, xbmc.LOGDEBUG)
         return stream_info
 
-    def _login(self, session: Session):
-        """Login to Orange."""
+    def _get_auth_headers(self) -> dict:
+        self._refresh_session_data()
+        session_data = get_addon_setting("provider.session_data", dict)
+        wassup = session_data.get('wassup')
+        tv_token = session_data.get('tv_token')
+        return {"Cookie": f"wassup={wassup}", "tv_token": f"Bearer {tv_token}"}
+
+    def _refresh_session_data(self) -> dict:
+        """Fetch session data from home page."""
+        session_data = get_addon_setting("provider.session_data", dict)
+
+        if self._is_token_valid(session_data):
+            return
+
+        if self._is_wassup_valid(session_data):
+            wassup = session_data.get("wassup")
+            headers = {"Cookie": f"wassup={wassup}"}
+        else:
+            headers = {}
+
         try:
-            data = json.dumps({})
-            request("POST", f"{_LOGIN_URL}/api/access", data=data, session=session)
+            response = request("GET", HOMEPAGE_URL, headers=headers)
+            if "wassup" in response.cookies:
+                session_data["wassup"] = response.cookies.get("wassup")
+            session_data["tv_token"] = json.loads(re.search('"token":(".*?")', response.text).group(1))
+            session_data["tv_token_expires"] = datetime.utcnow().timestamp() + 30 * 60
+
+        except RequestException as e:
+            raise AuthenticationRequired("Cannot initiate new session (request failed)") from e
+
+        except AttributeError as e:
+            log("Not on Orange network, login required", xbmc.LOGINFO)
+            if not get_addon_setting("provider.use_credentials", bool):
+                log("Cannot initiate new session (tv token not found)", xbmc.LOGINFO)
+                raise AuthenticationRequired("Please provide and use your credentials") from e
+            wassup = self._login()
+            headers = {"Cookie": f"wassup={wassup}"}
+            response = request("GET", HOMEPAGE_URL, headers=headers)
+            session_data["wassup"] = response.cookies.get("wassup")
+            session_data["tv_token"] = json.loads(re.search('"token":(".*?")', response.text).group(1))
+            session_data["tv_token_expires"] = datetime.utcnow().timestamp() + 30 * 60
+
+        except JSONDecodeError as e:
+            raise StreamDataDecodeError("Cannot initiate new session (tv token not loaded") from e
+
+        set_addon_setting("provider.session_data", dict(session_data))
+
+    def _is_token_valid(self, session_data: dict) -> bool:
+        """Check if tv_token is valid."""
+        if not session_data.get("tv_token") or not session_data.get("tv_token_expires"):
+            return False
+
+        at = datetime.utcnow()
+        return session_data.get("tv_token_expires") > at.timestamp()
+
+    def _is_wassup_valid(self, session_data: dict) -> bool:
+        """Check if wassup cookie is valid."""
+        if not session_data.get("wassup"):
+            return False
+
+        at = datetime.utcnow()
+        try:
+            decoded_wassup = bytes.fromhex(session_data.get("wassup")).decode()
+            xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", decoded_wassup).group(1)
+            wassup_expires_at = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6]))
+            return wassup_expires_at > at
+        except (TypeError, AttributeError):
+            return False
+
+    def _login(self):
+        """Login to Orange to get wassup cookie."""
+        session = Session()
+        session.headers = {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Content-Type': 'application/json',
+        }
+
+        try:
+            request("POST", f"{LOGIN_URL}/api/access", data='{}', session=session)
         except RequestException:
-            log("Error while authenticating (init)", xbmc.LOGWARNING)
+            log("Error while authenticating (access)", xbmc.LOGWARNING)
             return
 
         try:
             data = json.dumps({"login": get_addon_setting("provider.username"), "loginOrigin": "input"})
-            request("POST", f"{_LOGIN_URL}/api/login", data=data, session=session)
+            request("POST", f"{LOGIN_URL}/api/login", data=data, session=session)
         except RequestException:
             log("Error while authenticating (login)", xbmc.LOGWARNING)
             return
 
         try:
             data = json.dumps({"password": get_addon_setting("provider.password"), "remember": True})
-            request("POST", f"{_LOGIN_URL}/api/password", data=data, session=session)
+            request("POST", f"{LOGIN_URL}/api/password", data=data, session=session)
         except RequestException:
             log("Error while authenticating (password)", xbmc.LOGWARNING)
+            return
 
-        if "wassup" not in session.cookies:
+        wassup = session.cookies.get('wassup')
+        if not wassup:
             log("Error while authenticating (wassup not found)", xbmc.LOGWARNING)
 
-    def _get_channel_live_id(self, channel: dict) -> str:
-        """Get live id for given channel."""
-        return channel["technicalChannels"]["live"][0]["liveTargetURLRelativePath"]
-
-    def _extract_logo(self, logos: list, definition_type: str = "mobileAppliDark") -> str:
-        for logo in logos:
-            if logo["definitionType"] == definition_type:
-                return _STREAM_LOGO_URL.format(path=logo["listLogos"][0]["path"])
-
-        return None
+        return wassup
 
     def _get_programs(self, start_day: datetime, days_to_display: int, chunks_per_day: int, mco: str = "OFR") -> list:
         """Return the programs for today (default) or the specified period."""
@@ -375,7 +417,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             except ValueError:
                 period = "today"
 
-            url = _PROGRAMS_ENDPOINT.format(period=period, mco=mco)
+            url = PROGRAMS_ENDPOINT.format(period=period, mco=mco)
             programs.extend(request_json(url, default=[]))
 
         return programs
