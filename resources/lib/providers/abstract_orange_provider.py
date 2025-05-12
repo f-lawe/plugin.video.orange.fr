@@ -9,7 +9,7 @@ from time import strptime
 from typing import List
 from urllib.parse import urlencode
 
-import xbmc
+import xbmc, xbmcvfs, xbmcaddon
 from requests import Session
 from requests.exceptions import JSONDecodeError, RequestException
 
@@ -19,48 +19,137 @@ from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_glob
 from lib.utils.request import get_random_ua, request, request_json
 
 
-HOMEPAGE_URL = "https://tv.orange.fr"
-LOGIN_URL = "https://login.orange.fr"
+WEBAPP_PUBLIC_URL = "https://tv.orange.fr"
 
+## anciennes variables ##
 PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
 # LIVE_PROGRAM_URL = "https://rp-ott-mediation-tv.orange.fr/api-gw/bff-epg-player/v1/programs"
 # BFF_EPG_GRID_URL = "/bff-guidetv-epggrid/v1/auth/accountToken/guidetv/epggrid/epggrid-tv-grid"
 
-TV_GW_BASE_URL = "https://mediation-tv.orange.fr/all/api-gw"
-PARAMS = 'appVersion=1.0.6&deviceModel=WEB_PC&deviceCategory=W_PC&customerOrangePopulation=OTT_Metro&customerCanalPopulation=&consentPersoStatus=0'
-
-LIVE_SERVICE_PLAN_URL = "/bff-live-player-rights/v1/auth/accountToken/livePlayerRights"
-LIVE_STREAM_STARTOVER_URL = "stream/v1/auth/accountToken/livecontrol"
-
-BFF_REPLAY_LISTING_CHANNELS_URL = "bff-replay-listing-channels/v1/auth/accountToken/replay/listing/listing-channels"
-BFF_REPLAY_LANDING_CHANNEL_URL = "bff-replay-landing-channelcorner/v1/auth/accountToken/replay/landing/landing-channel"
-BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL = "bff-replay-listing-channelcorner-category/v1/auth/accountToken/replay/listing/listing-channel-cat"
-BFF_REPLAY_FIP_URL = "bff-replay-infocard/v1/auth/accountToken/replay"
-REPLAY_AUTH_URL = "/catchup/v4/auth/accountToken/applications"
-
-STREAM_LICENSE_AUTH_URL = "/license/v1/auth/accountToken"
-
 class AbstractOrangeProvider(AbstractProvider, ABC):
     """Abstract Orange Provider."""
-
     chunks_per_day = 2
     mco = "OFR"
     groups = {}
 
+    def __init__(self):
+        """Fetch auth data from home page and build __pinia and __config variables."""
+        headers = {}
+        profile_path = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
+        pinia_file = f'{profile_path}__pinia.json'
+        config_file = f'{profile_path}__config.json'
+
+        if xbmcvfs.exists(pinia_file):
+            with xbmcvfs.File(pinia_file) as f:
+                self.__pinia = json.loads(f.read())
+            with xbmcvfs.File(config_file) as f:
+                self.__config = json.loads(f.read())
+
+            if self.__pinia["tv_token_expires"] > datetime.utcnow().timestamp():
+                return
+
+            wassup = self.__pinia["wassup"]
+            if self._is_wassup_valid(wassup):
+                headers = {"Cookie": f"wassup={wassup}"}
+
+        response = request("GET", WEBAPP_PUBLIC_URL, headers=headers)
+        self.__pinia = json.loads(re.search('window.__pinia = ({.*?});', response.text).group(1))
+        self.__config = json.loads(re.search('window.__config = ({.*?});', response.text).group(1))
+
+        if not self.__pinia['authStore']['isAuthenticated']:
+            log("Not on Orange network, login required", xbmc.LOGINFO)
+            if not get_addon_setting("provider.use_credentials", bool):
+                raise AuthenticationRequired("Please provide and use your credentials") from e
+            wassup = self._login()
+            headers = {"Cookie": f"wassup={wassup}"}
+            response = request("GET", WEBAPP_PUBLIC_URL, headers=headers)
+            self.__pinia = json.loads(re.search('window.__pinia = ({.*?});', response.text).group(1))
+            self.__pinia["wassup"] = wassup
+        
+        if "wassup" in response.cookies:
+            self.__pinia["wassup"] = response.cookies.get("wassup")
+
+        self.__pinia["tv_token_expires"] = datetime.utcnow().timestamp() + 30 * 60
+
+        with xbmcvfs.File(pinia_file, 'w') as f:
+            f.write(json.dumps(self.__pinia))
+
+        self.__config["PARAMS"] = "&".join([
+            f'appVersion={self.__pinia["appStore"]["appVersion"]}',
+            f'deviceModel={self.__config["BFF_DEVICE_MODEL"]}',
+            f'deviceCategory={self.__config["BFF_DEVICE_CATEGORY"]}',
+            f'customerOrangePopulation={self.__pinia["userStore"]["rights"]["customerOrangePopulation"]}',
+            f'customerCanalPopulation={self.__pinia["userStore"]["rights"]["customerCanalPopulation"]}',
+            f'consentPersoStatus=0',
+        ])
+
+        if not xbmcvfs.exists(config_file):
+            with xbmcvfs.File(config_file, 'w') as f:
+                f.write(json.dumps(self.__config))
+    
+    def _is_wassup_valid(self, wassup: str) -> bool:
+        """Check if wassup cookie is valid."""
+        decoded_wassup = bytes.fromhex(wassup).decode()
+        xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", decoded_wassup).group(1)
+        wassup_expires = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6]))
+        return wassup_expires > datetime.utcnow()
+
+    def _login(self):
+        """Login to Orange to get wassup cookie."""
+        url = self.__config["IDME_URL"].split('/?')[0]
+        session = Session()
+        session.headers = {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Content-Type': 'application/json',
+        }
+
+        try:
+            request("POST", f"{url}/api/access", data='{}', session=session)
+        except RequestException:
+            log("Error while authenticating (access)", xbmc.LOGWARNING)
+            return
+
+        try:
+            data = json.dumps({"login": get_addon_setting("provider.username"), "loginOrigin": "input"})
+            request("POST", f"{url}/api/login", data=data, session=session)
+        except RequestException:
+            log("Error while authenticating (login)", xbmc.LOGWARNING)
+            return
+
+        try:
+            data = json.dumps({"password": get_addon_setting("provider.password"), "remember": True})
+            request("POST", f"{url}/api/password", data=data, session=session)
+        except RequestException:
+            log("Error while authenticating (password)", xbmc.LOGWARNING)
+            return
+
+        wassup = session.cookies.get('wassup')
+        if not wassup:
+            log("Error while authenticating (wassup not found)", xbmc.LOGWARNING)
+
+        return wassup
+
+    def _get_auth_headers(self) -> dict:
+        return {
+            "Cookie": f"wassup={self.__pinia['wassup']}",
+            "tv_token": f"Bearer {self.__pinia['authStore']['authInitEw']['token']}"
+        }
+
     def get_live_stream_info(self, stream_id: str) -> dict:
         """Get live stream info."""
-        url = f'{TV_GW_BASE_URL}/{LIVE_STREAM_STARTOVER_URL}/{stream_id}?{PARAMS}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["LIVE_STREAM_STARTOVER_URL"]}/{stream_id}?{self.__config["PARAMS"]}'
         return self._get_stream_info(url)
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
         """Get catchup stream info."""
-        url = f'{TV_GW_BASE_URL}{REPLAY_AUTH_URL}/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId='
+        url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId='
         return self._get_stream_info(url)
 
     def get_streams(self) -> list:
         """Load stream data from Orange and convert it to JSON-STREAMS format."""
         headers = self._get_auth_headers()
-        url = f'{TV_GW_BASE_URL}{LIVE_SERVICE_PLAN_URL}?{PARAMS}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["LIVE_SERVICE_PLAN_URL"]}?{self.__config["PARAMS"]}'
         channels = request_json(url, headers=headers)["channels"]
         log(f"{len(channels)} channels found", xbmc.LOGINFO)
 
@@ -144,7 +233,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_channels(self) -> list:
         """Load available catchup channels."""
         headers = self._get_auth_headers()
-        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_LISTING_CHANNELS_URL}?{PARAMS}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LISTING_CHANNELS_URL"]}?{self.__config["PARAMS"]}'
         channels = request_json(url, headers=headers)['page']['sections'][1]['items']
         # log(f"channels : {channels}", xbmc.LOGINFO)
 
@@ -161,7 +250,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_categories(self, channel_id: str) -> list:
         """Return a list of catchup categories for the specified channel id."""
         headers = self._get_auth_headers()
-        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_LANDING_CHANNEL_URL}?{PARAMS}&channelId={channel_id}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LANDING_CHANNEL_URL"]}?{self.__config["PARAMS"]}&channelId={channel_id}'
         categories = request_json(url, headers=headers)['page']['sections'][1:]
         # log(f"categories : {categories}", xbmc.LOGINFO)
         
@@ -177,7 +266,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_articles(self, channel_id: str, category_id: str) -> list:
         """Return a list of catchup groups for the specified channel id and category id."""
         headers = self._get_auth_headers()
-        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL}?{PARAMS}&channelId={channel_id}&categoryId={category_id}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL"]}?{self.__config["PARAMS"]}&channelId={channel_id}&categoryId={category_id}'
         articles = request_json(url, headers=headers)['page']['sections'][1]['items']
         # log(f"articles : {articles}", xbmc.LOGINFO)
 
@@ -202,7 +291,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_videos(self, channel_id: str, category_id: str, article_id: str) -> list:
         """Return a list of catchup videos for the specified channel id, category id and article id."""
         headers = self._get_auth_headers()
-        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_FIP_URL}/fip-replay-serial?{PARAMS}&groupId={article_id}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_FIP_URL"]}/fip-replay-serial?{self.__config["PARAMS"]}&groupId={article_id}'
         videos = request_json(url, headers=headers)['page']['sections'][2]['items']
         # log(f"videos : {videos}", xbmc.LOGINFO)
 
@@ -225,7 +314,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_video(self, channel_id: str, category_id: str, article_id: str, video_id: str) -> dict:
         """Return a catchup video for the article id."""
         headers = self._get_auth_headers()
-        url = f'{TV_GW_BASE_URL}/{BFF_REPLAY_FIP_URL}/fip-replay-unit?{PARAMS}&videoId={video_id}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_FIP_URL"]}/fip-replay-unit?{self.__config["PARAMS"]}&videoId={video_id}'
         video = request_json(url, headers=headers)['page']['sections']
         # log(f"video : {video}", xbmc.LOGINFO)
 
@@ -247,11 +336,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def _get_stream_info(self, stream_endpoint_url: str) -> dict:
         """Load stream info from Orange."""
-        stream_info = self._request_stream_info(stream_endpoint_url)
-        return stream_info
-
-    def _request_stream_info(self, stream_endpoint_url: str) -> dict:
-        """Load stream data from Orange."""
         try:
             headers = self._get_auth_headers()
             res = request("GET", stream_endpoint_url, headers=headers)
@@ -272,7 +356,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         protectionData = stream.get("protectionData") or stream.get("protectionDatas")
         path = stream.get("streamURL") or stream.get("url")
 
-        license_server_url = f"{TV_GW_BASE_URL}{STREAM_LICENSE_AUTH_URL}" if stream.get("url") is None else ""
+        license_server_url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["STREAM_LICENSE_AUTH_URL"]}' if stream.get("url") is None else ""
 
         for system in protectionData:
             if system.get("keySystem") == get_drm():
@@ -297,110 +381,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         log(stream_info, xbmc.LOGDEBUG)
         return stream_info
-
-    def _get_auth_headers(self) -> dict:
-        self._refresh_session_data()
-        session_data = get_addon_setting("provider.session_data", dict)
-        wassup = session_data.get('wassup')
-        tv_token = session_data.get('tv_token')
-        return {"Cookie": f"wassup={wassup}", "tv_token": f"Bearer {tv_token}"}
-
-    def _refresh_session_data(self) -> dict:
-        """Fetch session data from home page."""
-        session_data = get_addon_setting("provider.session_data", dict)
-
-        if self._is_token_valid(session_data):
-            return
-
-        if self._is_wassup_valid(session_data):
-            wassup = session_data.get("wassup")
-            headers = {"Cookie": f"wassup={wassup}"}
-        else:
-            headers = {}
-
-        try:
-            response = request("GET", HOMEPAGE_URL, headers=headers)
-            if "wassup" in response.cookies:
-                session_data["wassup"] = response.cookies.get("wassup")
-            session_data["tv_token"] = json.loads(re.search('"token":(".*?")', response.text).group(1))
-            session_data["tv_token_expires"] = datetime.utcnow().timestamp() + 30 * 60
-
-        except RequestException as e:
-            raise AuthenticationRequired("Cannot initiate new session (request failed)") from e
-
-        except AttributeError as e:
-            log("Not on Orange network, login required", xbmc.LOGINFO)
-            if not get_addon_setting("provider.use_credentials", bool):
-                log("Cannot initiate new session (tv token not found)", xbmc.LOGINFO)
-                raise AuthenticationRequired("Please provide and use your credentials") from e
-            wassup = self._login()
-            headers = {"Cookie": f"wassup={wassup}"}
-            response = request("GET", HOMEPAGE_URL, headers=headers)
-            session_data["wassup"] = response.cookies.get("wassup")
-            session_data["tv_token"] = json.loads(re.search('"token":(".*?")', response.text).group(1))
-            session_data["tv_token_expires"] = datetime.utcnow().timestamp() + 30 * 60
-
-        except JSONDecodeError as e:
-            raise StreamDataDecodeError("Cannot initiate new session (tv token not loaded") from e
-
-        set_addon_setting("provider.session_data", dict(session_data))
-
-    def _is_token_valid(self, session_data: dict) -> bool:
-        """Check if tv_token is valid."""
-        if not session_data.get("tv_token") or not session_data.get("tv_token_expires"):
-            return False
-
-        at = datetime.utcnow()
-        return session_data.get("tv_token_expires") > at.timestamp()
-
-    def _is_wassup_valid(self, session_data: dict) -> bool:
-        """Check if wassup cookie is valid."""
-        if not session_data.get("wassup"):
-            return False
-
-        at = datetime.utcnow()
-        try:
-            decoded_wassup = bytes.fromhex(session_data.get("wassup")).decode()
-            xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", decoded_wassup).group(1)
-            wassup_expires_at = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6]))
-            return wassup_expires_at > at
-        except (TypeError, AttributeError):
-            return False
-
-    def _login(self):
-        """Login to Orange to get wassup cookie."""
-        session = Session()
-        session.headers = {
-            'Accept': 'application/json',
-            'Accept-Encoding': 'gzip, deflate, br, zstd',
-            'Content-Type': 'application/json',
-        }
-
-        try:
-            request("POST", f"{LOGIN_URL}/api/access", data='{}', session=session)
-        except RequestException:
-            log("Error while authenticating (access)", xbmc.LOGWARNING)
-            return
-
-        try:
-            data = json.dumps({"login": get_addon_setting("provider.username"), "loginOrigin": "input"})
-            request("POST", f"{LOGIN_URL}/api/login", data=data, session=session)
-        except RequestException:
-            log("Error while authenticating (login)", xbmc.LOGWARNING)
-            return
-
-        try:
-            data = json.dumps({"password": get_addon_setting("provider.password"), "remember": True})
-            request("POST", f"{LOGIN_URL}/api/password", data=data, session=session)
-        except RequestException:
-            log("Error while authenticating (password)", xbmc.LOGWARNING)
-            return
-
-        wassup = session.cookies.get('wassup')
-        if not wassup:
-            log("Error while authenticating (wassup not found)", xbmc.LOGWARNING)
-
-        return wassup
 
     def _get_programs(self, start_day: datetime, days_to_display: int, chunks_per_day: int, mco: str = "OFR") -> list:
         """Return the programs for today (default) or the specified period."""
