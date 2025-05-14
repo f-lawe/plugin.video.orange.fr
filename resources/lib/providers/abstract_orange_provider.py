@@ -149,13 +149,13 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
         """Get catchup stream info."""
-        url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream?terminalModel={self.__config["REPLAY_TERMINAL_MODEL"]}&terminalId='
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream?terminalModel={self.__config["REPLAY_TERMINAL_MODEL"]}&terminalId='
         return self._get_stream_info(url)
 
     def get_streams(self) -> list:
         """Load stream data from Orange and convert it to JSON-STREAMS format."""
         headers = self._get_auth_headers()
-        url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["LIVE_SERVICE_PLAN_URL"]}?{self.__config["PARAMS"]}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["LIVE_SERVICE_PLAN_URL"]}?{self.__config["PARAMS"]}'
         channels = request_json(url, headers=headers)["channels"]
         log(f"{len(channels)} channels found", xbmc.LOGINFO)
 
@@ -362,7 +362,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         protectionData = stream.get("protectionData") or stream.get("protectionDatas")
         path = stream.get("streamURL") or stream.get("url")
 
-        license_server_url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["STREAM_LICENSE_AUTH_URL"]}' if stream.get("url") is None else ""
+        license_server_url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["STREAM_LICENSE_AUTH_URL"]}' if stream.get("url") is None else ""
 
         for system in protectionData:
             if system.get("keySystem") == get_drm():
