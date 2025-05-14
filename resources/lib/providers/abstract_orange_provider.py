@@ -9,7 +9,10 @@ from time import strptime
 from typing import List
 from urllib.parse import urlencode
 
-import xbmc, xbmcvfs, xbmcaddon
+import xbmc
+import xbmcvfs
+import xbmcaddon
+
 from requests import Session
 from requests.exceptions import JSONDecodeError, RequestException
 
@@ -21,9 +24,10 @@ from lib.utils.request import request, request_json
 
 WEBAPP_PUBLIC_URL = "https://tv.orange.fr"
 
-## anciennes variables ##
+## old EPG endpoint
 PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
-# LIVE_PROGRAM_URL = "https://rp-ott-mediation-tv.orange.fr/api-gw/bff-epg-player/v1/programs"
+
+## new EPG endpoint
 # BFF_EPG_GRID_URL = "/bff-guidetv-epggrid/v1/auth/accountToken/guidetv/epggrid/epggrid-tv-grid"
 
 class AbstractOrangeProvider(AbstractProvider, ABC):
@@ -140,16 +144,16 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def get_live_stream_info(self, stream_id: str) -> dict:
         """Get live stream info."""
         live_endpoint = get_addon_setting("provider.live")
-        if live_endpoint == "live":
-            live_key = "LIVE_STREAM_URL"
-        else:
-            live_key = "LIVE_STREAM_STARTOVER_URL"
+        live_key = "LIVE_STREAM_URL" if live_endpoint == "live" else "LIVE_STREAM_STARTOVER_URL"
         url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config[live_key]}/{stream_id}?{self.__config["PARAMS"]}'
         return self._get_stream_info(url)
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
         """Get catchup stream info."""
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream?terminalModel={self.__config["REPLAY_TERMINAL_MODEL"]}&terminalId='
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream'
+            f'?terminalModel={self.__config["REPLAY_TERMINAL_MODEL"]}&terminalId='
+        )
         return self._get_stream_info(url)
 
     def get_streams(self) -> list:
@@ -239,7 +243,10 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_channels(self) -> list:
         """Load available catchup channels."""
         headers = self._get_auth_headers()
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LISTING_CHANNELS_URL"]}?{self.__config["PARAMS"]}'
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LISTING_CHANNELS_URL"]}'
+            f'?{self.__config["PARAMS"]}'
+        )
         channels = request_json(url, headers=headers)['page']['sections'][1]['items']
         # log(f"channels : {channels}", xbmc.LOGINFO)
 
@@ -247,7 +254,9 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             {
                 "is_folder": True,
                 "label": channel["titleText"],
-                "path": build_addon_url(f"/catchup/{channel['events']['onClick']['track']['trackParams'][-2]['value']}"),
+                "path": build_addon_url(
+                    f"/catchup/{channel['events']['onClick']['track']['trackParams'][-2]['value']}"
+                ),
                 "art": {"thumb": channel["titleLogoImageUrl"] + '|verifypeer=false'},
             }
             for channel in channels if 'rightTag' not in channel
@@ -256,7 +265,10 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_categories(self, channel_id: str) -> list:
         """Return a list of catchup categories for the specified channel id."""
         headers = self._get_auth_headers()
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LANDING_CHANNEL_URL"]}?{self.__config["PARAMS"]}&channelId={channel_id}'
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LANDING_CHANNEL_URL"]}'
+            f'?{self.__config["PARAMS"]}&channelId={channel_id}'
+        )
         categories = request_json(url, headers=headers)['page']['sections'][1:]
         # log(f"categories : {categories}", xbmc.LOGINFO)
         
@@ -264,7 +276,9 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             {
                 "is_folder": True,
                 "label": category['title']['text'],
-                "path": build_addon_url(f"/catchup/{channel_id}/{category['extraLink']['events']['onClick']['navigate']['route'].split('/')[-1]}"),
+                "path": build_addon_url(
+                    f"/catchup/{channel_id}/{category['extraLink']['events']['onClick']['navigate']['route'].split('/')[-1]}"
+                ),
             }
             for category in categories
         ]
@@ -272,7 +286,10 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_articles(self, channel_id: str, category_id: str) -> list:
         """Return a list of catchup groups for the specified channel id and category id."""
         headers = self._get_auth_headers()
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL"]}?{self.__config["PARAMS"]}&channelId={channel_id}&categoryId={category_id}'
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_LISTING_CHANNEL_CATEGORY_URL"]}'
+            f'?{self.__config["PARAMS"]}&channelId={channel_id}&categoryId={category_id}'
+        )
         articles = request_json(url, headers=headers)['page']['sections'][1]['items']
         # log(f"articles : {articles}", xbmc.LOGINFO)
 
@@ -297,18 +314,25 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_videos(self, channel_id: str, category_id: str, article_id: str) -> list:
         """Return a list of catchup videos for the specified channel id, category id and article id."""
         headers = self._get_auth_headers()
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_FIP_URL"]}/fip-replay-serial?{self.__config["PARAMS"]}&groupId={article_id}'
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_FIP_URL"]}/fip-replay-serial'
+            f'?{self.__config["PARAMS"]}&groupId={article_id}'
+        )
         videos = request_json(url, headers=headers)['page']['sections'][2]['items']
         # log(f"videos : {videos}", xbmc.LOGINFO)
 
         if len(videos) == 1:
-            return self._get_catchup_video(channel_id, category_id, article_id, videos[0]['events']['onClick']['track']['trackParams'][0]['value'])
+            return self._get_catchup_video(
+                channel_id, category_id, article_id, videos[0]['events']['onClick']['track']['trackParams'][0]['value']
+            )
 
         return [
             {
                 "is_folder": True,
                 "label": video["titleText"],
-                "path": build_addon_url(f"/catchup/{channel_id}/{category_id}/{article_id}/{video['events']['onClick']['track']['trackParams'][0]['value']}"),
+                "path": build_addon_url(
+                    f"/catchup/{channel_id}/{category_id}/{article_id}/{video['events']['onClick']['track']['trackParams'][0]['value']}"
+                ),
                 "art": {"poster": video["backgroundImageUrl"] + '|verifypeer=false'},
                 "info": {
                     "plot": f'[B]{video["titleText"]}[/B]\n{video["mainText"]["text"]}',
@@ -320,7 +344,10 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def _get_catchup_video(self, channel_id: str, category_id: str, article_id: str, video_id: str) -> dict:
         """Return a catchup video for the article id."""
         headers = self._get_auth_headers()
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_FIP_URL"]}/fip-replay-unit?{self.__config["PARAMS"]}&videoId={video_id}'
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["BFF_REPLAY_FIP_URL"]}/fip-replay-unit'
+            f'?{self.__config["PARAMS"]}&videoId={video_id}'
+        )
         video = request_json(url, headers=headers)['page']['sections']
         # log(f"video : {video}", xbmc.LOGINFO)
 
@@ -333,7 +360,11 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 "info": {
                     # "duration": int(video["duration"]) * 60,
                     # "genres": video["genres"],
-                    "plot": f'[B]{video[1]["information"]["text"]}[/B]\n[I]{video[1]["footNote"]}[/I]\n{video[2]["items"][0]["paragraphs"][0]["text"]}',
+                    "plot": (
+                        f'[B]{video[1]["information"]["text"]}[/B]\n'
+                        f'[I]{video[1]["footNote"]}[/I]\n'
+                        f'{video[2]["items"][0]["paragraphs"][0]["text"]}'
+                    ),
                     # "premiered": datetime.fromtimestamp(int(video["broadcastDate"]) / 1000).strftime("%Y-%m-%d"),
                     # "year": int(video["productionDate"]),
                 },
@@ -342,8 +373,8 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def _get_stream_info(self, stream_endpoint_url: str) -> dict:
         """Load stream info from Orange."""
+        headers = self._get_auth_headers()
         try:
-            headers = self._get_auth_headers()
             res = request("GET", stream_endpoint_url, headers=headers)
             stream = res.json()
         except RequestException as e:
@@ -362,7 +393,10 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         protectionData = stream.get("protectionData") or stream.get("protectionDatas")
         path = stream.get("streamURL") or stream.get("url")
 
-        license_server_url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["STREAM_LICENSE_AUTH_URL"]}' if stream.get("url") is None else ""
+        license_server_url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["STREAM_LICENSE_AUTH_URL"]}'
+            if stream.get("url") is None else ""
+        )
 
         for system in protectionData:
             if system.get("keySystem") == get_drm():
