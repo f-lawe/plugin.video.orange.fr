@@ -62,7 +62,15 @@ msgstr "Fournisseur d'accès à internet"
 
 msgctxt "#30204"
 msgid "Help 30204"
-msgstr "Sélectionner votre fournisser"
+msgstr "Sélectionner votre fournisseur"
+
+msgctxt "#30211"
+msgid "Live endpoint"
+msgstr "Endpoint pour le live"
+
+msgctxt "#30212"
+msgid "Help 30212"
+msgstr "Sélectionner l'endpoint pour le live"
 
 msgctxt "#30205"
 msgid "Use login credentials"

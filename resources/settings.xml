@@ -11,10 +11,10 @@
 
   <!-- Provider -->
   <category label="30200">
-  <setting id="provider.country" label="30201" help="30202" type="select" values="France" default="France"/>
+    <setting id="provider.country" label="30201" help="30202" type="select" values="France" default="France"/>
     <setting id="provider.name" visible="eq(-1,France)" label="30203" help="30204" type="labelenum" values="OQEE by Free|Orange|Orange Caraïbe|Orange Réunion" default="Orange"/>
+    <setting id="provider.live" visible="eq(-1,Orange)" label="30211" help="30212" type="labelenum" values="live|livecontrol" default="live"/>
     <setting type="lsep"/>
-    <setting id="provider.session_data" visible="false" default="{}"/>
     <setting id="provider.use_credentials" label="30205" help="30206" type="bool" default="false"/>
     <setting id="provider.username" label="30207" help="30208" enable="eq(-1,true)" type="text" default=""/>
     <setting id="provider.password" label="30209" help="30210" enable="eq(-2,true)" type="text" default="" option="hidden"/>
