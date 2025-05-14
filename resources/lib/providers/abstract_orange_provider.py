@@ -13,10 +13,10 @@ import xbmc, xbmcvfs, xbmcaddon
 from requests import Session
 from requests.exceptions import JSONDecodeError, RequestException
 
-from lib.exceptions import AuthenticationRequired, StreamDataDecodeError, StreamNotIncluded, StreamRequestException
+from lib.exceptions import AuthenticationRequired, StreamDataDecodeError, StreamNotIncluded
 from lib.providers.abstract_provider import AbstractProvider
-from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log, set_addon_setting
-from lib.utils.request import get_random_ua, request, request_json
+from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log
+from lib.utils.request import request, request_json
 
 
 WEBAPP_PUBLIC_URL = "https://tv.orange.fr"
@@ -28,6 +28,7 @@ PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/appli
 
 class AbstractOrangeProvider(AbstractProvider, ABC):
     """Abstract Orange Provider."""
+
     chunks_per_day = 2
     mco = "OFR"
     groups = {}
@@ -35,7 +36,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     def __init__(self):
         """Fetch auth data from home page and build __pinia and __config variables."""
         headers = {}
-        profile_path = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
+        profile_path = xbmcaddon.Addon().getAddonInfo('profile')
         pinia_file = f'{profile_path}__pinia.json'
         config_file = f'{profile_path}__config.json'
 
@@ -59,7 +60,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         if not self.__pinia['authStore']['isAuthenticated']:
             log("Not on Orange network, login required", xbmc.LOGINFO)
             if not get_addon_setting("provider.use_credentials", bool):
-                raise AuthenticationRequired("Please provide and use your credentials") from e
+                raise AuthenticationRequired("Please provide and use your credentials")
             wassup = self._login()
             headers = {"Cookie": f"wassup={wassup}"}
             response = request("GET", WEBAPP_PUBLIC_URL, headers=headers)
@@ -80,7 +81,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             f'deviceCategory={self.__config["BFF_DEVICE_CATEGORY"]}',
             f'customerOrangePopulation={self.__pinia["userStore"]["rights"]["customerOrangePopulation"]}',
             f'customerCanalPopulation={self.__pinia["userStore"]["rights"]["customerCanalPopulation"]}',
-            f'consentPersoStatus=0',
+            'consentPersoStatus=0',
         ])
 
         if not xbmcvfs.exists(config_file):
@@ -143,7 +144,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
         """Get catchup stream info."""
-        url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream?terminalModel=WEB_PC&terminalId='
+        url = f'{self.__config["TV_GW_BASE_URL"]}{self.__config["REPLAY_AUTH_URL"]}/PC/videos/{stream_id}/stream?terminalModel={self.__config["REPLAY_TERMINAL_MODEL"]}&terminalId='
         return self._get_stream_info(url)
 
     def get_streams(self) -> list:
@@ -162,7 +163,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 "stream": build_addon_url(f'/stream/live/{channel["externalId"]}'),
                 "group": [group_name for group_name in self.groups if channel["epgId"] in self.groups[group_name]],
             }
-            for channel in channels if channel['subscribed']
+            for channel in channels if channel['subscribed'] and channel["externalId"] != 'livetv_acces_limite_ctv'
         ]
 
     def get_epg(self) -> dict:
