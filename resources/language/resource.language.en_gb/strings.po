@@ -64,6 +64,14 @@ msgctxt "#30204"
 msgid "Help 30204"
 msgstr ""
 
+msgctxt "#30211"
+msgid "Live endpoint"
+msgstr ""
+
+msgctxt "#30212"
+msgid "Help 30212"
+msgstr ""
+
 msgctxt "#30205"
 msgid "Use login credentials"
 msgstr ""
