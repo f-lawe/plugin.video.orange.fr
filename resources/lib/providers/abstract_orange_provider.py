@@ -138,7 +138,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_live_stream_info(self, stream_id: str) -> dict:
         """Get live stream info."""
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["LIVE_STREAM_STARTOVER_URL"]}/{stream_id}?{self.__config["PARAMS"]}'
+        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["LIVE_STREAM_URL"]}/{stream_id}?{self.__config["PARAMS"]}'
         return self._get_stream_info(url)
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
