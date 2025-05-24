@@ -55,8 +55,9 @@ def request(method: str, url: str, headers: Mapping[str, str] = {}, data=None, s
 
     log(f"Fetching {url}", xbmc.LOGDEBUG)
     res = session.request(method, url, data=data)
-    res.raise_for_status()
     log(f" -> {res.status_code}", xbmc.LOGDEBUG)
+    log(f" -> {res.text}", xbmc.LOGDEBUG)
+    res.raise_for_status()
     return res
 
 

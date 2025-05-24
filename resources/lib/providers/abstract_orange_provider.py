@@ -47,8 +47,11 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         if xbmcvfs.exists(pinia_file):
             with xbmcvfs.File(pinia_file) as f:
                 self.__pinia = json.loads(f.read())
+
             with xbmcvfs.File(config_file) as f:
                 self.__config = json.loads(f.read())
+
+            self._update_config(config_file)
 
             if self.__pinia["tv_token_expires"] > datetime.utcnow().timestamp():
                 return
@@ -70,7 +73,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             response = request("GET", WEBAPP_PUBLIC_URL, headers=headers)
             self.__pinia = json.loads(re.search('window.__pinia = ({.*?});', response.text).group(1))
             self.__pinia["wassup"] = wassup
-        
+
         if "wassup" in response.cookies:
             self.__pinia["wassup"] = response.cookies.get("wassup")
 
@@ -79,19 +82,31 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         with xbmcvfs.File(pinia_file, 'w') as f:
             f.write(json.dumps(self.__pinia))
 
-        self.__config["PARAMS"] = "&".join([
-            f'appVersion={self.__pinia["appStore"]["appVersion"]}',
-            f'deviceModel={self.__config["BFF_DEVICE_MODEL"]}',
-            f'deviceCategory={self.__config["BFF_DEVICE_CATEGORY"]}',
-            f'customerOrangePopulation={self.__pinia["userStore"]["rights"]["customerOrangePopulation"]}',
-            f'customerCanalPopulation={self.__pinia["userStore"]["rights"]["customerCanalPopulation"]}',
-            'consentPersoStatus=0',
-        ])
+        self._update_config(config_file)
 
-        if not xbmcvfs.exists(config_file):
+    def _update_config(self, config_file: str):
+        """Update __config if needed."""
+        live_keys = {
+            "live": "LIVE_STREAM_URL",
+            "livecontrol": "LIVE_STREAM_STARTOVER_URL"
+        }
+        live_endpoint = get_addon_setting("provider.live")
+
+        if not xbmcvfs.exists(config_file) or self.__config["LIVE_KEY"] != live_keys[live_endpoint]:
+            self.__config["LIVE_KEY"] = live_keys[live_endpoint]
+
+            self.__config["PARAMS"] = "&".join([
+                f'appVersion={self.__pinia["appStore"]["appVersion"]}',
+                f'deviceModel={self.__config["BFF_DEVICE_MODEL"]}',
+                f'deviceCategory={self.__config["BFF_DEVICE_CATEGORY"]}',
+                f'customerOrangePopulation={self.__pinia["userStore"]["rights"]["customerOrangePopulation"]}',
+                f'customerCanalPopulation={self.__pinia["userStore"]["rights"]["customerCanalPopulation"]}',
+                'consentPersoStatus=0',
+            ])
+
             with xbmcvfs.File(config_file, 'w') as f:
                 f.write(json.dumps(self.__config))
-    
+
     def _is_wassup_valid(self, wassup: str) -> bool:
         """Check if wassup cookie is valid."""
         decoded_wassup = bytes.fromhex(wassup).decode()
@@ -143,8 +158,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_live_stream_info(self, stream_id: str) -> dict:
         """Get live stream info."""
-        live_endpoint = get_addon_setting("provider.live")
-        live_key = "LIVE_STREAM_URL" if live_endpoint == "live" else "LIVE_STREAM_STARTOVER_URL"
+        live_key = self.__config["LIVE_KEY"]
         url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config[live_key]}/{stream_id}?{self.__config["PARAMS"]}'
         return self._get_stream_info(url)
 
@@ -271,7 +285,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         )
         categories = request_json(url, headers=headers)['page']['sections'][1:]
         # log(f"categories : {categories}", xbmc.LOGINFO)
-        
+
         return [
             {
                 "is_folder": True,
