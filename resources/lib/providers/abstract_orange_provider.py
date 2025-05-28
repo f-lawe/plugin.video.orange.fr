@@ -1,4 +1,4 @@
-# ruff: noqa: D102
+# ruff: noqa: D102,I001
 """Orange provider template."""
 
 import json
@@ -21,8 +21,8 @@ from lib.providers.abstract_provider import AbstractProvider
 from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log
 from lib.utils.request import request, request_json
 
-
 WEBAPP_PUBLIC_URL = "https://tv.orange.fr"
+IDME_URL = 'https://login.orange.fr'
 
 ## old EPG endpoint
 PROGRAMS_ENDPOINT = "https://rp-ott-mediation-tv.woopic.com/api-gw/live/v3/applications/STB4PC/programs?period={period}&epgIds=all&mco={mco}"
@@ -38,7 +38,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
     groups = {}
 
     def __init__(self):
-        """Fetch auth data from home page and build __pinia and __config variables."""
+        """Fetch auth data from home page if needed and build __pinia and __config variables."""
         headers = {}
         profile_path = xbmcaddon.Addon().getAddonInfo('profile')
         pinia_file = f'{profile_path}__pinia.json'
@@ -51,18 +51,18 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             with xbmcvfs.File(config_file) as f:
                 self.__config = json.loads(f.read())
 
-            self._update_config(config_file)
+            self._update_config_file(config_file)
 
             if self.__pinia["tv_token_expires"] > datetime.utcnow().timestamp():
                 return
 
-            wassup = self.__pinia["wassup"]
-            if self._is_wassup_valid(wassup):
+            wassup_expires = self.__pinia['wassup_expires']
+            if wassup_expires and wassup_expires > datetime.utcnow().timestamp():
+                wassup = self.__pinia["wassup"]
                 headers = {"Cookie": f"wassup={wassup}"}
 
         response = request("GET", WEBAPP_PUBLIC_URL, headers=headers)
         self.__pinia = json.loads(re.search('window.__pinia = ({.*?});', response.text).group(1))
-        self.__config = json.loads(re.search('window.__config = ({.*?});', response.text).group(1))
 
         if not self.__pinia['authStore']['isAuthenticated']:
             log("Not on Orange network, login required", xbmc.LOGINFO)
@@ -74,18 +74,24 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             self.__pinia = json.loads(re.search('window.__pinia = ({.*?});', response.text).group(1))
             self.__pinia["wassup"] = wassup
 
-        if "wassup" in response.cookies:
-            self.__pinia["wassup"] = response.cookies.get("wassup")
+        for cookie in response.cookies:
+            if cookie.name == 'wassup':
+                self.__pinia["wassup"] = cookie.value
+                self.__pinia["wassup_expires"] = cookie.expires # null on Orange network
+                break
 
-        self.__pinia["tv_token_expires"] = datetime.utcnow().timestamp() + 30 * 60
+        self.__pinia["tv_token_expires"] = datetime.utcnow().timestamp() + 48 * 60 * 60
 
         with xbmcvfs.File(pinia_file, 'w') as f:
             f.write(json.dumps(self.__pinia))
 
-        self._update_config(config_file)
+        if "_AbstractOrangeProvider__config" not in self.__dict__:
+            self.__config = json.loads(re.search('window.__config = ({.*?});', response.text).group(1))
 
-    def _update_config(self, config_file: str):
-        """Update __config if needed."""
+        self._update_config_file(config_file)
+
+    def _update_config_file(self, config_file: str):
+        """Update __config file if needed."""
         live_keys = {
             "live": "LIVE_STREAM_URL",
             "livecontrol": "LIVE_STREAM_STARTOVER_URL"
@@ -107,16 +113,8 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             with xbmcvfs.File(config_file, 'w') as f:
                 f.write(json.dumps(self.__config))
 
-    def _is_wassup_valid(self, wassup: str) -> bool:
-        """Check if wassup cookie is valid."""
-        decoded_wassup = bytes.fromhex(wassup).decode()
-        xwvd = re.search("\|X_WASSUP_VALID_DATE=(.*?)\|", decoded_wassup).group(1)
-        wassup_expires = datetime(*(strptime(xwvd, "%Y%m%d%H%M%S")[0:6]))
-        return wassup_expires > datetime.utcnow()
-
     def _login(self):
         """Login to Orange to get wassup cookie."""
-        url = self.__config["IDME_URL"].split('/?')[0]
         session = Session()
         session.headers = {
             'Accept': 'application/json',
@@ -125,21 +123,21 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         }
 
         try:
-            request("POST", f"{url}/api/access", data='{}', session=session)
+            request("POST", f"{IDME_URL}/api/access", data='{}', session=session)
         except RequestException:
             log("Error while authenticating (access)", xbmc.LOGWARNING)
             return
 
         try:
             data = json.dumps({"login": get_addon_setting("provider.username"), "loginOrigin": "input"})
-            request("POST", f"{url}/api/login", data=data, session=session)
+            request("POST", f"{IDME_URL}/api/login", data=data, session=session)
         except RequestException:
             log("Error while authenticating (login)", xbmc.LOGWARNING)
             return
 
         try:
             data = json.dumps({"password": get_addon_setting("provider.password"), "remember": True})
-            request("POST", f"{url}/api/password", data=data, session=session)
+            request("POST", f"{IDME_URL}/api/password", data=data, session=session)
         except RequestException:
             log("Error while authenticating (password)", xbmc.LOGWARNING)
             return
@@ -419,7 +417,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         stream_info = {
             "path": path,
             "protocol": "mpd",
-            "mime_type": "application/xml+dash",
+            "mime_type": "application/dash+xml",
             "drm_config": {
                 "license_type": get_drm(),
                 "license_key": "|".join(
