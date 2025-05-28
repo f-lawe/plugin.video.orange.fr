@@ -5,7 +5,6 @@ import json
 import re
 from abc import ABC
 from datetime import date, datetime, timedelta
-from time import strptime
 from typing import List
 from urllib.parse import urlencode
 
