@@ -57,7 +57,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                 return
 
             wassup_expires = self.__pinia['wassup_expires']
-            if wassup_expires is None or wassup_expires > datetime.now().timestamp():
+            if wassup_expires and wassup_expires > datetime.now().timestamp():
                 wassup = self.__pinia["wassup"]
                 headers = {"Cookie": f"wassup={wassup}"}
 
