@@ -38,7 +38,7 @@ def get_random_ua() -> str:
     return _RANDOM_USER_AGENT
 
 
-def request(method: str, url: str, headers: Mapping[str, str] = None, data=None, session: Session = None) -> Response:
+def request(method: str, url: str, headers: Mapping[str, str] = {}, data=None, session: Session = None) -> Response:
     """Send HTTP request using requests."""
     default_headers = {
         "Accept": "application/json",
@@ -48,17 +48,20 @@ def request(method: str, url: str, headers: Mapping[str, str] = None, data=None,
         "User-Agent": get_random_ua(),
     }
 
-    headers = {**(session.headers if session is not None else default_headers), **(headers or {})}
     session = session or Session()
+    if 'User-Agent' in session.headers:
+        del session.headers['User-Agent']
+    session.headers = {**default_headers, **session.headers, **headers}
 
     log(f"Fetching {url}", xbmc.LOGDEBUG)
-    res = session.request(method, url, headers=headers, data=data)
-    res.raise_for_status()
+    res = session.request(method, url, data=data)
     log(f" -> {res.status_code}", xbmc.LOGDEBUG)
+    log(f" -> {res.text}", xbmc.LOGDEBUG)
+    res.raise_for_status()
     return res
 
 
-def request_json(url: str, headers: Mapping[str, str] = None, default: Union[dict, list] = None) -> Union[dict, list]:
+def request_json(url: str, headers: Mapping[str, str] = {}, default: Union[dict, list] = None) -> Union[dict, list]:
     """Send HTTP request and load json response."""
     try:
         res = request("GET", url, headers=headers)

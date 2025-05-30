@@ -8,6 +8,7 @@ class OrangeFranceProvider(AbstractOrangeProvider):
 
     def __init__(self):
         """Initialize Orange France provider."""
+        super().__init__()
         self.mco = "OFR"
         self.groups = {
             "TNT": [192, 4, 80, 34, 47, 118, 111, 445, 119, 195, 446, 444, 234, 78, 481, 226, 458, 482, 1404, 1401]
