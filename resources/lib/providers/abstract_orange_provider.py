@@ -20,6 +20,7 @@ from lib.providers.abstract_provider import AbstractProvider
 from lib.utils.kodi import build_addon_url, get_addon_setting, get_drm, get_global_setting, log
 from lib.utils.request import request, request_json
 
+
 WEBAPP_PUBLIC_URL = "https://tv.orange.fr"
 IDME_URL = 'https://login.orange.fr'
 
@@ -45,18 +46,18 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
         if xbmcvfs.exists(pinia_file):
             with xbmcvfs.File(pinia_file) as f:
-                self.__pinia = json.loads(f.read())
+                self.__pinia = json.load(f)
 
             with xbmcvfs.File(config_file) as f:
-                self.__config = json.loads(f.read())
+                self.__config = json.load(f)
 
             self._update_config_file(config_file)
 
-            if self.__pinia["tv_token_expires"] > datetime.utcnow().timestamp():
+            if self.__pinia["tv_token_expires"] > datetime.now().timestamp():
                 return
 
             wassup_expires = self.__pinia['wassup_expires']
-            if wassup_expires and wassup_expires > datetime.utcnow().timestamp():
+            if wassup_expires is None or wassup_expires > datetime.now().timestamp():
                 wassup = self.__pinia["wassup"]
                 headers = {"Cookie": f"wassup={wassup}"}
 
@@ -76,13 +77,14 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         for cookie in response.cookies:
             if cookie.name == 'wassup':
                 self.__pinia["wassup"] = cookie.value
-                self.__pinia["wassup_expires"] = cookie.expires # null on Orange network
+                self.__pinia["wassup_expires"] = cookie.expires # None on Orange network
                 break
 
-        self.__pinia["tv_token_expires"] = datetime.utcnow().timestamp() + 48 * 60 * 60
+        two_days = 48 * 60 * 60
+        self.__pinia["tv_token_expires"] = datetime.now().timestamp() + two_days
 
         with xbmcvfs.File(pinia_file, 'w') as f:
-            f.write(json.dumps(self.__pinia))
+            json.dump(self.__pinia, f)
 
         if "_AbstractOrangeProvider__config" not in self.__dict__:
             self.__config = json.loads(re.search('window.__config = ({.*?});', response.text).group(1))
@@ -110,7 +112,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             ])
 
             with xbmcvfs.File(config_file, 'w') as f:
-                f.write(json.dumps(self.__config))
+                json.dump(self.__config, f)
 
     def _login(self):
         """Login to Orange to get wassup cookie."""
@@ -155,9 +157,20 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
     def get_live_stream_info(self, stream_id: str) -> dict:
         """Get live stream info."""
+        stream_id_parts = stream_id.split("|")
+        four_hours = 4 * 60 * 60
+        if len(stream_id_parts) == 1:
+            start = four_hours
+        else:
+            start = four_hours - (datetime.now().timestamp() - int(stream_id_parts[1]))
+        if start < 1:
+            start = 1
         live_key = self.__config["LIVE_KEY"]
-        url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config[live_key]}/{stream_id}?{self.__config["PARAMS"]}'
-        return self._get_stream_info(url)
+        url = (
+            f'{self.__config["TV_GW_BASE_URL"]}/{self.__config[live_key]}/{stream_id_parts[0]}'
+            f'?{self.__config["PARAMS"]}'
+        )
+        return self._get_stream_info(url, start)
 
     def get_catchup_stream_info(self, stream_id: str) -> dict:
         """Get catchup stream info."""
@@ -173,6 +186,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         url = f'{self.__config["TV_GW_BASE_URL"]}/{self.__config["LIVE_SERVICE_PLAN_URL"]}?{self.__config["PARAMS"]}'
         channels = request_json(url, headers=headers)["channels"]
         log(f"{len(channels)} channels found", xbmc.LOGINFO)
+        # log(f"channels : {channels}", xbmc.LOGINFO)
 
         return [
             {
@@ -233,6 +247,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                     "description": program["synopsis"],
                     "genre": program["genre"] if program["genreDetailed"] is None else program["genreDetailed"],
                     "image": image,
+                    "stream": build_addon_url(f'/stream/live/{program["externalId"]}|{program["diffusionDate"]}'),
                 }
             )
 
@@ -382,7 +397,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
             }
         ]
 
-    def _get_stream_info(self, stream_endpoint_url: str) -> dict:
+    def _get_stream_info(self, stream_endpoint_url: str, start: float = 0) -> dict:
         """Load stream info from Orange."""
         headers = self._get_auth_headers()
         try:
@@ -396,9 +411,9 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
         except JSONDecodeError as e:
             raise StreamDataDecodeError() from e
 
-        return self._format_stream_info(stream)
+        return self._format_stream_info(stream, start)
 
-    def _format_stream_info(self, stream: dict) -> dict:
+    def _format_stream_info(self, stream: dict, start: float) -> dict:
         """Compute stream info."""
         headers = self._get_auth_headers()
         protectionData = stream.get("protectionData") or stream.get("protectionDatas")
@@ -428,6 +443,7 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
                     }.values()
                 ),
             },
+            "start": start,
         }
 
         log(stream_info, xbmc.LOGDEBUG)
@@ -450,5 +466,6 @@ class AbstractOrangeProvider(AbstractProvider, ABC):
 
             url = PROGRAMS_ENDPOINT.format(period=period, mco=mco)
             programs.extend(request_json(url, default=[]))
+            # log(f"programs : {programs}", xbmc.LOGINFO)
 
         return programs
